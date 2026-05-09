@@ -7,6 +7,14 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.2.2] — 2026-05-10
+
+### Fixed
+
+- Minor bug fixes and internal stability improvements.
+
+---
+
 ## [1.2.1] — 2026-05-10
 
 Extends the v1.2.0 staleness gate to anything that's a "tool" rather than
