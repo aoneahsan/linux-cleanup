@@ -7,6 +7,45 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.3.0] — 2026-05-10
+
+Final-polish release: visual TUI menu, automatic crash-bundle capture on
+unexpected failure, and a tightened feedback loop. No new cleanup logic;
+existing safety guards and staleness gates are unchanged.
+
+### Added
+
+- **TUI mode (`-t` / `--tui` / `-g` / `--gui`)** — whiptail/dialog-driven
+  menu for users who prefer pointing-and-shooting over CLI prompts. Each
+  selection drops back to the regular CLI output for the run, then loops
+  back to the menu. Falls back gracefully when neither tool is installed
+  with a copy-paste install hint per distro family (apt / dnf / pacman).
+- **Automatic crash-bundle capture** — installs an EXIT trap that, on any
+  unexpected non-zero exit (signal, syntax error, unset variable under
+  `set -u`, kill, etc.), writes a self-contained `crash-<stamp>.tar.gz`
+  to `~/.linux-cleanup/feedback/` containing the active session log, the
+  most-recent JSON report, and a system manifest. Prints a one-liner the
+  user can email to the author. Suppressed on clean exit, `Ctrl-C` (130),
+  `SIGTERM` (143), and argument-parse exits (2). No network calls — the
+  bundle stays on the user's machine until they choose to share it.
+- TUI **About** dialog with version, contact info, license, and privacy
+  guarantee inline.
+- Help text and examples updated to surface `-t` / `--tui`.
+
+### Changed
+
+- Banner and session-summary suppression list now includes `tui` mode so
+  the dialog isn't fighting log/banner output.
+
+### Notes
+
+- Feedback / contact / debug-bundle workflows from 1.2.x are unchanged
+  and remain the recommended way to file bugs (`linux-cleanup --feedback`,
+  `linux-cleanup --debug-bundle`). The new crash trap simply automates
+  bundle creation when something blows up unexpectedly.
+
+---
+
 ## [1.2.2] — 2026-05-10
 
 ### Fixed

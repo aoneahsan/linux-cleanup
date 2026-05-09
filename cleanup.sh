@@ -54,6 +54,13 @@ source "$CLEANUP_ROOT/modules/release_helpers.sh"
 source "$CLEANUP_ROOT/modules/global_packages.sh"
 # shellcheck source=modules/doctor.sh
 source "$CLEANUP_ROOT/modules/doctor.sh"
+# shellcheck source=modules/tui.sh
+source "$CLEANUP_ROOT/modules/tui.sh"
+# shellcheck source=modules/crash_trap.sh
+source "$CLEANUP_ROOT/modules/crash_trap.sh"
+
+# Arm crash trap as early as possible so even sourcing-time failures get caught.
+lclean_arm_crash_trap
 
 usage() {
   cat <<EOF
@@ -65,6 +72,7 @@ ${C_BLD}USAGE${C_RST}
 ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every category)
   -w, --walkthrough    Guided walkthrough (default if no args given)
   -m, --menu           Jump-to menu (pick a single category to run)
+  -t, --tui            Visual TUI menu (whiptail/dialog — install if missing)
   -a, --all-safe       One-shot clean of every regenerable cache (no per-step prompts)
   -s, --scan           Read-only — show what's reclaimable, no deletes
   -p, --stale          Find personal files unused N days (interactive only)
@@ -105,6 +113,7 @@ ${C_BLD}OPTIONS${C_RST}
 ${C_BLD}EXAMPLES${C_RST}
   $(basename "$0")                       # guided walkthrough through every category
   $(basename "$0") -m                    # jump-to menu
+  $(basename "$0") -t                    # whiptail TUI menu
   $(basename "$0") -a -y                 # wipe all regenerable caches, no prompts
   $(basename "$0") -s                    # scan & report
   $(basename "$0") -p -d 60              # find personal files untouched 60+ days
@@ -133,6 +142,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -w|--walkthrough) MODE=walkthrough ;;
     -m|--menu|-i|--interactive) MODE=menu ;;
+    -t|--tui|-g|--gui) MODE=tui ;;
     -a|--all-safe)    MODE=allsafe ;;
     -s|--scan)        MODE=scan ;;
     -p|--stale)       MODE=stale ;;
@@ -188,7 +198,7 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 # Suppress banner + log spam for utility modes that have their own output.
 case "$MODE" in
-  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle) ;;
+  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|tui) ;;
   *)
     ui_banner
     if (( PURGE_ALL )); then
@@ -331,6 +341,7 @@ case "$MODE" in
   uninstall_alias) uninstall_alias ;;
   uninstall_cron)  uninstall_cron ;;
   menu)          run_menu ;;
+  tui)           run_tui ;;
   *) ui_err "unknown mode: $MODE"; exit 2 ;;
 esac
 
@@ -340,7 +351,7 @@ RECOVERED=$(( DISK_AFTER_AVAIL - DISK_BEFORE_AVAIL ))
 
 # Walkthrough prints its own polished summary; utility modes don't need one.
 case "$MODE" in
-  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|uninstall_alias|uninstall_cron|install_alias|install_cron) ;;
+  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|uninstall_alias|uninstall_cron|install_alias|install_cron|tui) ;;
   *)
   ui_section "Session summary"
   if (( RECOVERED > 0 )); then
@@ -364,3 +375,6 @@ if (( CLEANUP_LOGS_ON_FINISH )); then
   printf '%bℹ logs cleaned (--cleanup-logs)%b  reports preserved at: %s\n' \
     "${C_DIM}" "${C_RST}" "$REPORTS_DIR" >&2
 fi
+
+# Reached only on a clean run. Quiets the EXIT-trap crash bundler.
+lclean_mark_finished

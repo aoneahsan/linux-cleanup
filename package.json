@@ -1,6 +1,6 @@
 {
   "name": "linux-cleanup",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Safe, modular disk + cache cleanup utility for Linux. Reclaim 10-50+ GB of regenerable junk (yarn/npm/pnpm caches, Chrome/Firefox/Brave caches, Gradle, Cypress, Playwright, Android AVDs, stale node_modules, browser partials, system journals, kernels) with allowlist-based safety guards, JSON session reports, and Markdown/HTML export.",
   "bin": {
     "linux-cleanup": "bin/linux-cleanup.js"

@@ -13,7 +13,7 @@
 
 | | |
 |---|---|
-| **Version** | 1.0.0 |
+| **Version** | 1.3.0 |
 | **Status** | Stable — released as source-available, no-derivative, non-commercial |
 | **Author** | Ahsan Mahmood &middot; aoneahsan@gmail.com |
 | **License** | [LICENSE](./LICENSE) — Source-Available, No-Derivatives, Non-Commercial v1.0 |
@@ -49,6 +49,9 @@ Most existing "cleaner" tools either don't know about modern dev caches, are GUI
 - **JSON session reports** (canonical, schema-versioned) with on-demand Markdown / HTML export.
 - **Self-test** mode verifies dependencies, syntax, and safety guards.
 - **Shell alias + weekly cron installers** for one-time setup.
+- **Visual TUI** (`--tui`) — whiptail/dialog menu for users who prefer pointing-and-shooting; gracefully falls back to the regular CLI menu when neither tool is installed.
+- **Automatic crash bundles** — on any unexpected failure, the script captures the active log + latest report + a system manifest into `~/.linux-cleanup/feedback/crash-<stamp>.tar.gz` and prints a one-liner you can email to the author. Nothing is sent automatically.
+- **Built-in feedback path** (`--feedback`, `--debug-bundle`) — pre-filled `mailto:` draft, package log + report into a single tar.gz, plain email to the author. No telemetry, no analytics, no network calls.
 - **All output stays inside the project folder** — logs, reports, cron logs.
 
 ---
@@ -94,6 +97,7 @@ chmod +x cleanup.sh
 |---|---|---|
 | Walkthrough | _(default)_ or `-w` | 10-step guided cleanup with prompts, running totals, JSON report |
 | Menu | `-m` | Jump-to menu — pick a single category to run |
+| TUI | `-t` `--tui` | Visual whiptail/dialog menu (falls back gracefully if missing) |
 | All-safe batch | `-a` `-y` | Wipe every regenerable cache in one shot, no prompts |
 | Scan only | `-s` | Read-only — show what's reclaimable, no deletes |
 | Stale personal | `-p` `-d 60` | Find personal files unused 60+ days (interactive) |
@@ -294,6 +298,12 @@ linux-cleanup --feedback
 # 2. Bundle the latest log + report into a single tar.gz to attach
 linux-cleanup --debug-bundle
 ```
+
+If the script ever exits unexpectedly (signal, syntax error, `set -u` trip,
+etc.), it auto-creates `~/.linux-cleanup/feedback/crash-<stamp>.tar.gz`
+with the active log, the most-recent report, and a minimal system
+manifest, then prints a one-liner with the path. Review it, then email
+it — nothing is sent for you.
 
 `--debug-bundle` creates `~/.linux-cleanup/feedback/debug-bundle-TIMESTAMP.tar.gz` containing:
 - The latest log file (`logs/cleanup-*.log`)

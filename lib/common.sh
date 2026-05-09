@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.2.2"
+LINUX_CLEANUP_VERSION="1.3.0"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
