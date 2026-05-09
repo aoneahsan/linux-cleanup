@@ -56,6 +56,20 @@ Most existing "cleaner" tools either don't know about modern dev caches, are GUI
 
 ---
 
+## 📚 Full documentation
+
+Comprehensive per-feature docs live under [`docs/`](./docs/README.md). Highlights:
+
+- [Quick start](./docs/quick-start.md) — your first cleanup, in under five minutes
+- [Safety](./docs/safety.md) — the four guards that protect your data
+- [Every feature explained](./docs/README.md#features) — one page per mode, full detail
+- [CLI flags reference](./docs/reference/cli-flags.md) — every flag, alphabetised
+- [Reports & schema](./docs/features/reports.md) — JSON / Markdown / HTML output
+- [Feedback & crash bundles](./docs/features/feedback-and-crash-bundles.md) — how to file a bug
+- [FAQ](./docs/faq.md) · [Troubleshooting](./docs/troubleshooting.md) · [About the author](./docs/about-the-author.md)
+
+---
+
 ## Quick start
 
 ### Option 1 — zero install, run via npx (recommended)
