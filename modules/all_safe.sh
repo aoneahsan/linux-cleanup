@@ -42,7 +42,24 @@ run_all_safe() {
   done
   ui_info "Estimated reclaim: $(bytes_pretty "$total_b")"
   ui_warn "Will NOT touch: ~/Documents, ~/Pictures, project node_modules, Android AVDs, Flatpak, Zoom, ~/.config, ~/.claude."
-  ui_warn "Globally installed packages (npm/pnpm/yarn) are PRESERVED. Use --globals to audit unused ones."
+  ui_warn "Globally installed packages (npm/pnpm/yarn/bun/deno) are PRESERVED."
+  ui_warn "Shell-init files (.bashrc, .profile, .zshrc, etc.) are NEVER touched."
+  ui_warn "Runtime install dirs (~/.nvm, ~/.cargo, ~/.bun, ~/.deno, ~/.volta) are NEVER touched."
+  ui_info "Use --globals to audit unused globals.  Use --doctor to repair shell-init issues."
+
+  # Sanity check: assert no listed target falls inside a protected runtime tree.
+  local bad=0 t pat
+  for t in "${ALL_SAFE_TARGETS[@]}"; do
+    for pat in "$HOME/.nvm" "$HOME/.cargo" "$HOME/.rustup" "$HOME/.volta" \
+               "$HOME/.fnm" "$HOME/go" "$HOME/.bashrc" "$HOME/.profile" \
+               "$HOME/.bash_profile" "$HOME/.zshrc" "$HOME/.bash_aliases" \
+               "$HOME/.npm-global"; do
+      if [[ "$t" == "$pat" || "$t" == "$pat"/* ]]; then
+        ui_err "BUG: protected path leaked into ALL_SAFE_TARGETS: $t (under $pat) — aborting."
+        return 1
+      fi
+    done
+  done
   if ! ui_confirm "Proceed with batch clean? (use -y to skip prompt)" y; then
     ui_info "aborted"
     return

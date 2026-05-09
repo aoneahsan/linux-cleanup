@@ -135,6 +135,15 @@ PROTECTED_EXACT=(
   "$HOME/go/bin"
 )
 
+# Filename basenames that are ALWAYS off-limits, anywhere on disk.
+# safe_rm refuses if the target path is or ends with any of these.
+PROTECTED_BASENAMES=(
+  ".bashrc" ".bash_profile" ".bash_login" ".profile" ".bash_logout"
+  ".zshrc" ".zshenv" ".zprofile" ".zlogin" ".zlogout"
+  ".bash_aliases" ".bash_history" ".zsh_history"
+  ".inputrc" ".dircolors" ".config" ".local"
+)
+
 is_protected() {
   [[ -z "${1:-}" ]] && return 0
   local p
@@ -162,6 +171,16 @@ safe_rm() {
   if is_protected "$target"; then
     ui_err "REFUSE: protected path: $target"; return 1
   fi
+  # Last-ditch basename guard: never delete shell-init / history files,
+  # regardless of caller. Belt-and-braces against a future bug introducing
+  # such a path into a target list.
+  local base="${target##*/}"
+  local pb
+  for pb in "${PROTECTED_BASENAMES[@]}"; do
+    if [[ "$base" == "$pb" ]]; then
+      ui_err "REFUSE: shell-init / history file: $target"; return 1
+    fi
+  done
   if [[ ! -e "$target" && ! -L "$target" ]]; then
     return 0
   fi
