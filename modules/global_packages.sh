@@ -49,6 +49,18 @@ _global_modules_dir() {
         [[ -d "$prefix" ]] && { printf '%s' "$prefix"; return; }
       done
       ;;
+    bun)
+      # bun's globals live under ~/.bun/install/global/node_modules with a
+      # manifest at ~/.bun/install/global/package.json listing direct installs.
+      prefix="$HOME/.bun/install/global/node_modules"
+      [[ -d "$prefix" ]] && { printf '%s' "$prefix"; return; }
+      ;;
+    deno)
+      # deno installs scripts as standalone wrappers in ~/.deno/bin (no
+      # node_modules tree). We treat ~/.deno/bin as the "root".
+      prefix="$HOME/.deno/bin"
+      [[ -d "$prefix" ]] && { printf '%s' "$prefix"; return; }
+      ;;
   esac
   return 0
 }
@@ -145,6 +157,28 @@ _list_global_packages() {
         [[ -n "$dir" ]] && printf '%s\t%s\n' "$name" "$dir"
       done < <(_manifest_dep_names "$manifest")
       ;;
+    bun)
+      # bun's manifest at ~/.bun/install/global/package.json lists direct installs.
+      local manifest="$HOME/.bun/install/global/package.json"
+      [[ -f "$manifest" ]] || return 0
+      local name dir
+      while IFS= read -r name; do
+        [[ -z "$name" ]] && continue
+        dir="$(_resolve_in_root "$root" "$name")"
+        [[ -z "$dir" ]] && dir="$HOME/.bun/install/global"
+        printf '%s\t%s\n' "$name" "$dir"
+      done < <(_manifest_dep_names "$manifest")
+      ;;
+    deno)
+      # Each installed deno script is a wrapper file in ~/.deno/bin.
+      # No transitive deps (single-binary model), no dep graph to compute.
+      local entry name
+      for entry in "$HOME/.deno/bin"/*; do
+        [[ -f "$entry" && -x "$entry" ]] || continue
+        name="${entry##*/}"
+        printf '%s\t%s\n' "$name" "$entry"
+      done
+      ;;
   esac
 }
 
@@ -177,7 +211,7 @@ run_global_packages_audit() {
   ui_warn "Run any uninstall commands MANUALLY after reviewing the list."
 
   local pm any=0
-  for pm in npm pnpm yarn; do
+  for pm in npm pnpm yarn bun deno; do
     local root pkgs
     root="$(_global_modules_dir "$pm")"
     pkgs="$(_list_global_packages "$pm")"
@@ -221,6 +255,8 @@ run_global_packages_audit() {
           npm)  printf -v _cmd "  npm uninstall -g %s" "$name" ;;
           pnpm) printf -v _cmd "  pnpm remove -g %s" "$name" ;;
           yarn) printf -v _cmd "  yarn global remove %s" "$name" ;;
+          bun)  printf -v _cmd "  bun remove -g %s" "$name" ;;
+          deno) printf -v _cmd "  deno uninstall %s" "$name" ;;
         esac
       else
         status="recently used"
@@ -240,6 +276,8 @@ run_global_packages_audit() {
           npm)  printf '    npm uninstall -g %s\n' "$name" ;;
           pnpm) printf '    pnpm remove -g %s\n' "$name" ;;
           yarn) printf '    yarn global remove %s\n' "$name" ;;
+          bun)  printf '    bun remove -g %s\n' "$name" ;;
+          deno) printf '    deno uninstall %s\n' "$name" ;;
         esac
       done < <(_list_global_packages "$pm" | sort)
     else

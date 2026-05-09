@@ -8,6 +8,8 @@ clean_pnpm_store(){ clean_target "pnpm content store"      "$HOME/.local/share/p
 clean_pnpm_cache(){ clean_target "pnpm cache"              "$HOME/.cache/pnpm"            "regenerated"; }
 clean_composer()  { clean_target "Composer cache"          "$HOME/.cache/composer"        "regenerated"; }
 clean_pip()       { clean_target "pip cache"               "$HOME/.cache/pip"             "regenerated"; }
+clean_bun_cache() { clean_target "bun install cache"       "$HOME/.bun/install/cache"     "regenerated on next bun install (preserves global packages + bun binary)"; }
+clean_deno_cache(){ clean_target "deno cache"              "$HOME/.cache/deno"            "regenerated on next deno run (preserves installed scripts at ~/.deno/bin)"; }
 
 clean_npm_cache() {
   if [[ ! -e "$HOME/.npm/_cacache" ]]; then
@@ -33,6 +35,8 @@ run_pkg_managers() {
   clean_npm_npx
   clean_pnpm_store
   clean_pnpm_cache
+  clean_bun_cache
+  clean_deno_cache
   clean_composer
   clean_pip
 }

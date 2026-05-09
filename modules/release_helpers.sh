@@ -28,6 +28,8 @@ list_targets() {
   ui_target_row "npx cache"               "$HOME/.npm/_npx"
   ui_target_row "pnpm content store"      "$HOME/.local/share/pnpm/store"
   ui_target_row "pnpm cache"              "$HOME/.cache/pnpm"
+  ui_target_row "bun install cache"       "$HOME/.bun/install/cache"
+  ui_target_row "deno cache"              "$HOME/.cache/deno"
   ui_target_row "Composer cache"          "$HOME/.cache/composer"
   ui_target_row "pip cache"               "$HOME/.cache/pip"
 

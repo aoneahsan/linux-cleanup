@@ -10,6 +10,8 @@ scan_caches_table() {
   ui_target_row "npx cache (_npx)"         "$HOME/.npm/_npx"
   ui_target_row "pnpm store (cache only)"  "$HOME/.local/share/pnpm/store"
   ui_target_row "pnpm cache"               "$HOME/.cache/pnpm"
+  ui_target_row "bun install cache"        "$HOME/.bun/install/cache"
+  ui_target_row "deno cache"               "$HOME/.cache/deno"
   ui_target_row "Composer cache"           "$HOME/.cache/composer"
   ui_target_row "pip cache"                "$HOME/.cache/pip"
   ui_target_row "Chrome cache"             "$HOME/.cache/google-chrome"

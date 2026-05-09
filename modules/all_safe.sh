@@ -9,6 +9,8 @@ ALL_SAFE_TARGETS=(
   "$HOME/.npm/_cacache"
   "$HOME/.local/share/pnpm/store"
   "$HOME/.cache/pnpm"
+  "$HOME/.bun/install/cache"
+  "$HOME/.cache/deno"
   "$HOME/.cache/composer"
   "$HOME/.cache/pip"
   "$HOME/.cache/google-chrome"

@@ -116,6 +116,23 @@ PROTECTED_EXACT=(
   "$HOME/.config/yarn/global"
   "$HOME/.yarn"
   "$HOME/.npm"
+  "$HOME/.bun"
+  "$HOME/.bun/install"
+  "$HOME/.bun/install/global"
+  "$HOME/.bun/install/global/node_modules"
+  "$HOME/.bun/bin"
+  "$HOME/.deno"
+  "$HOME/.deno/bin"
+  "$HOME/.volta"
+  "$HOME/.volta/bin"
+  "$HOME/.nvm"
+  "$HOME/.nvm/versions"
+  "$HOME/.fnm"
+  "$HOME/.cargo"
+  "$HOME/.cargo/bin"
+  "$HOME/.rustup"
+  "$HOME/go"
+  "$HOME/go/bin"
 )
 
 is_protected() {
