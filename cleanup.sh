@@ -11,6 +11,7 @@ export CLEANUP_ROOT
 
 ASSUME_YES=0
 DAYS=100
+PURGE_ALL=0
 NO_REPORT=0
 CLEANUP_LOGS_ON_FINISH=0
 
@@ -89,7 +90,13 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
       --uninstall-cron   Remove the cron entry
 
 ${C_BLD}OPTIONS${C_RST}
-  -d, --days N         Threshold for "stale" (default: 100)
+  -d, --days N         Threshold for "stale" (default: 100). Files are deleted
+                       only when BOTH atime and mtime are older than this many
+                       days. Lower it (e.g. -d 30) for a more aggressive sweep.
+      --purge-all      Disable the staleness gate and wipe target caches in
+                       full (pre-1.2.0 behavior). Use sparingly — kills
+                       rarely-used assets like Gradle wrapper distros you
+                       open every 1-2 months.
   -y, --yes            Auto-confirm regenerable-cache deletions (with --all-safe only)
       --no-report      Skip JSON session report generation (logs still kept)
       --cleanup-logs   Delete this run's log files at finish (reports always kept)
@@ -149,6 +156,7 @@ while [[ $# -gt 0 ]]; do
     --uninstall-alias) MODE=uninstall_alias ;;
     --uninstall-cron)  MODE=uninstall_cron ;;
     -d|--days)        DAYS="${2:?missing days value}"; shift ;;
+    --purge-all)      PURGE_ALL=1 ;;
     -y|--yes)         ASSUME_YES=1 ;;
     --no-report)      NO_REPORT=1 ;;
     --cleanup-logs)   CLEANUP_LOGS_ON_FINISH=1 ;;
@@ -157,7 +165,7 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
-export ASSUME_YES DAYS
+export ASSUME_YES DAYS PURGE_ALL
 
 # Write a credit header to the log BEFORE tee starts. Every log file is
 # self-attributing so it's clear who/what produced it, even years later.
@@ -183,7 +191,11 @@ case "$MODE" in
   walkthrough|version|list_targets|self_test|export|feedback|debug_bundle) ;;
   *)
     ui_banner
-    ui_info "Mode: $MODE   Stale-threshold: ${DAYS}d   Auto-yes: $ASSUME_YES"
+    if (( PURGE_ALL )); then
+      ui_info "Mode: $MODE   Delete strategy: FULL PURGE   Auto-yes: $ASSUME_YES"
+    else
+      ui_info "Mode: $MODE   Delete strategy: prune ≥${DAYS}d   Auto-yes: $ASSUME_YES"
+    fi
     ui_info "Log: $LOG_FILE"
     ;;
 esac

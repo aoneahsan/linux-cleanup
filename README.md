@@ -113,11 +113,25 @@ chmod +x cleanup.sh
 | Uninstall cron | `--uninstall-cron` | Remove the cron entry |
 
 **Common options:**
-- `-d N` `--days N` — threshold for "stale" (default: 100)
+- `-d N` `--days N` — staleness threshold (default: 100). A file is removed only when **both** `atime` and `mtime` are older than this many days. Lower it (e.g. `-d 30`) for a more aggressive sweep.
+- `--purge-all` — disable the staleness gate and wipe target caches in full (pre-1.2.0 behavior). Use sparingly: it removes rarely-used assets like Gradle wrapper distros (`~/.gradle/wrapper/dists/gradle-X.Y-all/…`) you might re-download next month.
 - `-y` `--yes` — auto-confirm regenerable caches (only valid with `--all-safe`)
 - `--no-report` — skip JSON session report generation (logs still kept)
 - `--cleanup-logs` — delete this run's log files at finish (reports always preserved)
 - `--no-color` — disable colored output (`NO_COLOR` env var also respected)
+
+### Default delete strategy (since 1.2.0)
+
+Cache cleaners **prune** instead of wiping. For each target directory, only files unused for ≥ `--days` days (default 100, both `atime` and `mtime`) are deleted; the rest stays. Empty subdirs left behind are swept up.
+
+This protects valuables that look like junk:
+
+- `~/.gradle/wrapper/dists/gradle-8.13-all/…` (230 MB, opened every 1-2 months)
+- Playwright browsers for an old release branch
+- Yarn-cached tarballs of pinned dependencies
+- Cypress binaries you only run pre-release
+
+If you want the old behavior — full wipe of every cache target — pass `--purge-all`.
 
 **Persistence model**
 

@@ -15,16 +15,21 @@ clean_npm_cache() {
   if [[ ! -e "$HOME/.npm/_cacache" ]]; then
     ui_info "npm cache — already absent"; return 0
   fi
-  local size; size="$(dir_size "$HOME/.npm/_cacache")"
-  if ui_confirm "Run npm cache clean --force ($size)?" n; then
-    if command -v npm >/dev/null 2>&1; then
-      npm cache clean --force >/dev/null 2>&1 && ui_ok "npm cache cleared ($size freed)"
+  if (( ${PURGE_ALL:-0} == 1 )); then
+    local size; size="$(dir_size "$HOME/.npm/_cacache")"
+    if ui_confirm "Run npm cache clean --force ($size, FULL PURGE)?" n; then
+      if command -v npm >/dev/null 2>&1; then
+        npm cache clean --force >/dev/null 2>&1 && ui_ok "npm cache cleared ($size freed)"
+      else
+        safe_rm "$HOME/.npm/_cacache" && ui_ok "npm cache dir removed ($size freed)"
+      fi
     else
-      safe_rm "$HOME/.npm/_cacache" && ui_ok "npm cache dir removed ($size freed)"
+      ui_info "npm cache — skipped"
     fi
-  else
-    ui_info "npm cache — skipped"
+    return
   fi
+  # Default: stale-only prune via the shared cleaner so the ≥${DAYS}d gate applies.
+  clean_target "npm cache" "$HOME/.npm/_cacache" "regenerated on next npm install"
 }
 
 run_pkg_managers() {

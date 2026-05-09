@@ -7,6 +7,55 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.2.0] — 2026-05-10
+
+Default delete strategy is now **stale-only**: nothing inside a target cache
+is removed unless its files have been untouched (both atime and mtime) for
+≥ `--days` days (default 100). This protects rarely-used-but-valuable
+assets — Gradle wrapper distros (`~/.gradle/wrapper/dists/gradle-X.Y-all/…`)
+opened every 1-2 months, Playwright browsers for an old release branch,
+yarn-cached tarballs of pinned dependencies, etc. — that earlier versions
+wiped wholesale.
+
+### Changed
+
+- **`clean_target` (the shared cleaner used by all cache modules) now
+  prunes by default**, not full-wipes. It walks the target with
+  `find -type f \( -atime +DAYS -a -mtime +DAYS \) -delete`, then sweeps
+  empty directories. Recently-used files survive; the directory shell stays
+  in place so subsequent tools find their config.
+- **`run_all_safe` (`--all-safe`) batch flow now prunes per target** in
+  the same way. The summary reports bytes freed AND bytes still kept per
+  target, so you can see what survived and why.
+- **`clean_npm_cache` honors the staleness gate** instead of always running
+  `npm cache clean --force` (which ignored age). Full-purge mode still calls
+  the npm CLI when available.
+- The pre-run banner now prints "Delete strategy: prune ≥Nd" or
+  "Delete strategy: FULL PURGE" so it's unambiguous what will happen.
+
+### Added
+
+- **`--purge-all` flag** restores the pre-1.2.0 wipe-the-whole-thing
+  behavior for users who genuinely want it (e.g. reclaiming maximum disk
+  before reimaging). The flag is documented prominently in `--help` with
+  the trade-off spelled out.
+- **`prune_stale <root> <days>`** helper in `lib/common.sh`. Public API for
+  modules: refuses protected paths, deletes only files where BOTH atime
+  and mtime exceed the threshold, sweeps empty dirs left behind, echoes
+  bytes freed.
+
+### Why
+
+The 1.1.0 default deleted entire cache trees on confirm, which was the
+right call for `~/.cache/yarn` (regenerates fast) but the wrong call for
+`~/.gradle/wrapper/dists/` (a 230 MB download you might genuinely need
+again next month). The 100-day threshold cleanly separates "I touched
+this recently and would miss it" from "I haven't opened this in over
+three months and it's safe to reclaim". Power users can still force the
+old behavior with `--purge-all` or sharpen the gate with `-d 30`.
+
+---
+
 ## [1.1.0] — 2026-05-10
 
 Safety hardening release. Closes the door on globally installed packages

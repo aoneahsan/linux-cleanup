@@ -36,8 +36,8 @@ No GUI. No "one big red button." No telemetry.
 
 If you live on Linux and write code, give it a try.
 
-GitHub: github.com/aoneahsan/linux-cleanup
-npm: npmjs.com/package/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #Linux #DeveloperTools #OpenSource #DevOps
 
@@ -71,7 +71,8 @@ The whole thing is a Bash script. You can read it. You can fork it. You can audi
 
 That's the safest first command. Try it.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #Linux #OpenSource #DeveloperExperience #Cybersecurity
 
@@ -98,7 +99,8 @@ Either way, no compilation, no system packages, no PPA, no curl-pipe-bash.
 
 Tested on Ubuntu, Pop!_OS, Linux Mint, and Debian-derived distros. Should work anywhere with Bash 4+ and Node 14+.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #NodeJS #Linux #CLI #DeveloperTools
 
@@ -126,7 +128,8 @@ If your `~/Documents` looks anything like mine, try it:
 
   npx linux-cleanup --node-modules -d 60
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #JavaScript #NodeJS #WebDev #Linux
 
@@ -161,7 +164,8 @@ Because if a regression happens — "wait, where did that file go?" — you have
 
 This is the kind of transparency I wish more system tools had.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #OpenSource #DeveloperTools #Linux #Observability
 
@@ -191,7 +195,8 @@ Or, if you prefer to keep things manual but want a shorter command:
 
 Both are uninstalls are clean. No leftover files. No surprises.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #Linux #Automation #DeveloperProductivity #DevOps
 
@@ -225,7 +230,8 @@ A non-exhaustive list of caches sitting on your dev machine right now:
 
 You'll be surprised. I was.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #WebDev #MobileDev #Linux #DeveloperTools
 
@@ -250,7 +256,8 @@ The last one is my favorite. Before you trust any cleanup tool, you should be ab
 
 That's the level of transparency I think system tools should default to.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #OpenSource #Linux #SoftwareEngineering #CLI
 
@@ -274,7 +281,8 @@ What it does is give a developer a single, scriptable, transparent entry point t
 
 If that's what you need, you'll like it. If you need a one-button GUI, you won't, and that's fine.
 
-github.com/aoneahsan/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
 #Linux #OpenSource #DeveloperExperience
 
@@ -301,8 +309,8 @@ This is intentional. Cleanup tools touch real data. Multiple unmaintained forks 
 
 If you want a feature added, file an issue. If you want commercial use, email me. The code is here:
 
-github.com/aoneahsan/linux-cleanup
-npmjs.com/package/linux-cleanup
+GitHub: https://github.com/aoneahsan/linux-cleanup
+npm: https://npmjs.com/package/linux-cleanup
 
   npx linux-cleanup --scan
 

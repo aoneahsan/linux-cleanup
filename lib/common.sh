@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.1.0"
+LINUX_CLEANUP_VERSION="1.2.0"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -241,7 +241,48 @@ ui_target_row() {
   printf "  %-44s %10s  %s\n" "$label" "$size" "${C_DIM}$path${C_RST}"
 }
 
-# Generic interactive cleaner: prompt + safe_rm
+# prune_stale <root> <days>
+#
+# Walks <root> and deletes only files where BOTH atime and mtime are older
+# than <days> days. Then removes any directories left empty as a result.
+# Refuses if <root> is in the protected list. Echoes bytes freed.
+#
+# This is the surgical alternative to safe_rm <dir>: instead of nuking the
+# whole cache (which destroys e.g. Gradle wrapper distros the user opens
+# every 1-2 months), it only takes content the user genuinely hasn't touched
+# in the cooling-off window. Defaults align with $DAYS (default 100).
+prune_stale() {
+  local root="$1" days="${2:-${DAYS:-100}}"
+  [[ -e "$root" ]] || { printf '0'; return 0; }
+  if is_protected "$root"; then
+    ui_err "REFUSE: protected path: $root"
+    printf '0'; return 1
+  fi
+  local before after freed
+  before=$(dir_bytes "$root")
+  # Only delete a file if it's untouched (atime) AND unmodified (mtime) for >days.
+  # -depth ensures we process contents before parents; -delete then nukes file/symlink.
+  find "$root" -depth -mindepth 1 \
+       \( -type f -o -type l \) \
+       -atime +"$days" -mtime +"$days" \
+       -delete 2>/dev/null || true
+  # Sweep up directories that became empty.
+  find "$root" -depth -mindepth 1 -type d -empty -delete 2>/dev/null || true
+  after=$(dir_bytes "$root")
+  freed=$(( before - after ))
+  (( freed < 0 )) && freed=0
+  printf '%d' "$freed"
+}
+
+# Generic interactive cleaner.
+#
+# Default mode (PURGE_ALL=0): prune only files unused for ≥${DAYS}d
+# (both atime and mtime older than threshold). Recently-used items survive.
+# This protects rarely-used-but-valuable assets like Gradle wrapper distros,
+# Playwright browsers for an old release branch, etc.
+#
+# Full-purge mode (PURGE_ALL=1, via --purge-all): wipe the entire target.
+# Use this when you genuinely want pre-1.2.0 behavior.
 clean_target() {
   local label="$1" target="$2" desc="${3:-}"
   if [[ ! -e "$target" ]]; then
@@ -250,11 +291,31 @@ clean_target() {
   fi
   local size
   size="$(dir_size "$target")"
-  local prompt="Delete $label ($size)?"
+
+  if (( ${PURGE_ALL:-0} == 1 )); then
+    local prompt="Delete $label ($size, FULL PURGE)?"
+    [[ -n "$desc" ]] && prompt+=" — $desc"
+    if ui_confirm "$prompt" n; then
+      safe_rm "$target" && ui_ok "$label cleared ($size freed)"
+    else
+      ui_info "$label — skipped"
+    fi
+    return
+  fi
+
+  local prompt="Prune $label files unused ≥${DAYS}d ($size in total)?"
   [[ -n "$desc" ]] && prompt+=" — $desc"
   if ui_confirm "$prompt" n; then
-    if safe_rm "$target"; then
-      ui_ok "$label cleared ($size freed)"
+    if is_protected "$target"; then
+      ui_err "REFUSE: protected path: $target"
+      return 1
+    fi
+    local freed
+    freed=$(prune_stale "$target" "${DAYS:-100}")
+    if (( freed > 0 )); then
+      ui_ok "$label pruned — $(bytes_pretty "$freed") freed; $(dir_size "$target") remains (recently-used kept)"
+    else
+      ui_info "$label — nothing older than ${DAYS}d; nothing pruned"
     fi
   else
     ui_info "$label — skipped"
