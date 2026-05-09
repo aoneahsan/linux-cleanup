@@ -7,6 +7,68 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.1.0] — 2026-05-10
+
+Safety hardening release. Closes the door on globally installed packages
+and shell-init files ever being touched by any cleanup path.
+
+### Fixed
+
+- **pnpm globals no longer wiped.** Cleanup of the pnpm content store
+  previously targeted `~/.local/share/pnpm` (`PNPM_HOME`), which holds
+  globally installed packages, bin shims, and the `pnpm` binary itself
+  from `pnpm setup`. Cleanup now targets only `~/.local/share/pnpm/store`
+  (the regenerable content-addressable cache). Affects `--all-safe`,
+  `--menu` option 3, scan, walkthrough, and `--list-targets`.
+
+### Added — safety guards
+
+- **`PROTECTED_EXACT` list** in `lib/common.sh` — exact-match block on
+  package-manager install dirs and runtime homes:
+  `~/.local/share/pnpm`, `~/.local/share/pnpm/{global,bin,nodejs}`,
+  `~/.npm-global*`, `~/.yarn`, `~/.npm`, `~/.config/yarn/global`,
+  `~/.bun`, `~/.bun/install/global`, `~/.deno`, `~/.deno/bin`,
+  `~/.volta`, `~/.nvm`, `~/.fnm`, `~/.cargo`, `~/.rustup`, `~/go/bin`.
+- **`PROTECTED_BASENAMES` list** — `safe_rm` refuses any path whose
+  basename matches a shell-init or history file (`.bashrc`, `.profile`,
+  `.zshrc`, `.bash_aliases`, `.bash_history`, `.config`, `.local`, etc.),
+  regardless of full path.
+- **`--all-safe` startup assertion** — aborts with a `BUG:` message if
+  any protected runtime dir ever leaks into the target list, preventing
+  silent regressions.
+
+### Added — bun + deno coverage
+
+- **bun**: cache cleanup at `~/.bun/install/cache`; install dir
+  `~/.bun/install/global` protected.
+- **deno**: cache cleanup at `~/.cache/deno`; `~/.deno/bin` protected.
+- Both wired into `--all-safe`, `--scan`, and the new `--globals` audit.
+
+### Added — `--globals` audit (read-only)
+
+New mode that lists directly-installed global packages from
+**npm / pnpm / yarn / bun / deno**, marks each as `recently used`,
+`needed by: <pkg>`, or `STALE — safe to uninstall` (mtime ≥ `--days N`,
+default 100, with no other global declaring it as a dependency), and
+prints copy-pasteable uninstall commands. **Never deletes anything.**
+Works even when the package manager CLI isn't on PATH (filesystem
+fallbacks). Available as menu option 18 or `--globals`.
+
+### Added — `--doctor` repair (additive only)
+
+New mode that detects when an installed runtime exists on disk but
+isn't wired into `~/.bashrc` (`nvm`, `pnpm`, `bun`, `deno`, `cargo`)
+and offers to append the canonical init block. **Only appends with
+confirmation. Never deletes or modifies existing lines.** Available as
+menu option 19 or `--doctor`.
+
+### Changed
+
+- `--all-safe` now prints explicit "globals are PRESERVED" and
+  "shell-init files are NEVER touched" notices in its preamble.
+
+---
+
 ## [1.0.0] — 2026-05-09
 
 Initial public release.
