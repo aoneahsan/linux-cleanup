@@ -51,6 +51,8 @@ source "$CLEANUP_ROOT/modules/walkthrough.sh"
 source "$CLEANUP_ROOT/modules/release_helpers.sh"
 # shellcheck source=modules/global_packages.sh
 source "$CLEANUP_ROOT/modules/global_packages.sh"
+# shellcheck source=modules/doctor.sh
+source "$CLEANUP_ROOT/modules/doctor.sh"
 
 usage() {
   cat <<EOF
@@ -69,7 +71,8 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
       --partials       Find partial / orphan downloads (.fdmdownload, .crdownload, .part)
       --audit          Show top 20 largest entries in \$HOME
       --node-modules   Find stale node_modules in projects untouched N+ days
-      --globals        Audit (read-only) global npm/pnpm/yarn packages — show stale ones with no dependents
+      --globals        Audit (read-only) global npm/pnpm/yarn/bun/deno packages — show stale ones with no dependents
+      --doctor         Detect & repair shell-init breakage (nvm/pnpm/bun/deno/cargo not sourced in ~/.bashrc)
       --editor-ext     Clean superseded VS Code / Cursor extension versions
       --reports        Reports manager — list / convert (MD/HTML) / view past reports
       --export FMT ID  Non-interactive: export report to MD/HTML/both
@@ -131,6 +134,7 @@ while [[ $# -gt 0 ]]; do
     --audit)          MODE=audit ;;
     --node-modules)   MODE=nodemod ;;
     --globals)        MODE=globals ;;
+    --doctor)         MODE=doctor ;;
     --editor-ext)     MODE=editorext ;;
     --reports)        MODE=reports ;;
     --export)         MODE=export; EXPORT_FMT="${2:-both}"; EXPORT_ID="${3:-latest}"; shift 2 || true ;;
@@ -205,7 +209,8 @@ run_menu() {
 
   ${C_BLD}Project + personal (interactive)${C_RST}
     ${C_GRN}10${C_RST}) Stale node_modules in old projects
-    ${C_GRN}18${C_RST}) Audit global npm/pnpm/yarn packages (read-only)
+    ${C_GRN}18${C_RST}) Audit global npm/pnpm/yarn/bun/deno packages (read-only)
+    ${C_GRN}19${C_RST}) Doctor — detect & repair shell-init breakage
     ${C_GRN}8${C_RST})  Partial / orphan downloads
     ${C_GRN}7${C_RST})  Personal files unused ${DAYS}+ days
 
@@ -247,6 +252,7 @@ MENU
       16) show_feedback ;;
       17) make_debug_bundle ;;
       18) run_global_packages_audit ;;
+      19) run_doctor ;;
       q|Q) break ;;
       *)  ui_warn "unknown choice: $choice" ;;
     esac
@@ -299,6 +305,7 @@ case "$MODE" in
   audit)         run_size_audit ;;
   nodemod)       run_stale_node_modules ;;
   globals)       run_global_packages_audit ;;
+  doctor)        run_doctor ;;
   editorext)     run_editor_extensions ;;
   reports)       run_reports_manager ;;
   export)        export_reports "$EXPORT_FMT" "$EXPORT_ID" ;;
