@@ -26,7 +26,7 @@ list_targets() {
   ui_target_row "Yarn berry global cache" "$HOME/.yarn/berry/cache"
   ui_target_row "npm cache"               "$HOME/.npm/_cacache"
   ui_target_row "npx cache"               "$HOME/.npm/_npx"
-  ui_target_row "pnpm content store"      "$HOME/.local/share/pnpm"
+  ui_target_row "pnpm content store"      "$HOME/.local/share/pnpm/store"
   ui_target_row "pnpm cache"              "$HOME/.cache/pnpm"
   ui_target_row "Composer cache"          "$HOME/.cache/composer"
   ui_target_row "pip cache"               "$HOME/.cache/pip"

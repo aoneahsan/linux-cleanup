@@ -49,6 +49,8 @@ source "$CLEANUP_ROOT/modules/reports.sh"
 source "$CLEANUP_ROOT/modules/walkthrough.sh"
 # shellcheck source=modules/release_helpers.sh
 source "$CLEANUP_ROOT/modules/release_helpers.sh"
+# shellcheck source=modules/global_packages.sh
+source "$CLEANUP_ROOT/modules/global_packages.sh"
 
 usage() {
   cat <<EOF
@@ -67,6 +69,7 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
       --partials       Find partial / orphan downloads (.fdmdownload, .crdownload, .part)
       --audit          Show top 20 largest entries in \$HOME
       --node-modules   Find stale node_modules in projects untouched N+ days
+      --globals        Audit (read-only) global npm/pnpm/yarn packages — show stale ones with no dependents
       --editor-ext     Clean superseded VS Code / Cursor extension versions
       --reports        Reports manager — list / convert (MD/HTML) / view past reports
       --export FMT ID  Non-interactive: export report to MD/HTML/both
@@ -127,6 +130,7 @@ while [[ $# -gt 0 ]]; do
     --partials)       MODE=partials ;;
     --audit)          MODE=audit ;;
     --node-modules)   MODE=nodemod ;;
+    --globals)        MODE=globals ;;
     --editor-ext)     MODE=editorext ;;
     --reports)        MODE=reports ;;
     --export)         MODE=export; EXPORT_FMT="${2:-both}"; EXPORT_ID="${3:-latest}"; shift 2 || true ;;
@@ -201,6 +205,7 @@ run_menu() {
 
   ${C_BLD}Project + personal (interactive)${C_RST}
     ${C_GRN}10${C_RST}) Stale node_modules in old projects
+    ${C_GRN}18${C_RST}) Audit global npm/pnpm/yarn packages (read-only)
     ${C_GRN}8${C_RST})  Partial / orphan downloads
     ${C_GRN}7${C_RST})  Personal files unused ${DAYS}+ days
 
@@ -241,6 +246,7 @@ MENU
       15) run_reports_manager ;;
       16) show_feedback ;;
       17) make_debug_bundle ;;
+      18) run_global_packages_audit ;;
       q|Q) break ;;
       *)  ui_warn "unknown choice: $choice" ;;
     esac
@@ -292,6 +298,7 @@ case "$MODE" in
   partials)      run_partial_downloads ;;
   audit)         run_size_audit ;;
   nodemod)       run_stale_node_modules ;;
+  globals)       run_global_packages_audit ;;
   editorext)     run_editor_extensions ;;
   reports)       run_reports_manager ;;
   export)        export_reports "$EXPORT_FMT" "$EXPORT_ID" ;;

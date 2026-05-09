@@ -7,7 +7,7 @@ ALL_SAFE_TARGETS=(
   "$HOME/.yarn/berry/cache"
   "$HOME/.npm/_npx"
   "$HOME/.npm/_cacache"
-  "$HOME/.local/share/pnpm"
+  "$HOME/.local/share/pnpm/store"
   "$HOME/.cache/pnpm"
   "$HOME/.cache/composer"
   "$HOME/.cache/pip"
@@ -40,6 +40,7 @@ run_all_safe() {
   done
   ui_info "Estimated reclaim: $(bytes_pretty "$total_b")"
   ui_warn "Will NOT touch: ~/Documents, ~/Pictures, project node_modules, Android AVDs, Flatpak, Zoom, ~/.config, ~/.claude."
+  ui_warn "Globally installed packages (npm/pnpm/yarn) are PRESERVED. Use --globals to audit unused ones."
   if ! ui_confirm "Proceed with batch clean? (use -y to skip prompt)" y; then
     ui_info "aborted"
     return

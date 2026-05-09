@@ -8,7 +8,7 @@ scan_caches_table() {
   ui_target_row "Yarn berry global cache"  "$HOME/.yarn/berry/cache"
   ui_target_row "npm cache (_cacache)"     "$HOME/.npm/_cacache"
   ui_target_row "npx cache (_npx)"         "$HOME/.npm/_npx"
-  ui_target_row "pnpm store"               "$HOME/.local/share/pnpm"
+  ui_target_row "pnpm store (cache only)"  "$HOME/.local/share/pnpm/store"
   ui_target_row "pnpm cache"               "$HOME/.cache/pnpm"
   ui_target_row "Composer cache"           "$HOME/.cache/composer"
   ui_target_row "pip cache"                "$HOME/.cache/pip"

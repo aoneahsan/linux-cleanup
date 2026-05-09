@@ -90,13 +90,32 @@ ui_confirm() {
   [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-# Paths the tool will NEVER delete inside, even if requested.
+# Paths the tool will NEVER delete inside (subtree-protected).
 PROTECTED_PATHS=(
   "$HOME/.ssh" "$HOME/.gnupg" "$HOME/.gnome"
   "$HOME/Documents" "$HOME/Pictures" "$HOME/Music" "$HOME/Videos"
   "$HOME/Desktop" "$HOME/Public" "$HOME/Templates"
   "$HOME/.claude" "$HOME/.local/share/claude" "$HOME/.config"
   "$HOME/.mozilla" "$HOME/.thunderbird"
+)
+
+# Exact-match-only blocks: deleting THIS path is forbidden, but deleting a
+# specific subdirectory (e.g. only the store/ inside) is still allowed.
+# This is critical for pnpm: $HOME/.local/share/pnpm is PNPM_HOME — it holds
+# globally installed package shims, the `global/` install tree, and the
+# `pnpm` binary from `pnpm setup`. Only the `store/` subdirectory is a
+# regenerable cache; everything else is real installed software.
+PROTECTED_EXACT=(
+  "$HOME/.local/share/pnpm"
+  "$HOME/.local/share/pnpm/global"
+  "$HOME/.local/share/pnpm/bin"
+  "$HOME/.local/share/pnpm/nodejs"
+  "$HOME/.npm-global"
+  "$HOME/.npm-global/lib"
+  "$HOME/.npm-global/lib/node_modules"
+  "$HOME/.config/yarn/global"
+  "$HOME/.yarn"
+  "$HOME/.npm"
 )
 
 is_protected() {
@@ -110,6 +129,9 @@ is_protected() {
   local prot
   for prot in "${PROTECTED_PATHS[@]}"; do
     [[ "$p" == "$prot" || "$p" == "$prot"/* ]] && return 0
+  done
+  for prot in "${PROTECTED_EXACT[@]}"; do
+    [[ "$p" == "$prot" ]] && return 0
   done
   return 1
 }

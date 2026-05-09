@@ -4,7 +4,7 @@
 clean_yarn_v1()   { clean_target "Yarn v1 cache"           "$HOME/.cache/yarn"            "regenerated on next yarn install"; }
 clean_yarn_berry(){ clean_target "Yarn berry global cache" "$HOME/.yarn/berry/cache"      "regenerated on next install"; }
 clean_npm_npx()   { clean_target "npx package cache"       "$HOME/.npm/_npx"              "regenerated on next npx run"; }
-clean_pnpm_store(){ clean_target "pnpm content store"      "$HOME/.local/share/pnpm"      "regenerated on next pnpm install"; }
+clean_pnpm_store(){ clean_target "pnpm content store"      "$HOME/.local/share/pnpm/store" "regenerated on next pnpm install (preserves global packages + pnpm setup)"; }
 clean_pnpm_cache(){ clean_target "pnpm cache"              "$HOME/.cache/pnpm"            "regenerated"; }
 clean_composer()  { clean_target "Composer cache"          "$HOME/.cache/composer"        "regenerated"; }
 clean_pip()       { clean_target "pip cache"               "$HOME/.cache/pip"             "regenerated"; }
