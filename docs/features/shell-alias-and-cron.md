@@ -124,4 +124,4 @@ That's a bad idea — `--all-safe` rebuilds caches that you've actively been usi
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

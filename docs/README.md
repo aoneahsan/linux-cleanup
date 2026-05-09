@@ -103,4 +103,4 @@ Understanding-oriented background. Read these once, refer back rarely.
 
 ---
 
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0 · **License**: Source-Available, No-Derivatives, Non-Commercial v1.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1 · **License**: Source-Available, No-Derivatives, Non-Commercial v1.0

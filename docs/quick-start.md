@@ -126,4 +126,4 @@ See [Shell alias & weekly cron](./features/shell-alias-and-cron.md) for what eac
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — Senior software engineer, Lahore. [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan).
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

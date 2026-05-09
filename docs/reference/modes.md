@@ -32,4 +32,4 @@ Every mode, what it does, what it touches, whether it's interactive, and what ca
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

@@ -154,4 +154,4 @@ Expected — a fresh yarn cache rebuild downloads everything again. That's the t
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

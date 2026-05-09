@@ -118,4 +118,4 @@ No — `Ctrl-C` aborts the running action and returns you to the menu prompt. Pr
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

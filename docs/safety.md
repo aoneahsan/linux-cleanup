@@ -147,4 +147,4 @@ This is the same reasoning Linux package managers use, and the same reasoning th
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — independent software engineer specialising in safe-by-default developer tooling. [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan).
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

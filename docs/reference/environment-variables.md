@@ -54,4 +54,4 @@ NO_COLOR=1 linux-cleanup --scan --no-report > /tmp/scan.log
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

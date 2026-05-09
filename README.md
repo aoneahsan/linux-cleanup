@@ -13,7 +13,7 @@
 
 | | |
 |---|---|
-| **Version** | 1.3.0 |
+| **Version** | 1.3.1 |
 | **Status** | Stable — released as source-available, no-derivative, non-commercial |
 | **Author** | Ahsan Mahmood &middot; aoneahsan@gmail.com |
 | **License** | [LICENSE](./LICENSE) — Source-Available, No-Derivatives, Non-Commercial v1.0 |

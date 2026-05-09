@@ -230,4 +230,4 @@ The bundle has everything the author needs. Email it with a one-paragraph descri
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — Reach me at [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com), [LinkedIn](https://linkedin.com/in/aoneahsan), [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

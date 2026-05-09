@@ -190,4 +190,4 @@ Unusual. The crash bundle is normally <100 KB (manifest + a single log file + a 
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — author of linux-cleanup. Reach me directly at [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com), or [LinkedIn](https://linkedin.com/in/aoneahsan), or [GitHub](https://github.com/aoneahsan). I read every email.
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

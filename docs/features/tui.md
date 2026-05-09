@@ -131,4 +131,4 @@ Press `Esc` or pick the `quit` entry instead. `Ctrl-C` inside `whiptail` can lea
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — built the TUI to lower the barrier for non-CLI-fluent teammates without compromising the script's safety model. [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan).
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

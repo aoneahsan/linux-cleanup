@@ -59,4 +59,4 @@ linux-cleanup --all-safe -y --no-report --cleanup-logs >>cleanup.log 2>&1 || \
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1

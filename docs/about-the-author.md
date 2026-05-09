@@ -108,6 +108,6 @@ linux-cleanup is licensed under the **Source-Available, No-Derivatives, Non-Comm
 
 ---
 
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.0
+**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
 
 > _"Build the small thing properly, document it once, and never apologise for it again."_

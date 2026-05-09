@@ -7,6 +7,38 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.3.1] — 2026-05-10
+
+Documentation-only release. No behaviour changes.
+
+### Added
+
+- Comprehensive [`docs/`](./docs/README.md) tree (~32 pages, ~272 KB)
+  structured along the [Diátaxis framework](https://diataxis.fr/):
+  tutorials, how-to guides, reference, explanation. Every cleanup mode,
+  every flag, every output path, every exit code, and the full report
+  JSON schema are now documented in their own pages.
+- Per-feature pages under `docs/features/` (16 pages) — walkthrough,
+  menu, tui, all-safe, scan, system-cleanup, personal-stale-files,
+  partial-downloads, home-audit, node-modules-finder, globals-audit,
+  doctor, editor-extensions, reports, shell-alias-and-cron,
+  feedback-and-crash-bundles.
+- Reference pages under `docs/reference/`: cli-flags, modes,
+  environment-variables, output-paths, exit-codes, report-schema.
+- How-to recipes: reclaim-the-most-space, send-a-bug-report, uninstall.
+- Top-level: installation, quick-start, safety, faq, troubleshooting,
+  about-the-author.
+- Root `README.md` gains a "Full documentation" section linking the
+  most-used pages so the docs are discoverable from the project landing
+  page.
+
+### Notes
+
+- Code, safety guards, and CLI surface are unchanged from 1.3.0.
+- Internal doc links verified — no broken references.
+
+---
+
 ## [1.3.0] — 2026-05-10
 
 Final-polish release: visual TUI menu, automatic crash-bundle capture on
