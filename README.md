@@ -58,9 +58,9 @@ Most existing "cleaner" tools either don't know about modern dev caches, are GUI
 ### Option 1 — zero install, run via npx (recommended)
 
 ```bash
-npx @aoneahsan/linux-cleanup           # guided walkthrough, downloads + runs
-npx @aoneahsan/linux-cleanup --scan    # read-only audit
-npx @aoneahsan/linux-cleanup --help
+npx linux-cleanup           # guided walkthrough, downloads + runs
+npx linux-cleanup --scan    # read-only audit
+npx linux-cleanup --help
 ```
 
 When run via `npx`, the package is fetched into a temporary npm cache directory. **Your logs and reports persist at `~/.linux-cleanup/`** (not in the temp dir), so they survive npx eviction and are always there for the next run.
@@ -68,7 +68,7 @@ When run via `npx`, the package is fetched into a temporary npm cache directory.
 ### Option 2 — install globally
 
 ```bash
-npm install -g @aoneahsan/linux-cleanup
+npm install -g linux-cleanup
 linux-cleanup                          # then 'linux-cleanup' is on your PATH everywhere
 ```
 

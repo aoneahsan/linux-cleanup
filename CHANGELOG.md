@@ -14,8 +14,8 @@ Initial public release.
 ### Distribution
 
 - **Published as an npm package** under the `@aoneahsan` scope — runnable
-  via `npx @aoneahsan/linux-cleanup` (zero install) or
-  `npm install -g @aoneahsan/linux-cleanup` (persistent install). The npm
+  via `npx linux-cleanup` (zero install) or
+  `npm install -g linux-cleanup` (persistent install). The npm
   package ships a thin Node.js launcher (`bin/linux-cleanup.js`) that locates
   the bash entry point and routes logs/reports to `~/.linux-cleanup/` so they
   survive npx temp eviction. After global install, the binary is named
