@@ -1,0 +1,69 @@
+{
+  "name": "@aoneahsan/linux-cleanup",
+  "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Safe, modular disk + cache cleanup utility for Linux. Reclaim 10-50+ GB of regenerable junk (yarn/npm/pnpm caches, Chrome/Firefox/Brave caches, Gradle, Cypress, Playwright, Android AVDs, stale node_modules, browser partials, system journals, kernels) with allowlist-based safety guards, JSON session reports, and Markdown/HTML export.",
+  "bin": {
+    "linux-cleanup": "bin/linux-cleanup.js"
+  },
+  "main": "bin/linux-cleanup.js",
+  "scripts": {
+    "test": "bash cleanup.sh --self-test",
+    "scan": "bash cleanup.sh --scan",
+    "version-check": "bash cleanup.sh --version"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "modules/",
+    "cleanup.sh",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "VERSION"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "os": [
+    "linux"
+  ],
+  "keywords": [
+    "linux",
+    "cleanup",
+    "disk-cleanup",
+    "cache-cleanup",
+    "disk-space",
+    "free-disk-space",
+    "yarn-cache",
+    "npm-cache",
+    "pnpm-cache",
+    "node-modules",
+    "android",
+    "gradle",
+    "cypress",
+    "playwright",
+    "developer-tools",
+    "system-utility",
+    "bash",
+    "cli"
+  ],
+  "author": {
+    "name": "Ahsan Mahmood",
+    "email": "aoneahsan@gmail.com",
+    "url": "https://aoneahsan.com"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://aoneahsan.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aoneahsan/linux-cleanup.git"
+  },
+  "bugs": {
+    "url": "mailto:aoneahsan@gmail.com",
+    "email": "aoneahsan@gmail.com"
+  },
+  "preferGlobal": true
+}

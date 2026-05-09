@@ -1,0 +1,218 @@
+                    LINUX-CLEANUP LICENSE
+       Source-Available · No-Derivatives · Non-Commercial
+                          Version 1.0
+
+================================================================================
+
+Copyright (c) 2026 Ahsan Mahmood. All rights reserved.
+
+Author Contact:
+  Name:      Ahsan Mahmood
+  Email:     aoneahsan@gmail.com
+  Website:   https://aoneahsan.com
+  LinkedIn:  https://linkedin.com/in/aoneahsan
+  Phone:     +92 304 6619706
+
+================================================================================
+1.  DEFINITIONS
+================================================================================
+
+"Software" means the linux-cleanup tool, including its source code, scripts,
+documentation, and accompanying files distributed under this License.
+
+"Author" means the copyright holder named above.
+
+"You" means an individual or legal entity exercising rights under this License.
+
+"Original Form" means the Software as published by the Author, byte-for-byte
+unmodified, with all copyright notices, license files, attribution headers,
+and disclaimer text intact.
+
+"Commercial Use" means any use intended for, or directed toward, commercial
+advantage or monetary compensation. This includes selling, sublicensing,
+renting, leasing, offering as a paid service, or bundling with paid products
+or services.
+
+================================================================================
+2.  GRANT OF RIGHTS
+================================================================================
+
+Subject to the terms and conditions of this License, the Author hereby grants
+You a worldwide, non-exclusive, royalty-free, perpetual (unless terminated as
+provided in Section 6) right to:
+
+  (a) DOWNLOAD AND INSTALL the Software in its Original Form.
+
+  (b) READ AND STUDY the source code for educational and personal-research
+      purposes.
+
+  (c) USE the Software in its Original Form on systems You own or control,
+      for any lawful purpose, including ordinary business operations of Your
+      organization, provided such use does not itself constitute Commercial
+      Use as defined above.
+
+  (d) SHARE AND REDISTRIBUTE the Software in its Original Form, free of
+      charge, including the complete copy of this LICENSE file and all
+      original copyright and author-attribution notices.
+
+================================================================================
+3.  RESTRICTIONS
+================================================================================
+
+You MAY NOT, without prior explicit written permission from the Author:
+
+  (a) MODIFY the Software, in part or in whole, for any purpose, including
+      but not limited to translation, adaptation, derivation, bug-fixing,
+      refactoring, hardening, porting, or feature addition.
+
+  (b) DISTRIBUTE modified versions, forks, derivatives, or any work that
+      incorporates, embeds, or is based upon the Software, in source or
+      binary form.
+
+  (c) ENGAGE IN COMMERCIAL USE of the Software, including but not limited
+      to selling the Software, charging for distribution of the Software,
+      offering paid hosting or paid support of the Software, or bundling
+      the Software with any paid product or paid service such that the
+      bundling provides commercial advantage.
+
+  (d) REMOVE OR ALTER any copyright notice, author attribution, license
+      file, or DISCLAIMER text in any copy You retain or share.
+
+  (e) USE the Author's name, contact details, or trademarks to endorse or
+      promote any product, service, or modified version of the Software
+      without prior written permission.
+
+PERMITTED EXCEPTIONS:
+  · Bug reports and security disclosures may be sent to the Author at the
+    contact addresses above. The Author may, at their sole discretion, choose
+    to incorporate such input into a future release. Submitting a report does
+    not grant the submitter any rights beyond those granted by this License.
+  · Quoting short excerpts of the source code in articles, books, talks, or
+    educational materials, with appropriate attribution, is permitted.
+
+================================================================================
+4.  DISCLAIMER OF WARRANTY
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
+KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE AUTHOR
+SPECIFICALLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO THE
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+NON-INFRINGEMENT, TITLE, ACCURACY, RELIABILITY, COMPATIBILITY, SECURITY, OR
+FREEDOM FROM DEFECTS, ERRORS, OR HARMFUL COMPONENTS.
+
+THE SOFTWARE IS A SYSTEM-LEVEL UTILITY THAT DELETES FILES AND MODIFIES
+SYSTEM STATE. WHILE IT IMPLEMENTS SAFETY GUARDS (PATH ALLOWLISTS, INTERACTIVE
+CONFIRMATION, PROTECTED-PATH REJECTION), NO GUARD IS PERFECT AND NO TESTING
+IS EXHAUSTIVE. YOU ARE SOLELY RESPONSIBLE FOR:
+
+  · Backing up Your data BEFORE running the Software.
+  · Reviewing every action the Software proposes BEFORE confirming it.
+  · Verifying that the Software's behavior matches Your expectations on
+    Your specific environment, distribution, and configuration.
+
+================================================================================
+5.  LIMITATION OF LIABILITY
+================================================================================
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
+AUTHOR BE LIABLE TO YOU OR TO ANY THIRD PARTY FOR:
+
+  (a) ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR
+      CONSEQUENTIAL DAMAGES, INCLUDING WITHOUT LIMITATION:
+        - loss of data, files, or work product;
+        - loss of profits, revenue, or business opportunity;
+        - business interruption, downtime, or service unavailability;
+        - loss of goodwill, reputation, or contractual benefit;
+        - computer failure, system corruption, or hardware damage;
+        - cost of substitute goods, services, or recovery efforts;
+      ARISING OUT OF OR IN ANY WAY CONNECTED WITH THE USE OF, INABILITY TO
+      USE, MISUSE OF, OR INTERACTION WITH THE SOFTWARE, EVEN IF SUCH
+      DAMAGES WERE FORESEEABLE OR THE AUTHOR HAS BEEN ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGES.
+
+  (b) ANY CLAIM, DEMAND, LAWSUIT, ADMINISTRATIVE PROCEEDING, REGULATORY
+      ACTION, OR OTHER LEGAL PROCEEDING brought by You or any third party,
+      including but not limited to actions related to data loss, privacy,
+      regulatory non-compliance, intellectual property, or contractual
+      breach, that arises out of, relates to, or is in any way connected
+      with Your downloading, installing, using, sharing, or otherwise
+      interacting with the Software.
+
+THIS LIMITATION OF LIABILITY APPLIES REGARDLESS OF THE LEGAL THEORY ON
+WHICH ANY CLAIM IS BASED, INCLUDING CONTRACT, TORT (INCLUDING NEGLIGENCE),
+STRICT LIABILITY, STATUTE, OR OTHERWISE, AND APPLIES EVEN IF ANY REMEDY
+PROVIDED HEREIN IS FOUND TO HAVE FAILED OF ITS ESSENTIAL PURPOSE.
+
+WHERE APPLICABLE LAW DOES NOT ALLOW THE LIMITATION OR EXCLUSION OF CERTAIN
+DAMAGES OR LIABILITIES, THE AUTHOR'S AGGREGATE LIABILITY UNDER THIS
+LICENSE SHALL BE LIMITED TO THE MINIMUM AMOUNT PERMITTED BY LAW, AND IN
+NO CASE SHALL EXCEED ONE UNITED STATES DOLLAR (USD $1.00).
+
+================================================================================
+6.  INDEMNIFICATION
+================================================================================
+
+You agree to defend, indemnify, and hold harmless the Author and the Author's
+affiliates, family members, employees, agents, and assigns from and against
+any and all claims, demands, damages, judgments, losses, liabilities, costs,
+and expenses (including reasonable attorneys' fees and court costs) arising
+out of or in any way connected with:
+
+  (a) Your use, misuse, or inability to use the Software;
+  (b) Your violation of any term of this License;
+  (c) Your violation of any law, regulation, or third-party right (including
+      any intellectual-property right, privacy right, or property right);
+  (d) Any content, data, or material You delete, lose, alter, expose, or
+      otherwise affect through Your use of the Software.
+
+================================================================================
+7.  TERMINATION
+================================================================================
+
+This License and the rights granted hereunder will terminate automatically and
+immediately upon any breach by You of any of its terms. Upon termination, You
+must immediately cease all use of the Software and delete every copy in Your
+possession or control.
+
+The provisions of Sections 4 (Disclaimer of Warranty), 5 (Limitation of
+Liability), 6 (Indemnification), 7 (Termination), 8 (Governing Law), and 9
+(Entire Agreement) shall survive any termination of this License.
+
+================================================================================
+8.  GOVERNING LAW AND DISPUTE RESOLUTION
+================================================================================
+
+This License shall be construed and enforced in accordance with general
+international principles of contract law, without regard to conflict-of-law
+rules. Any dispute, controversy, or claim arising out of or relating to this
+License, or the breach, termination, or validity thereof, shall first be
+attempted to be resolved through good-faith negotiation between the parties.
+
+If negotiation fails, the Author reserves the sole right to elect a venue and
+forum for resolution. You expressly waive any objection to such venue based
+on inconvenience or jurisdiction. You agree not to file any lawsuit against
+the Author in any court without first making a good-faith effort, in writing,
+to resolve the dispute directly with the Author for at least sixty (60) days.
+
+================================================================================
+9.  ENTIRE AGREEMENT — ACCEPTANCE
+================================================================================
+
+This License constitutes the entire agreement between You and the Author with
+respect to the Software and supersedes any prior agreement, oral or written.
+No modification of this License is binding unless signed in writing by the
+Author.
+
+If any provision of this License is held to be unenforceable, the remaining
+provisions shall continue in full force and effect.
+
+By DOWNLOADING, ACCESSING, COPYING, INSTALLING, RUNNING, SHARING, OR
+OTHERWISE USING the Software in any way, You acknowledge that You have read,
+understood, and agreed to be bound by all the terms and conditions of this
+License. If You do not agree, You must not download, copy, install, run,
+share, or retain any copy of the Software.
+
+================================================================================
+END OF LICENSE
+================================================================================
