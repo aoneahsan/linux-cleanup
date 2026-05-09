@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.2.0"
+LINUX_CLEANUP_VERSION="1.2.1"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -271,6 +271,72 @@ prune_stale() {
   after=$(dir_bytes "$root")
   freed=$(( before - after ))
   (( freed < 0 )) && freed=0
+  printf '%d' "$freed"
+}
+
+# newest_access_age_days <path>
+#
+# For a file: prints the smaller of (now - atime) and (now - mtime), in days.
+# For a directory: walks recursively and prints the freshest atime/mtime
+# anywhere inside, in days. "How many days since this asset was last
+# touched in any way." Echoes a very large number if the path is missing
+# so callers can treat it as "definitely stale" without special-casing.
+newest_access_age_days() {
+  local path="$1"
+  [[ -e "$path" ]] || { printf '999999'; return; }
+  local now newest
+  now=$(date +%s)
+  if [[ -f "$path" || -L "$path" ]]; then
+    local at mt
+    at=$(stat -c %X -- "$path" 2>/dev/null || echo 0)
+    mt=$(stat -c %Y -- "$path" 2>/dev/null || echo 0)
+    newest=$(( at > mt ? at : mt ))
+  else
+    # Look at FILES only — directory atimes/mtimes get bumped by routine
+    # operations (creating, renaming, listing in some FS configs) and don't
+    # reflect actual usage of the underlying asset. Files are the truth.
+    newest=$(find "$path" \( -type f -o -type l \) -printf '%A@\n%T@\n' 2>/dev/null \
+             | awk -F. '{print $1}' | sort -n | tail -1)
+    if [[ -z "$newest" || "$newest" == "0" ]]; then
+      # Empty dir or unreadable — fall back to dir's own mtime as last resort.
+      newest=$(stat -c %Y -- "$path" 2>/dev/null || echo 0)
+    fi
+  fi
+  printf '%d' $(( (now - newest) / 86400 ))
+}
+
+# prune_stale_units <root> <days> [glob]
+#
+# Treats each top-level child of <root> matching <glob> (default *) as an
+# indivisible unit (e.g. one AVD, one tool installation, one Gradle distro).
+# A unit is deleted whole only when EVERY file inside it has atime AND mtime
+# older than <days>. Recently-used units survive intact. Echoes bytes freed.
+#
+# Use this for caches where partial-prune would corrupt state (Android AVDs,
+# editor extensions with sibling metadata files, etc.).
+prune_stale_units() {
+  local root="$1" days="${2:-${DAYS:-100}}" pattern="${3:-*}"
+  [[ -d "$root" ]] || { printf '0'; return 0; }
+  if is_protected "$root"; then
+    ui_err "REFUSE: protected path: $root"
+    printf '0'; return 1
+  fi
+  local freed=0 entry age b
+  shopt -s nullglob dotglob
+  for entry in "$root"/$pattern; do
+    [[ -e "$entry" ]] || continue
+    age=$(newest_access_age_days "$entry")
+    if (( age > days )); then
+      b=$(dir_bytes "$entry")
+      if safe_rm "$entry"; then
+        freed=$(( freed + b ))
+        ui_ok "  pruned $(basename "$entry") (${age}d idle, $(bytes_pretty "$b") freed)"
+      fi
+    else
+      ui_info "  kept $(basename "$entry") (${age}d idle — within ${days}d window)"
+    fi
+  done
+  shopt -u nullglob dotglob
   printf '%d' "$freed"
 }
 

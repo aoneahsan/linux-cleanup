@@ -5,7 +5,7 @@
 
 ---
 
-## Post 1 — The "where did my disk go?" hook
+## Post 1 — The "where did my disk go?" hook - USED
 
 My laptop kept yelling "Disk almost full."
 
@@ -43,7 +43,7 @@ npm: https://npmjs.com/package/linux-cleanup
 
 ---
 
-## Post 2 — Safety-first framing
+## Post 2 — Safety-first framing - USED
 
 A dangerous category of "cleaner" tools exists on Linux:
 

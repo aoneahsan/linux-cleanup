@@ -46,22 +46,51 @@ clean_editor_old_extensions() {
     return
   fi
 
-  ui_section "$label — superseded extension versions"
-  local total_b=0 b
+  # Per-version idle gate (since v1.2.0): a superseded version qualifies for
+  # deletion only if its files haven't been touched (atime/mtime) for ≥${DAYS}d.
+  # Active superseded = "the editor still loads it occasionally" → keep.
+  # The "newer version exists" check already covers condition #1
+  # (no active software depends on this version); the idle gate covers #2.
+  local eligible=() ineligible=() v age
   for v in "${victims[@]}"; do
-    b=$(dir_bytes "$ext_dir/$v")
-    total_b=$(( total_b + b ))
-    printf "  %10s  %s\n" "$(dir_size "$ext_dir/$v")" "$v"
+    age=$(newest_access_age_days "$ext_dir/$v")
+    if (( ${PURGE_ALL:-0} == 1 )) || (( age > ${DAYS:-100} )); then
+      eligible+=("$v|$age")
+    else
+      ineligible+=("$v|$age")
+    fi
   done
-  ui_info "Total reclaim: $(bytes_pretty "$total_b") across ${#victims[@]} dirs"
 
-  if ui_confirm "Delete all superseded versions above?" n; then
+  ui_section "$label — superseded extension versions"
+  local total_b=0 b name age_d
+  if (( ${#ineligible[@]} > 0 )); then
+    ui_info "Kept (used within ${DAYS:-100}d window — superseded but still loaded):"
+    for entry in "${ineligible[@]}"; do
+      name="${entry%|*}"; age_d="${entry##*|}"
+      printf "  %4dd idle  %10s  %s\n" "$age_d" "$(dir_size "$ext_dir/$name")" "$name"
+    done
+  fi
+  if (( ${#eligible[@]} == 0 )); then
+    ui_info "$label — no superseded versions older than ${DAYS:-100}d. Nothing to delete."
+    return
+  fi
+  ui_info "Eligible for deletion (superseded AND ≥${DAYS:-100}d idle):"
+  for entry in "${eligible[@]}"; do
+    name="${entry%|*}"; age_d="${entry##*|}"
+    b=$(dir_bytes "$ext_dir/$name")
+    total_b=$(( total_b + b ))
+    printf "  %4dd idle  %10s  %s\n" "$age_d" "$(dir_size "$ext_dir/$name")" "$name"
+  done
+  ui_info "Total reclaim: $(bytes_pretty "$total_b") across ${#eligible[@]} dirs"
+
+  if ui_confirm "Delete the ${#eligible[@]} eligible superseded versions above?" n; then
     local freed=0
-    for v in "${victims[@]}"; do
-      b=$(dir_bytes "$ext_dir/$v")
-      if safe_rm "$ext_dir/$v"; then
+    for entry in "${eligible[@]}"; do
+      name="${entry%|*}"
+      b=$(dir_bytes "$ext_dir/$name")
+      if safe_rm "$ext_dir/$name"; then
         freed=$(( freed + b ))
-        ui_ok "deleted $v"
+        ui_ok "deleted $name"
       fi
     done
     ui_ok "$label freed: $(bytes_pretty "$freed")"

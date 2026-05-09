@@ -7,6 +7,50 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.2.1] — 2026-05-10
+
+Extends the v1.2.0 staleness gate to anything that's a "tool" rather than
+a regenerable cache. Software/tool deletions now require BOTH conditions:
+no active software depends on the asset, AND the user hasn't touched it
+in ≥`--days` days (default 100).
+
+### Changed
+
+- **Android AVDs (`clean_android_avd`)** — was wiping the whole `~/.android/avd`
+  on confirm. Now inspects each `*.avd` directory as a unit, pairs it with
+  its sibling `*.ini` config, and prunes the pair only when every file in
+  the AVD is ≥${DAYS}d idle. Recently-used emulator profiles survive intact.
+- **VS Code / Cursor superseded extensions (`clean_editor_old_extensions`)**
+  — the "newer version exists" check covered condition #1; we now also
+  require the superseded version's directory to be ≥${DAYS}d idle before
+  it qualifies for deletion. Recently-loaded older versions are listed but
+  kept. Output now shows per-version idle days.
+- **Flatpak user data (`clean_flatpak_user`)** — `~/.local/share/flatpak`
+  hosts INSTALLED user-scope flatpak apps, not just caches. The module now
+  refuses to touch the tree if any user-scope app is installed (queried via
+  `flatpak list --user --app`) and additionally requires ≥${DAYS}d idle on
+  the tree before any prune. The safer dependency cleanup is delegated to
+  `flatpak uninstall --user --unused`, which the module now points to.
+
+### Added
+
+- **`newest_access_age_days <path>`** in `lib/common.sh`. Returns the days
+  since the freshest atime/mtime anywhere under the path. Used by AVD,
+  extension, and flatpak modules to enforce the idle gate at unit level.
+- **`prune_stale_units <root> <days> [glob]`** helper. Treats each
+  top-level child as an indivisible unit so partial-prune can't corrupt
+  state (designed for AVDs, editor extensions, tool installs).
+
+### Why
+
+A user pointed out that v1.2.0 still wiped Android AVDs wholesale, and
+that the same logic should apply to anything that's a "tool" rather than
+just a cache: don't remove software the OS or another tool still depends
+on, and don't remove software the user themselves used recently. v1.2.1
+applies that two-condition rule consistently.
+
+---
+
 ## [1.2.0] — 2026-05-10
 
 Default delete strategy is now **stale-only**: nothing inside a target cache
