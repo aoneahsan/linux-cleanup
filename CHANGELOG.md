@@ -7,6 +7,21 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Relicensed to the [MIT License](./LICENSE).** linux-cleanup was previously
+  distributed under a custom "Source-Available · No-Derivatives · Non-Commercial
+  v1.0" license. It is now permissive, OSI-approved open source: free to use,
+  modify, fork, redistribute, and use commercially, with attribution. The MIT
+  "AS IS / no liability" disclaimer replaces the prior warranty, liability,
+  and indemnification terms. `package.json` now declares `"license": "MIT"`,
+  and all README/docs references were updated accordingly. (Applies going
+  forward; previously published releases keep the license they shipped under.)
+
+---
+
 ## [1.3.1] — 2026-05-10
 
 Documentation-only release. No behaviour changes.

@@ -15,7 +15,7 @@
  *
  * Author:  Ahsan Mahmood <aoneahsan@gmail.com>
  * Web:     https://aoneahsan.com
- * License: Source-Available, No-Derivatives, Non-Commercial v1.0 (see LICENSE)
+ * License: MIT (see LICENSE)
  */
 'use strict';
 

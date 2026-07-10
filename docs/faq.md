@@ -91,17 +91,15 @@ It works fine. linux-cleanup runs on the Linux side of WSL — its safety model 
 
 ---
 
-## Why a non-commercial license?
+## What license is it under?
 
-The author wants the script to remain a single, auditable, drift-free codebase that everyone benefits equally from. A permissive license would invite forks that might add telemetry, paid tiers, or "premium" features — the exact model the script was built to avoid. The current license (Source-Available, No-Derivatives, Non-Commercial v1.0) keeps the source visible for audit, allows free personal and team use, but blocks both forks and commercial rebadging. See the [LICENSE](../LICENSE) for the legal text.
-
-If you have a use case the license blocks (e.g., your company wants to ship it inside an internal tool), email the author to discuss.
+linux-cleanup is released under the **[MIT License](../LICENSE)** — a short, permissive, OSI-approved open-source license. You can use it (personally or commercially), read it, modify it, fork it, embed it in other tools, and redistribute it. The only condition is that you keep the copyright notice and the MIT permission notice in copies or substantial portions. The software is provided "AS IS" with no warranty — see the [LICENSE](../LICENSE) for the full text.
 
 ---
 
 ## I want to add a feature. How?
 
-The license blocks code contributions, but **description-only feature requests are very welcome**. Email [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com) with:
+**Pull requests are welcome** under the MIT License — fork the repo and open a PR. If you'd rather not code, description-only feature requests are just as welcome: email [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com) with:
 
 - The use case ("I'd want to clean X because Y")
 - Why existing modes don't already cover it

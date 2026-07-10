@@ -290,24 +290,19 @@ npm: https://npmjs.com/package/linux-cleanup
 
 ## Post 10 — The license + ethos
 
-I shipped `linux-cleanup` under a Source-Available, No-Derivatives, Non-Commercial license.
+I shipped `linux-cleanup` under the MIT License.
 
 You can:
 
 ✓ Read every line of the source
 ✓ Run it on your own machines, including at work
-✓ Audit it, fork it for personal study
-✓ Open issues, ask questions
+✓ Modify it, fork it, embed it in your own tools
+✓ Use it commercially — no permission needed
+✓ Open issues, send pull requests, ask questions
 
-You cannot:
+The only ask: keep the copyright and license notice in copies. It's provided "AS IS" — a cleanup tool touches real data, so back up first and review every action before you confirm it.
 
-✗ Repackage it under a different name
-✗ Sell it or bundle it into a paid product
-✗ Ship modified forks publicly
-
-This is intentional. Cleanup tools touch real data. Multiple unmaintained forks make that more dangerous, not less. Centralizing maintenance is how I keep the safety guards trustworthy.
-
-If you want a feature added, file an issue. If you want commercial use, email me. The code is here:
+Why MIT? It's a free developer utility. The point is for it to be used, packaged by distros, and improved by whoever wants to. A permissive license removes the friction and lets it reach more people. If you build something on top of it, I'd love to hear about it. The code is here:
 
 GitHub: https://github.com/aoneahsan/linux-cleanup
 npm: https://npmjs.com/package/linux-cleanup

@@ -29,12 +29,12 @@ Next Eligible Update After: 2026-07-03
 | Chrome Extension ID | N/A |
 | PyPI Package | N/A |
 | Docs URL | not published as a site; docs ship in-repo under `docs/` (~32 pages, Diátaxis-structured) |
-| License | Source-Available · No-Derivatives · Non-Commercial v1.0 (custom `LICENSE` file; `package.json` declares `SEE LICENSE IN LICENSE`) |
+| License | MIT (standard `LICENSE` file; `package.json` declares `MIT`) |
 | Author | Ahsan Mahmood — aoneahsan@gmail.com — https://aoneahsan.com |
 | Payment / Support URL | https://aoneahsan.com/payment?project-id=linux-cleanup&project-identifier=linux-cleanup |
 | Agent-Readable Pricing | N/A (free CLI tool; no paid tiers) |
 
-> **Asks for next refresh:** none outstanding from the master JSON — repo, npm link, license, and contact are all recorded. If a hosted docs site is published later (e.g. a GitHub Pages render of `docs/`), record its URL in the `docs` field. The `bugs` URL in `package.json` is a `mailto:` (no issue tracker) by design, since the license forbids derivative works / code PRs.
+> **Asks for next refresh:** none outstanding from the master JSON — repo, npm link, license, and contact are all recorded. If a hosted docs site is published later (e.g. a GitHub Pages render of `docs/`), record its URL in the `docs` field. The `bugs` URL in `package.json` is a `mailto:` by design (email-first feedback); now that the project is MIT licensed, GitHub issues/PRs are welcome too.
 
 ---
 
@@ -126,7 +126,7 @@ Know modern developer caches better than generic cleaners do; refuse to touch an
 | Scheduling | weekly all-safe cron installer (Sunday 03:00) + shell-alias installer |
 | Privacy | zero network calls — no telemetry, analytics, or crash reporting; feedback is user-initiated `mailto:` + local tar.gz bundles |
 | Versioning | Semantic Versioning; Keep a Changelog format; plain-text `VERSION` file |
-| License | custom Source-Available, No-Derivatives, Non-Commercial v1.0 |
+| License | MIT (permissive, OSI-approved) |
 
 ## Feature Catalog
 
@@ -158,7 +158,7 @@ Know modern developer caches better than generic cleaners do; refuse to touch an
 - **Personal data is interactive-only** — no flag combination, including `--yes`, will silently delete personal files; `--yes` applies to regenerable caches only.
 - **Crash bundles are opt-in to send** — failures are captured locally and a one-liner is printed, but nothing leaves the machine unless the user emails it.
 - **All output stays inside the project / `~/.linux-cleanup/`** — nothing is written to `/var` or scattered across `$HOME`.
-- **Honest licensing note in the README** — it explicitly states the tool is source-available, NOT OSI open source (modification and commercial use are prohibited), and is a deleter, not a backup or security tool.
+- **Honest licensing note in the README** — it states the tool is MIT licensed (free to use, modify, fork, and distribute with attribution) and, importantly, is a deleter, not a backup or security tool.
 - **Docs are first-class** — the 1.3.1 release is documentation-only: ~32 pages structured along the Diátaxis framework, one page per mode, flag, output path, exit code, and the full report schema.
 
 ## Benefits for Users
@@ -172,7 +172,7 @@ Know modern developer caches better than generic cleaners do; refuse to touch an
 
 ## Value & Potential
 
-Linux Cleanup pairs a concrete, recurring developer pain (disk bloat from regenerable caches) with an unusually disciplined safety and reporting model — allowlist-guarded deletes, staleness-gated pruning, schema-versioned JSON reports, and a verifiable no-network stance. As a portfolio piece it demonstrates real systems engineering in Bash (modular architecture, sudo keepalive, EXIT-trap crash capture, JSON generation without heavy dependencies), pragmatic distribution (a thin Node launcher to reach the npm/npx audience), and product maturity (a 7-release changelog and a 32-page Diátaxis docs tree). Growth paths: a hosted docs site (render `docs/` to GitHub Pages), broader distro/package-manager coverage, and additional cache targets as toolchains evolve. Monetization is intentionally absent — it is a free, source-available tool — with support routed through aoneahsan.com/payment.
+Linux Cleanup pairs a concrete, recurring developer pain (disk bloat from regenerable caches) with an unusually disciplined safety and reporting model — allowlist-guarded deletes, staleness-gated pruning, schema-versioned JSON reports, and a verifiable no-network stance. As a portfolio piece it demonstrates real systems engineering in Bash (modular architecture, sudo keepalive, EXIT-trap crash capture, JSON generation without heavy dependencies), pragmatic distribution (a thin Node launcher to reach the npm/npx audience), and product maturity (a 7-release changelog and a 32-page Diátaxis docs tree). Growth paths: a hosted docs site (render `docs/` to GitHub Pages), broader distro/package-manager coverage, and additional cache targets as toolchains evolve. Monetization is intentionally absent — it is a free, MIT-licensed open-source tool — with support routed through aoneahsan.com/payment.
 
 ## Resume / CV Bullets
 
@@ -197,7 +197,7 @@ Linux Cleanup is a safe, modular disk/cache-cleanup CLI I built for Linux develo
 - Crash bundles done right: capturing a log + report + system manifest on failure — but never sending anything for you.
 - Designing JSON-first reports for a CLI, with self-contained dark-mode HTML export.
 - Interactive-by-default deletion: why no `--yes` flag should ever touch your personal files.
-- Source-available ≠ open source: being honest about a No-Derivatives, Non-Commercial license.
+- Picking a license for a free developer tool: why MIT maximizes adoption, distro packaging, and contributions.
 - A whiptail/dialog TUI that gracefully falls back to a plain CLI menu when neither is installed.
 
 ## Top 20 Hashtags
@@ -215,9 +215,9 @@ Linux Cleanup is a safe, modular disk/cache-cleanup CLI I built for Linux develo
 ## Known Constraints (honest framing)
 
 - **Linux-only.** `package.json` declares `os: ["linux"]`; the engine relies on Linux paths and tools (`apt`, `snap`, journal, AVDs). Not for macOS/Windows.
-- **Source-available, NOT OSI open source.** The license prohibits modification, derivatives, and commercial use; code contributions cannot be accepted (description-only feature requests by email are welcome).
+- **MIT licensed (permissive OSI open source).** Free to use, modify, fork, distribute, and use commercially, with attribution; pull requests and description-only feature requests by email are both welcome.
 - **It deletes; it never archives.** This is a destructive tool by design — not a backup, and not a security scanner.
-- **No issue tracker by design.** The `bugs` field is a `mailto:` — feedback flows through `--feedback` / `--debug-bundle` and email, consistent with the no-derivatives license.
+- **Email-first feedback by design.** The `bugs` field is a `mailto:` — feedback flows through `--feedback` / `--debug-bundle` and email (GitHub issues/PRs are also fine now that it's MIT).
 - **MD/HTML export requires `jq`.** JSON is always written; without `jq` the Markdown/HTML conversion is unavailable.
 - **System step needs sudo** and some features need optional tools (`snap`, `crontab`, `numfmt`, `xdg-open`, `less`) that gracefully degrade when missing.
 - **No hosted docs site yet.** The ~32-page docs live in-repo under `docs/`; if rendered to a site later, record the URL.

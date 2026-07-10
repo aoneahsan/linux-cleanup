@@ -113,7 +113,7 @@ Disables the staleness gate. Wipes recently-used Gradle wrappers, AVDs you might
 
 - **Do not run `--system` more than monthly.** Once it's done, the next pass usually only reclaims a few hundred MB. Save the time.
 - **Do not lower `-d` below 14 days routinely.** Anything more aggressive risks deleting tools you'll need next week. Use sparingly for one-shot deep cleans.
-- **Do not bypass the safety guards by editing the script.** The licence prohibits derivative works, and the guards exist to prevent the bug-of-the-month from being a permanent data loss.
+- **Think twice before bypassing the safety guards by editing the script.** The MIT license lets you modify it freely, but the guards exist to keep the bug-of-the-month from becoming permanent data loss — remove them at your own risk.
 
 ---
 

@@ -48,7 +48,7 @@ chmod +x cleanup.sh
 
 The npm package is just a thin Node.js launcher (`bin/linux-cleanup.js`) that locates this same bash script. The cloned repo is identical bytes to what npm publishes.
 
-Use this option if you want to inspect, audit, or hack on the script directly. Note: the [LICENSE](../LICENSE) prohibits derivative works; description-only feature requests are welcome by email.
+Use this option if you want to inspect, audit, or hack on the script directly. The project is [MIT licensed](../LICENSE), so forks and modifications are fine; pull requests and description-only feature requests are both welcome.
 
 ---
 

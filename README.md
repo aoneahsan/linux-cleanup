@@ -14,9 +14,9 @@
 | | |
 |---|---|
 | **Version** | 1.3.1 |
-| **Status** | Stable — released as source-available, no-derivative, non-commercial |
+| **Status** | Stable — free and open source under the MIT License |
 | **Author** | Ahsan Mahmood &middot; aoneahsan@gmail.com |
-| **License** | [LICENSE](./LICENSE) — Source-Available, No-Derivatives, Non-Commercial v1.0 |
+| **License** | [MIT](./LICENSE) — free to use, modify, fork, and distribute (attribution required) |
 
 ---
 
@@ -251,7 +251,7 @@ linux-cleanup/
 ├── logs/                      # Auto-created — every run is logged
 ├── reports/                   # Auto-created — JSON canonical, MD/HTML on demand
 ├── README.md                  # This file
-├── LICENSE                    # Custom: Source-Available, No-Derivatives, Non-Commercial
+├── LICENSE                    # MIT License
 ├── CHANGELOG.md               # Release history
 ├── VERSION                    # Plain-text version number
 └── .gitignore                 # Excludes logs/, reports/, backups
@@ -301,7 +301,7 @@ There is no network code path.
 
 ## Reporting issues / sending feedback
 
-Bug reports, feature ideas, and security disclosures are welcome — the License explicitly permits them.
+Bug reports, feature ideas, pull requests, and security disclosures are all welcome — the project is MIT licensed, so forks and contributions are fine.
 
 ### Quick path
 
@@ -344,7 +344,8 @@ You can also reach the author via:
 
 - Cannot see your logs unless you send them
 - Cannot push fixes to your machine — npm / npx pulls a new version when you re-run
-- Cannot accept code contributions (the License forbids derivative works); description-only feature requests are welcome by email
+
+Pull requests and forks are welcome under the MIT License; description-only feature requests by email are just as welcome if you'd rather not code.
 
 ---
 
@@ -363,7 +364,6 @@ This is a system tool that deletes files. It takes the following stance:
 
 ## What this is NOT
 
-- **Not OSI-conforming "open source."** The License explicitly prohibits modification and commercial use, which most OSI definitions require to permit. The project is **source-available** for read, study, use, and unmodified redistribution. The term "open source" is used colloquially in this README to indicate that the source is published in the open.
 - **Not a backup tool.** It deletes; it never archives.
 - **Not a security scanner.** It will not find secrets, malware, or vulnerabilities.
 - **Not a replacement for human judgment.** Always review what the script proposes before confirming.
@@ -382,11 +382,11 @@ This is a system tool that deletes files. It takes the following stance:
 
 ## License at a glance
 
-> ⚠ **By using this software you agree to the full [LICENSE](./LICENSE).**
+> **linux-cleanup is [MIT licensed](./LICENSE).**
 >
-> **Allowed:** Download, read, study, use as-is, redistribute unmodified.
-> **Prohibited:** Modify, fork, derive, distribute modified versions, sell, sublicense, bundle commercially, or remove attribution.
-> **Disclaimer:** The software is provided "AS IS" with no warranty. The author is not liable for any damages, data loss, or legal claims arising from your use. You agree to indemnify the author against any claim arising from your use.
+> **Allowed:** Use, copy, modify, merge, publish, distribute, sublicense, and sell — privately or commercially. Fork it, embed it, ship it.
+> **Only condition:** Keep the copyright notice and the MIT permission notice in copies or substantial portions.
+> **Disclaimer:** The software is provided "AS IS", without warranty of any kind. In no event shall the author be liable for any claim, damages, or other liability (including data loss) arising from its use. This is a tool that **deletes files** — back up your data and review every action before confirming it.
 
 The full text controls — see [LICENSE](./LICENSE).
 

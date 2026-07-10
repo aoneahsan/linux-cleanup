@@ -138,7 +138,8 @@ The manifest is the entry point — it tells you what happened, what's in the bu
 
 - See your logs unless you send them.
 - Push a fix to your machine — releases go out via npm; you re-pull when convenient.
-- Accept code contributions (the [LICENSE](../../LICENSE) prohibits derivative works). Description-only feature requests are very welcome by email.
+
+Pull requests are welcome — the [LICENSE](../../LICENSE) is MIT, so forks and contributions are fine. Description-only feature requests by email are equally welcome.
 
 ---
 

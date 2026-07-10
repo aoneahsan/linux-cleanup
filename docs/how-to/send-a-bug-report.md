@@ -113,7 +113,8 @@ The author cannot:
 
 - See your bundle unless you send it.
 - Push a fix to your machine — releases go out via npm; you re-pull when convenient (`npm install -g linux-cleanup@latest`).
-- Accept code contributions (the LICENSE prohibits derivative works). Description-only feature requests are very welcome.
+
+Pull requests are welcome — the LICENSE is MIT, so forks and contributions are fine. Description-only feature requests are equally welcome.
 
 ---
 

@@ -8,7 +8,7 @@ LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
 LINUX_CLEANUP_LINKEDIN="https://linkedin.com/in/aoneahsan"
 LINUX_CLEANUP_PHONE="+92 304 6619706"
-LINUX_CLEANUP_LICENSE="Source-Available, No-Derivatives, Non-Commercial v1.0"
+LINUX_CLEANUP_LICENSE="MIT License"
 
 # Colors only when stdout is a TTY AND NO_COLOR is not set (de-facto standard).
 # Disable explicitly with --no-color flag (handled in cleanup.sh).

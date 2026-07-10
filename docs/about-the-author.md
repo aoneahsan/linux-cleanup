@@ -104,7 +104,7 @@ Address:   https://zaions.com/address
 
 ## License
 
-linux-cleanup is licensed under the **Source-Available, No-Derivatives, Non-Commercial v1.0** licence. You can read it, run it, share it, and use it personally or in your team. You can't fork it, ship a derivative, or sell it. Read the full terms in [LICENSE](../LICENSE). For commercial use cases the licence blocks, [email me](mailto:aoneahsan@gmail.com) — most can be accommodated with a custom agreement.
+linux-cleanup is licensed under the **[MIT License](../LICENSE)** — permissive and OSI-approved. You can read it, run it, share it, modify it, fork it, embed it in other tools, and use it personally, in your team, or commercially. The only condition is keeping the copyright and MIT permission notice in copies. It's provided "AS IS" with no warranty — read the full terms in [LICENSE](../LICENSE). Questions? [email me](mailto:aoneahsan@gmail.com).
 
 ---
 
