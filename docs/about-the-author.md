@@ -108,6 +108,6 @@ linux-cleanup is licensed under the **[MIT License](../LICENSE)** — permissive
 
 ---
 
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-07-11 · **Tool version**: 1.4.0
 
 > _"Build the small thing properly, document it once, and never apologise for it again."_

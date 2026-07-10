@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Email the maintainer
+    url: mailto:aoneahsan@gmail.com
+    about: Prefer email over a public tracker? Reach the maintainer directly.
+  - name: Support the project
+    url: https://aoneahsan.com/payment?project-id=linux-cleanup&project-identifier=linux-cleanup
+    about: If linux-cleanup saved you time, you can support the work here.

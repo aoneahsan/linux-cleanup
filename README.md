@@ -13,7 +13,7 @@
 
 | | |
 |---|---|
-| **Version** | 1.3.1 |
+| **Version** | 1.4.0 |
 | **Status** | Stable — free and open source under the MIT License |
 | **Author** | Ahsan Mahmood &middot; aoneahsan@gmail.com |
 | **License** | [MIT](./LICENSE) — free to use, modify, fork, and distribute (attribution required) |
@@ -346,6 +346,18 @@ You can also reach the author via:
 - Cannot push fixes to your machine — npm / npx pulls a new version when you re-run
 
 Pull requests and forks are welcome under the MIT License; description-only feature requests by email are just as welcome if you'd rather not code.
+
+---
+
+## Contributing
+
+linux-cleanup is [MIT licensed](./LICENSE) and open to contributions.
+
+- **Fork and open a pull request** — no special access needed.
+- **Report bugs / request features** via [GitHub issues](https://github.com/aoneahsan/linux-cleanup/issues) or email.
+- `main` is protected: changes land through reviewed PRs; only the maintainer pushes to `main` directly.
+
+See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for dev setup, coding standards (safety-first, offline-only, ShellCheck-clean), and how to request contributor access.
 
 ---
 

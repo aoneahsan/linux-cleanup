@@ -126,4 +126,4 @@ Disables the staleness gate. Wipes recently-used Gradle wrappers, AVDs you might
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-07-11 · **Tool version**: 1.4.0

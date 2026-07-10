@@ -139,4 +139,4 @@ See the [CHANGELOG](../CHANGELOG.md) for full details.
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan) · [npm](https://npmjs.com/~aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-07-11 · **Tool version**: 1.4.0
