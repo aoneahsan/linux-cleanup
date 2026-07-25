@@ -39,3 +39,16 @@ request, may turn production source maps on (e.g. a one-off Sentry upload).
 Global records (rules, policy, audit reports) live in the `ahsan-notebook` repo at
 `static/assets/claude-code/`; the `~/.claude/…` paths are symlinks into it. Full text: `~/.claude/CLAUDE.md`.
 (Owner directives 2026-07-11 / 2026-07-14; fleet-rolled 2026-07-16.)
+
+<!-- RULE:orcid-bibtex v2026-07-25 -->
+## ORCID / BibTeX record
+
+This project is published as a work on ORCID **0009-0006-2311-8687** (Ahsan Mahmood). Its BibTeX entry lives at
+`~/Documents/ahsan-work/ahsan-notebook/static/assets/personal/orcid-project-projects-files/linux-cleanup.bib`, beside a
+combined `aoneahsan-all-works.bib` used for a single import.
+
+On **"update ORCID profile info"**: regenerate that file from this project's portfolio-info file and its
+**probe-verified** live URLs, refresh the combined file in the same edit, and invoke
+`aoneahsan-cccs-orcid-profile` + `aoneahsan-cccs-bibtex` (agent: `aoneahsan-ccca-orcid`). Never invent a URL, a
+DOI or a release year — an unreachable channel is omitted, never claimed. Importing, and the work-type retype
+that BibTeX cannot perform, are owner-only steps recorded in that folder's `MANUAL-TASKS.md`.
