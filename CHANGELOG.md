@@ -9,6 +9,10 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [1.4.0] — 2026-07-11
 
+The relicensing release: linux-cleanup becomes permissive open source and opens
+to outside contributions. No behaviour change — the CLI surface, safety guards,
+and staleness gates are identical to 1.3.1.
+
 ### Changed
 
 - **Relicensed to the [MIT License](./LICENSE).** linux-cleanup was previously
@@ -17,8 +21,44 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
   modify, fork, redistribute, and use commercially, with attribution. The MIT
   "AS IS / no liability" disclaimer replaces the prior warranty, liability,
   and indemnification terms. `package.json` now declares `"license": "MIT"`,
-  and all README/docs references were updated accordingly. (Applies going
-  forward; previously published releases keep the license they shipped under.)
+  `lib/common.sh` reports `MIT License` in every CLI, TUI, help, and report
+  surface, and all README/docs references were updated accordingly. (Applies
+  going forward; previously published releases keep the license they shipped
+  under.)
+- **`bugs.url` now points at GitHub Issues** (`https://github.com/aoneahsan/linux-cleanup/issues`)
+  instead of a `mailto:` link, so `npm bugs` and the npmjs.com sidebar resolve
+  to the public tracker. Email remains available via `bugs.email`.
+- **`homepage` now points at the repository** instead of the author's portfolio
+  site, so the npmjs.com "Homepage" link leads to the project.
+- **`description` shortened** to a single line matching the README tagline. The
+  previous description was a keyword list that also claimed a specific
+  reclaimable range; how much a run reclaims depends entirely on the machine, so
+  the claim was removed rather than restated.
+- **`keywords` trimmed** from 18 to 12 genuine search terms.
+
+### Added
+
+- **Root [`CONTRIBUTING.md`](./CONTRIBUTING.md)** — the fork-and-PR flow, how to
+  request collaborator access, the governance rule that `main` is protected and
+  every change lands through a reviewed PR, and the coding standards
+  (safety-first, offline-only, ShellCheck-clean, Bash 4+).
+- **GitHub issue templates** under `.github/ISSUE_TEMPLATE/` — bug report,
+  feature request, contributor-access request, plus a `config.yml` routing
+  security reports and support links.
+- **`funding`** in `package.json`, pointing at the project's support page.
+- **`assets/logo.svg`** — the SVG logo master used by the README.
+- **README rebuilt to the canonical package pattern** — the destructive nature
+  of the tool and the absence of any undo now appear above the installation
+  instructions, the environment-variable table records that
+  `LINUX_CLEANUP_HOME` is read by the Node launcher only, and every link is
+  absolute so it resolves when rendered on npmjs.com.
+
+### Notes
+
+- Users installing from npm are still on 1.3.1 and therefore still receive the
+  old license text. Publishing 1.4.0 is what delivers the relicense to them.
+- 1.3.0 appears below but was never published to npm; its changes reached users
+  as part of 1.3.1.
 
 ---
 
@@ -340,4 +380,5 @@ Initial public release.
 
 ---
 
-[1.0.0]: https://example.invalid/linux-cleanup/releases/tag/v1.0.0
+Every release is published to [npm](https://www.npmjs.com/package/linux-cleanup);
+the source lives at [github.com/aoneahsan/linux-cleanup](https://github.com/aoneahsan/linux-cleanup).

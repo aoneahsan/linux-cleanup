@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="linux-cleanup logo">
+  <title>linux-cleanup</title>
+  <defs>
+    <linearGradient id="lcBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14b8a6" />
+      <stop offset="1" stop-color="#0f5132" />
+    </linearGradient>
+    <linearGradient id="lcPlatter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#d1fae5" />
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="url(#lcBg)" />
+
+  <!-- Disk stack: two platters remain, the top one is being reclaimed -->
+  <g transform="translate(0 6)">
+    <ellipse cx="60" cy="84" rx="34" ry="11" fill="url(#lcPlatter)" />
+    <path d="M26 84v10c0 6.1 15.2 11 34 11s34-4.9 34-11V84c0 6.1-15.2 11-34 11s-34-4.9-34-11z" fill="#a7f3d0" />
+
+    <ellipse cx="60" cy="62" rx="34" ry="11" fill="url(#lcPlatter)" />
+    <path d="M26 62v10c0 6.1 15.2 11 34 11s34-4.9 34-11V62c0 6.1-15.2 11-34 11s-34-4.9-34-11z" fill="#a7f3d0" />
+
+    <!-- Dissolving top platter -->
+    <ellipse cx="60" cy="40" rx="34" ry="11" fill="#ffffff" opacity=".55" />
+  </g>
+
+  <!-- Reclaimed fragments sweeping away -->
+  <g fill="#ffffff">
+    <circle cx="101" cy="34" r="4.5" opacity=".9" />
+    <circle cx="112" cy="23" r="3" opacity=".7" />
+    <circle cx="97" cy="19" r="2.2" opacity=".5" />
+    <circle cx="110" cy="42" r="2" opacity=".45" />
+  </g>
+</svg>

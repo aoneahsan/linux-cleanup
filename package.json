@@ -1,7 +1,7 @@
 {
   "name": "linux-cleanup",
   "version": "1.4.0",
-  "description": "Safe, modular disk + cache cleanup utility for Linux. Reclaim 10-50+ GB of regenerable junk (yarn/npm/pnpm caches, Chrome/Firefox/Brave caches, Gradle, Cypress, Playwright, Android AVDs, stale node_modules, browser partials, system journals, kernels) with allowlist-based safety guards, JSON session reports, and Markdown/HTML export.",
+  "description": "Safe, modular disk and cache cleanup for Linux — prune by default, allowlist-guarded.",
   "bin": "bin/linux-cleanup.js",
   "main": "bin/linux-cleanup.js",
   "scripts": {
@@ -31,15 +31,9 @@
     "disk-cleanup",
     "cache-cleanup",
     "disk-space",
-    "free-disk-space",
+    "node-modules",
     "yarn-cache",
     "npm-cache",
-    "pnpm-cache",
-    "node-modules",
-    "android",
-    "gradle",
-    "cypress",
-    "playwright",
     "developer-tools",
     "system-utility",
     "bash",
@@ -51,7 +45,7 @@
     "url": "https://aoneahsan.com"
   },
   "license": "MIT",
-  "homepage": "https://aoneahsan.com",
+  "homepage": "https://github.com/aoneahsan/linux-cleanup",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aoneahsan/linux-cleanup.git"
@@ -59,6 +53,10 @@
   "bugs": {
     "url": "https://github.com/aoneahsan/linux-cleanup/issues",
     "email": "aoneahsan@gmail.com"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://aoneahsan.com/payment?project-id=linux-cleanup&project-identifier=linux-cleanup"
   },
   "preferGlobal": true
 }
