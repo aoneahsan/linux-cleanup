@@ -7,6 +7,31 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.5.1] — 2026-09-18
+
+Completes 1.5.0's fix. The whole-unit rule it introduced for Gradle and Android
+Studio applies to every cache built from extracted package directories.
+
+### Fixed
+
+- **Package caches are pruned in whole entries, never file by file.** A file-level
+  prune inside the npx cache, the Yarn v1 cache, the pub cache, the bun cache,
+  Cypress and Playwright browser builds, or TypeScript's typings cache removed the
+  idle files of an entry still in use — a CLI's rarely-run subcommand, a package's
+  `pubspec.yaml`, part of a browser build — leaving it looking installed while
+  missing files, so the tool broke on the first code path not used in the window.
+  Each npx tree, cached package, browser or Cypress version is now one unit: it
+  goes whole once nothing inside has been used for N days, or stays whole.
+  Caches of self-contained files (npm `_cacache`, Yarn berry zips, pnpm store,
+  pip, composer, deno, browser HTTP caches) still prune file by file.
+
+**Deprecated:** 1.5.0 and 1.4.0 carry the defect above (1.4.0 also the Gradle
+defect fixed in 1.5.0). If a run of either left a tool broken, `dart pub cache
+repair --all`, `npm ci` inside the affected `~/.npm/_npx/<hash>`, or deleting the
+affected cache entry restores it.
+
+---
+
 ## [1.5.0] — 2026-09-18
 
 The dev-cache safety release. Pruning at a short threshold (`-d 30`) could break

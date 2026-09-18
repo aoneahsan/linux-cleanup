@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.5.0"
+LINUX_CLEANUP_VERSION="1.5.1"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -312,10 +312,14 @@ newest_access_age_days() {
   printf '%d' $(( (now - newest) / 86400 ))
 }
 
-# Bytes freed by whole-unit removals. Callers that need a total zero it first;
-# unit helpers print their own progress lines, so they cannot also return a
-# byte count on stdout.
+# Whole-unit removal tallies. Callers that need totals zero them first; unit
+# helpers print their own progress lines, so they cannot also return a byte
+# count on stdout. UNITS_VERBOSE=0 silences the per-unit lines for caches with
+# thousands of entries (package caches); callers then print a summary.
 UNITS_FREED=0
+UNITS_REMOVED=0
+UNITS_KEPT=0
+UNITS_VERBOSE=1
 
 # remove_unit <path> <label> — delete one whole unit and add its size to UNITS_FREED.
 remove_unit() {
@@ -323,14 +327,17 @@ remove_unit() {
   b=$(dir_bytes "$path")
   if safe_rm "$path"; then
     UNITS_FREED=$(( UNITS_FREED + b ))
-    ui_ok "  removed ${label} ($(bytes_pretty "$b"))"
+    UNITS_REMOVED=$(( UNITS_REMOVED + 1 ))
+    (( UNITS_VERBOSE )) && ui_ok "  removed ${label} ($(bytes_pretty "$b"))"
   fi
+  return 0
 }
 
 # prune_stale_units <root> <days> <glob> [ignore-name...]
 #
-# Treats each directory child of <root> matching <glob> as one indivisible
-# unit (a Gradle per-version cache, an old IDE version's cache). A unit is
+# Treats each directory matching <root>/<glob> as one indivisible unit (a
+# Gradle per-version cache, an old IDE version, one extracted package in a
+# package cache, one npx install tree, one browser build). A unit is
 # deleted whole only when nothing inside it — ignoring the named marker
 # files — has been read or written for more than <days> days. Recently-used
 # units survive intact. Never deletes part of a unit: for caches like these a
@@ -350,10 +357,52 @@ prune_stale_units() {
     if (( age > days )); then
       remove_unit "$entry" "${entry/#$HOME/\~} — ${age}d idle"
     else
-      ui_info "  kept ${entry/#$HOME/\~} (${age}d idle — within ${days}d window)"
+      UNITS_KEPT=$(( UNITS_KEPT + 1 ))
+      (( UNITS_VERBOSE )) && ui_info "  kept ${entry/#$HOME/\~} (${age}d idle — within ${days}d window)"
     fi
   done
   shopt -u nullglob dotglob
+}
+
+# prune_package_cache <root> <glob> — quiet whole-entry pruning for a cache
+# made of extracted package DIRECTORIES (yarn v1, npx trees, pub, bun,
+# Cypress/Playwright builds, TypeScript typings). File-level pruning there
+# leaves packages that look installed but are missing files — a tool breaks on
+# the first code path it had not used in the window. Prints one summary line;
+# adds bytes freed to UNITS_FREED. No prompt: callers confirm.
+prune_package_cache() {
+  local root="$1" glob="$2" before_freed=$UNITS_FREED
+  [[ -d "$root" ]] || return 0
+  UNITS_REMOVED=0; UNITS_KEPT=0; UNITS_VERBOSE=0
+  prune_stale_units "$root" "${DAYS:-100}" "$glob"
+  UNITS_VERBOSE=1
+  if (( UNITS_REMOVED > 0 )); then
+    ui_ok "pruned ${root/#$HOME/\~}: ${UNITS_REMOVED} idle entries, $(bytes_pretty $(( UNITS_FREED - before_freed ))) freed (kept ${UNITS_KEPT} in use, whole)"
+  else
+    ui_info "nothing idle ≥${DAYS:-100}d in ${root/#$HOME/\~} (${UNITS_KEPT} entries in use)"
+  fi
+}
+
+# clean_target_units <label> <root> <glob> [desc] — interactive wrapper around
+# prune_package_cache; --purge-all keeps the legacy whole-directory wipe.
+clean_target_units() {
+  local label="$1" root="$2" glob="$3" desc="${4:-}"
+  if [[ ! -e "$root" ]]; then
+    ui_info "$label — already absent"
+    return 0
+  fi
+  if (( ${PURGE_ALL:-0} == 1 )); then
+    clean_target "$label" "$root" "$desc"
+    return
+  fi
+  local prompt="Remove $label entries unused ≥${DAYS}d ($(dir_size "$root") in total; whole entries only)?"
+  [[ -n "$desc" ]] && prompt+=" — $desc"
+  if ui_confirm "$prompt" n; then
+    UNITS_FREED=0
+    prune_package_cache "$root" "$glob"
+  else
+    ui_info "$label — skipped"
+  fi
 }
 
 # prune_matching_files <root> <days> <name-glob> — delete only files matching

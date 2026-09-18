@@ -88,8 +88,8 @@ Every `sudo` call is a separate, reviewable invocation. The script does not run 
 
 Only the following, and only when the relevant guards pass:
 
-- Package-manager **caches**: `~/.cache/yarn`, `~/.npm/_cacache`, `~/.local/share/pnpm/store`, `~/.cache/pip`, `~/.composer/cache`
-- App **caches**: Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, `~/.cache/Cypress`, `~/.cache/ms-playwright`, `~/.zoom/Cache`, `~/.config/Code/CachedExtensionVSIXs`, `~/.config/Cursor/CachedExtensionVSIXs`
+- Package-manager **caches**: `~/.npm/_cacache`, `~/.yarn/berry/cache`, `~/.local/share/pnpm/store`, `~/.cache/pip`, `~/.cache/composer` file by file; `~/.cache/yarn`, `~/.npm/_npx`, `~/.bun/install/cache` and `~/.pub-cache` in whole entries only (one package or npx tree at a time)
+- App **caches**: Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, Cypress / Playwright builds and TypeScript typings (whole versions only), `~/.zoom/Cache`, `~/.config/Code/CachedExtensionVSIXs`, `~/.config/Cursor/CachedExtensionVSIXs`
 - Gradle distributions, per-version caches and old Android Studio versions as **whole units** idle ≥ N days (in-use distributions and the current IDE are never touched; Gradle's own stores such as `modules-2` and `transforms-*` are left to Gradle's built-in cleanup)
 - Docker build cache and dangling images older than N days, only when the daemon is already running
 - Dev-tool **data** that's both stale and unused: stale Android AVDs, stale Flutter pub cache, stale Dart analysis-server caches, stale flatpak user data

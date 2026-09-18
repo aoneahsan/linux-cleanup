@@ -151,9 +151,9 @@ clean_ide_caches() {
 }
 
 clean_test_runners() {
-  clean_target "Cypress binaries"        "$HOME/.cache/Cypress"          "reinstalled by next yarn install"
-  clean_target "Playwright browsers"     "$HOME/.cache/ms-playwright"    "reinstalled by 'npx playwright install'"
-  clean_target "Playwright-Go binaries"  "$HOME/.cache/ms-playwright-go" "regenerated"
+  clean_target_units "Cypress binaries"       "$HOME/.cache/Cypress"          '*' "reinstalled by next yarn install"
+  clean_target_units "Playwright browsers"    "$HOME/.cache/ms-playwright"    '*' "reinstalled by 'npx playwright install'"
+  clean_target_units "Playwright-Go binaries" "$HOME/.cache/ms-playwright-go" '*' "regenerated"
 }
 
 clean_zoom() {
@@ -166,7 +166,7 @@ clean_zoom() {
 }
 
 clean_typescript_cache() {
-  clean_target "TypeScript watcher cache" "$HOME/.cache/typescript" "regenerated"
+  clean_target_units "TypeScript typings cache" "$HOME/.cache/typescript" '*' "regenerated"
 }
 
 run_app_caches() {

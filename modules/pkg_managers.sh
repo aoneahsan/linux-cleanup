@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # Package-manager caches. All regenerable.
+# Caches of single files (npm _cacache, yarn berry zips, pnpm store, pip,
+# composer, deno) prune file by file. Caches of extracted package DIRECTORIES
+# (yarn v1, npx trees, bun) prune whole entries only — see prune_package_cache.
 
-clean_yarn_v1()   { clean_target "Yarn v1 cache"           "$HOME/.cache/yarn"            "regenerated on next yarn install"; }
+clean_yarn_v1()   { clean_target_units "Yarn v1 cache"     "$HOME/.cache/yarn" 'v*/*'    "regenerated on next yarn install"; }
 clean_yarn_berry(){ clean_target "Yarn berry global cache" "$HOME/.yarn/berry/cache"      "regenerated on next install"; }
-clean_npm_npx()   { clean_target "npx package cache"       "$HOME/.npm/_npx"              "regenerated on next npx run"; }
+clean_npm_npx()   { clean_target_units "npx package cache" "$HOME/.npm/_npx" '*'         "regenerated on next npx run"; }
 clean_pnpm_store(){ clean_target "pnpm content store"      "$HOME/.local/share/pnpm/store" "regenerated on next pnpm install (preserves global packages + pnpm setup)"; }
 clean_pnpm_cache(){ clean_target "pnpm cache"              "$HOME/.cache/pnpm"            "regenerated"; }
 clean_composer()  { clean_target "Composer cache"          "$HOME/.cache/composer"        "regenerated"; }
 clean_pip()       { clean_target "pip cache"               "$HOME/.cache/pip"             "regenerated"; }
-clean_bun_cache() { clean_target "bun install cache"       "$HOME/.bun/install/cache"     "regenerated on next bun install (preserves global packages + bun binary)"; }
+clean_bun_cache() { clean_target_units "bun install cache" "$HOME/.bun/install/cache" '*' "regenerated on next bun install (preserves global packages + bun binary)"; }
 clean_deno_cache(){ clean_target "deno cache"              "$HOME/.cache/deno"            "regenerated on next deno run (preserves installed scripts at ~/.deno/bin)"; }
 
 clean_npm_cache() {

@@ -58,7 +58,27 @@ clean_android_avd() {
   fi
 }
 
-clean_pub_cache()   { clean_target "Flutter/Dart pub-cache"     "$HOME/.pub-cache"  "redownloaded by 'flutter pub get'"; }
+# pub-cache holds one extracted directory per package version under
+# hosted/<host>/ and git/ — whole entries only, or `pub get` trusts a package
+# that is missing files.
+clean_pub_cache() {
+  local root="$HOME/.pub-cache"
+  if [[ ! -d "$root" ]]; then
+    ui_info "Flutter/Dart pub-cache — already absent"
+    return 0
+  fi
+  if (( ${PURGE_ALL:-0} == 1 )); then
+    clean_target "Flutter/Dart pub-cache" "$root" "redownloaded by 'flutter pub get'"
+    return
+  fi
+  if ! ui_confirm "Remove pub-cache packages unused ≥${DAYS}d ($(dir_size "$root") in total; whole packages only) — redownloaded by 'flutter pub get'?" n; then
+    ui_info "Flutter/Dart pub-cache — skipped"
+    return
+  fi
+  UNITS_FREED=0
+  prune_package_cache "$root/hosted" '*/*'
+  prune_package_cache "$root/git" '*'
+}
 clean_dart_server() { clean_target "Dart analysis server cache" "$HOME/.dartServer" "regenerated"; }
 
 # Flatpak user dir backs INSTALLED user-scope flatpak apps + their runtimes.

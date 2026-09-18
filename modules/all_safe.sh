@@ -11,27 +11,32 @@
 # Will NOT touch personal data, project node_modules, AVDs, Flatpak, Zoom, /Documents, etc.
 
 ALL_SAFE_TARGETS=(
-  "$HOME/.cache/yarn"
   "$HOME/.yarn/berry/cache"
-  "$HOME/.npm/_npx"
   "$HOME/.npm/_cacache"
   "$HOME/.local/share/pnpm/store"
   "$HOME/.cache/pnpm"
-  "$HOME/.bun/install/cache"
   "$HOME/.cache/deno"
   "$HOME/.cache/composer"
   "$HOME/.cache/pip"
   "$HOME/.cache/google-chrome"
-  "$HOME/.cache/Cypress"
-  "$HOME/.cache/ms-playwright"
-  "$HOME/.cache/ms-playwright-go"
-  "$HOME/.cache/typescript"
   "$HOME/.dartServer"
   "$HOME/.cache/mozilla"
   "$HOME/.cache/BraveSoftware"
   "$HOME/.cache/chromium"
   "$HOME/.cache/microsoft-edge"
   "$HOME/.cache/vivaldi"
+)
+
+# Caches made of extracted package DIRECTORIES: "<root>|<glob of entries>".
+# Each entry goes whole or not at all (prune_package_cache).
+ALL_SAFE_UNIT_TARGETS=(
+  "$HOME/.cache/yarn|v*/*"
+  "$HOME/.npm/_npx|*"
+  "$HOME/.bun/install/cache|*"
+  "$HOME/.cache/Cypress|*"
+  "$HOME/.cache/ms-playwright|*"
+  "$HOME/.cache/ms-playwright-go|*"
+  "$HOME/.cache/typescript|*"
 )
 
 run_all_safe() {
@@ -43,8 +48,9 @@ run_all_safe() {
   fi
   ui_section "All-safe cleanup (regenerable caches only — ${mode_label})"
   ui_info "Targets:"
-  local t total_b=0 sb
-  for t in "${ALL_SAFE_TARGETS[@]}"; do
+  local t total_b=0 sb unit_roots=() u
+  for u in "${ALL_SAFE_UNIT_TARGETS[@]}"; do unit_roots+=("${u%%|*}"); done
+  for t in "${ALL_SAFE_TARGETS[@]}" "${unit_roots[@]}"; do
     if [[ -e "$t" ]]; then
       sb=$(dir_bytes "$t")
       total_b=$(( total_b + sb ))
@@ -72,7 +78,7 @@ run_all_safe() {
 
   # Sanity check: assert no listed target falls inside a protected runtime tree.
   local pat
-  for t in "${ALL_SAFE_TARGETS[@]}"; do
+  for t in "${ALL_SAFE_TARGETS[@]}" "${unit_roots[@]}"; do
     for pat in "$HOME/.nvm" "$HOME/.cargo" "$HOME/.rustup" "$HOME/.volta" \
                "$HOME/.fnm" "$HOME/go" "$HOME/.bashrc" "$HOME/.profile" \
                "$HOME/.bash_profile" "$HOME/.zshrc" "$HOME/.bash_aliases" \
@@ -116,6 +122,15 @@ run_all_safe() {
   done
 
   UNITS_FREED=0
+  for u in "${ALL_SAFE_UNIT_TARGETS[@]}"; do
+    t="${u%%|*}"
+    [[ -e "$t" ]] || continue
+    if (( ${PURGE_ALL:-0} == 1 )); then
+      remove_unit "$t" "$t"
+    else
+      prune_package_cache "$t" "${u#*|}"
+    fi
+  done
   if (( ${PURGE_ALL:-0} == 1 )); then
     for t in "$HOME/.gradle/caches" "$HOME/.gradle/wrapper"; do
       [[ -e "$t" ]] && remove_unit "$t" "$t"

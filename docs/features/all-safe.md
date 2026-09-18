@@ -14,8 +14,8 @@ Sequences through every "safe / regenerable" category and runs it back-to-back w
 
 | Category | What it cleans |
 |---|---|
-| Package-manager caches | `~/.cache/yarn`, `~/.npm/_cacache`, `~/.local/share/pnpm/store`, `~/.cache/pip`, `~/.composer/cache` |
-| App caches | Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, `~/.cache/Cypress`, `~/.cache/ms-playwright`, `~/.zoom/Cache`, VSCode / Cursor `CachedExtensionVSIXs` |
+| Package-manager caches | File by file: `~/.npm/_cacache`, `~/.yarn/berry/cache`, `~/.local/share/pnpm/store`, `~/.cache/pip`, `~/.cache/composer`. **Whole entries only** (one package / one npx tree at a time): `~/.cache/yarn`, `~/.npm/_npx`, `~/.bun/install/cache` |
+| App caches | Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, Cypress / Playwright builds and TypeScript typings (whole versions only), `~/.zoom/Cache`, VSCode / Cursor `CachedExtensionVSIXs` |
 | Gradle + Android Studio | Gradle distributions, per-version caches and old Android Studio versions as **whole units** idle ≥ N days (in-use distributions and the current IDE are never touched; Gradle's own stores such as `modules-2` and `transforms-*` are left to Gradle's built-in cleanup) |
 | Docker | Build cache and dangling images older than N days — only when the daemon is already running; never containers, volumes or tagged images |
 | Dev-tool data (stale-only) | Stale Android AVDs, stale Flutter pub-cache, stale Dart analysis-server caches, stale flatpak user data |
