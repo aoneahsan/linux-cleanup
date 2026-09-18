@@ -23,7 +23,7 @@
 | 6 | Age `/tmp` | Removes entries older than `--days N` from `/tmp/` (uses `find -mtime`) |
 | 7 | Drop kernel page cache | `sudo sync; sudo sysctl vm.drop_caches=3` |
 
-Step 7 doesn't free disk — it frees RAM by releasing the page cache. Linux re-populates it lazily; the impact on your next disk read is negligible.
+Step 7 doesn't free disk — it frees RAM by releasing the page cache, which Linux re-populates lazily as files are read again. Since 1.5.0 it is never auto-accepted by `-y`: it is offered only when you answer the prompt yourself.
 
 ---
 

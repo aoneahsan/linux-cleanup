@@ -16,12 +16,20 @@
 
 LCLEAN_FINISHED=${LCLEAN_FINISHED:-0}
 
+# Where crash and debug bundles go: a "feedback" dir beside logs/reports.
+# The parent must be an absolute path with no newline or control character;
+# anything else falls back to ~/.linux-cleanup. `mkdir -p` creates whatever it
+# is handed, so an unvalidated value would litter the user's working directory
+# (ISSUE-004: a relative, newline-bearing path did exactly that once).
 _lclean_crash_dir() {
   local parent
   if [[ -n "${LINUX_CLEANUP_DATA_HOME:-}" ]]; then
     parent="$LINUX_CLEANUP_DATA_HOME"
   else
     parent="$(dirname "${LOG_DIR:-/tmp}")"
+  fi
+  if [[ "$parent" != /* || "$parent" == *[[:cntrl:]]* ]]; then
+    parent="${HOME:-/tmp}/.linux-cleanup"
   fi
   printf '%s/feedback' "$parent"
 }

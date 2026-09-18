@@ -5,6 +5,9 @@
 # survive — important for things you reopen every 1-2 months
 # (Gradle wrapper distros, Playwright browsers, etc.).
 # Pass --purge-all to restore the pre-1.2.0 wipe-the-whole-thing behavior.
+# Gradle, Android Studio and Docker are handled after the file-level targets,
+# as whole units only (see modules/app_caches.sh and modules/dev_tools.sh) —
+# pruning inside them file by file corrupts them.
 # Will NOT touch personal data, project node_modules, AVDs, Flatpak, Zoom, /Documents, etc.
 
 ALL_SAFE_TARGETS=(
@@ -19,9 +22,6 @@ ALL_SAFE_TARGETS=(
   "$HOME/.cache/composer"
   "$HOME/.cache/pip"
   "$HOME/.cache/google-chrome"
-  "$HOME/.cache/Google"
-  "$HOME/.gradle/caches"
-  "$HOME/.gradle/wrapper"
   "$HOME/.cache/Cypress"
   "$HOME/.cache/ms-playwright"
   "$HOME/.cache/ms-playwright-go"
@@ -51,15 +51,21 @@ run_all_safe() {
       printf "  %10s  %s\n" "$(dir_size "$t")" "$t"
     fi
   done
-  ui_info "Currently on disk across all targets: $(bytes_pretty "$total_b")"
+  for t in "$HOME/.gradle" "$HOME/.cache/Google" "$HOME/.local/share/Google"; do
+    [[ -e "$t" ]] && printf "  %10s  %s  (whole units only)\n" "$(dir_size "$t")" "$t"
+  done
+  ui_info "Currently on disk across file-level targets: $(bytes_pretty "$total_b")"
   if (( ${PURGE_ALL:-0} == 1 )); then
     ui_warn "FULL-PURGE MODE — every target above will be wiped, including recently-used files."
     ui_warn "Re-run without --purge-all to keep anything used in the last ${DAYS:-100} days."
   else
     ui_info "Will keep anything touched in the last ${DAYS:-100} days (atime AND mtime)."
-    ui_info "Rarely-used assets (Gradle wrapper distros, old Playwright browsers, etc.) survive."
+    ui_info "Rarely-used assets (old Playwright browsers, etc.) survive."
+    ui_info "Gradle distributions, per-version caches and old Android Studio versions go only as WHOLE units idle ≥${DAYS:-100}d;"
+    ui_info "the Gradle versions you build with and the current Android Studio are never touched."
+    ui_info "Docker: build cache + dangling images older than ${DAYS:-100}d (only if the daemon is already running)."
   fi
-  ui_warn "Will NOT touch: ~/Documents, ~/Pictures, project node_modules, Android AVDs, Flatpak, Zoom, ~/.config, ~/.claude."
+  ui_warn "Will NOT touch: ~/Documents, ~/Pictures, project node_modules, Android SDK + AVDs, Flatpak, Zoom, ~/.config, ~/.claude."
   ui_warn "Globally installed packages (npm/pnpm/yarn/bun/deno) are PRESERVED."
   ui_warn "Shell-init files (.bashrc, .profile, .zshrc, etc.) are NEVER touched."
   ui_info "Use --globals to audit unused globals.  Use --doctor to repair shell-init issues."
@@ -109,6 +115,21 @@ run_all_safe() {
     fi
   done
 
+  UNITS_FREED=0
+  if (( ${PURGE_ALL:-0} == 1 )); then
+    for t in "$HOME/.gradle/caches" "$HOME/.gradle/wrapper"; do
+      [[ -e "$t" ]] && remove_unit "$t" "$t"
+    done
+  else
+    ui_info "Gradle (whole units idle ≥${DAYS:-100}d):"
+    prune_gradle_home
+  fi
+  ui_info "Android Studio / Google app caches:"
+  prune_ide_caches
+  freed=$(( freed + UNITS_FREED ))
+
+  docker_prune_regenerable
+
   ui_section "All-safe complete"
-  ui_info "Total freed: $(bytes_pretty "$freed")"
+  ui_info "Total freed: $(bytes_pretty "$freed") (Docker reports its own figure above)"
 }

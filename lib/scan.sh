@@ -15,9 +15,9 @@ scan_caches_table() {
   ui_target_row "Composer cache"           "$HOME/.cache/composer"
   ui_target_row "pip cache"                "$HOME/.cache/pip"
   ui_target_row "Chrome cache"             "$HOME/.cache/google-chrome"
-  ui_target_row "Chrome ancillary cache"   "$HOME/.cache/Google"
-  ui_target_row "Gradle build caches"      "$HOME/.gradle/caches"
-  ui_target_row "Gradle wrapper distros"   "$HOME/.gradle/wrapper"
+  ui_target_row "Android Studio caches (all versions)" "$HOME/.cache/Google"
+  ui_target_row "Gradle caches (whole units)"  "$HOME/.gradle/caches"
+  ui_target_row "Gradle distros (whole units)" "$HOME/.gradle/wrapper"
   ui_target_row "Cypress binary cache"     "$HOME/.cache/Cypress"
   ui_target_row "Playwright browsers"      "$HOME/.cache/ms-playwright"
   ui_target_row "Playwright-Go"            "$HOME/.cache/ms-playwright-go"
@@ -28,6 +28,12 @@ scan_caches_table() {
   ui_target_row "Flatpak runtimes"         "$HOME/.local/share/flatpak"
   ui_target_row "Zoom data"                "$HOME/.zoom/data"
   ui_target_row "/tmp"                     "/tmp"
+  # Only when the daemon is already up — a scan must not start an on-demand Docker.
+  if _docker_ready >/dev/null 2>&1; then
+    printf "  %-44s %10s  %s\n" "Docker build cache" \
+      "$(docker system df --format '{{.Type}}|{{.Size}}' 2>/dev/null | awk -F'|' '$1=="Build Cache"{print $2}')" \
+      "${C_DIM}docker builder${C_RST}"
+  fi
 }
 
 scan_partial_downloads() {

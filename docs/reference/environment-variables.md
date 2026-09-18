@@ -8,7 +8,8 @@
 | `CLEANUP_NO_COLOR` | `0` | linux-cleanup-specific. Set to `1` to disable colour. Useful when you want colour everywhere except this tool. |
 | `LINUX_CLEANUP_LOG_DIR` | `~/.linux-cleanup/logs/` (npx / npm-global) or `<repo>/logs/` (git clone) | Where session logs go. Created if missing. |
 | `LINUX_CLEANUP_REPORTS_DIR` | `~/.linux-cleanup/reports/` (npx / npm-global) or `<repo>/reports/` (git clone) | Where JSON reports go. Created if missing. |
-| `LINUX_CLEANUP_DATA_HOME` | unset (falls back to `dirname $LINUX_CLEANUP_LOG_DIR`) | Parent directory for `logs/`, `reports/`, and `feedback/` subdirectories. Lets you point everything at e.g. an encrypted volume. |
+| `LINUX_CLEANUP_HOME` | `~/.linux-cleanup` | **Node launcher only** (`npx` / `npm install -g`): the data directory the launcher derives `LINUX_CLEANUP_LOG_DIR`, `LINUX_CLEANUP_REPORTS_DIR` and `LINUX_CLEANUP_DATA_HOME` from. A git-clone run of `cleanup.sh` never reads it — set the three variables it feeds instead. |
+| `LINUX_CLEANUP_DATA_HOME` | unset (falls back to `dirname $LINUX_CLEANUP_LOG_DIR`) | Parent directory for `logs/`, `reports/`, and `feedback/` subdirectories. Lets you point everything at e.g. an encrypted volume. A value that is not an absolute path, or that contains a newline or other control character, falls back to `~/.linux-cleanup`. |
 | `LINUX_CLEANUP_NPX` | unset | Set to `1` by the Node launcher (`bin/linux-cleanup.js`) when invoked via `npx` or `npm install -g`. Triggers a one-line note in the log header. Don't set this manually — it's an internal marker. |
 | `XDG_CONFIG_HOME` | `~/.config` | Where personal-roots config files live (`personal-roots.txt`, `project-roots.txt`). Honours the [XDG Base Directory spec](https://specifications.freedesktop.org/basedir-spec/). |
 

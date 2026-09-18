@@ -32,7 +32,7 @@ request, may turn production source maps on (e.g. a one-off Sentry upload).
 2. **Skills always:** before any task, scan the available-skills list and invoke EVERY relevant skill; if a needed
    skill is missing, download/enable/install it (or use the nearest installed equivalent and say so) — never
    proceed skill-less.
-3. **Model workflow:** PLAN and REVIEW on **Fable 5**; EXECUTE the approved plan on **Opus 4.8**. Plans in
+3. **Model workflow:** PLAN and REVIEW on **Fable 5**; EXECUTE the approved plan on **Opus 5** (model floor: Fable 5 / Opus 5 or newer, never Opus 4.8 or older). Plans in
    `~/.claude/plans/`; multi-phase features keep a resumable tracker (`docs/features/<slug>/00-tracker.json`),
    resumed rather than re-planned from zero.
 

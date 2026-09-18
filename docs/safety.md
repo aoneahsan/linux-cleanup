@@ -61,7 +61,7 @@ System cleanup (`--system`) is the only mode that calls `sudo`, and it does so f
 - `sudo snap set system refresh.retain=2; sudo snap remove --revision <old>`
 - `sudo apt-get autoremove --purge` for old kernels (Debian/Ubuntu only)
 - Aging `/tmp` entries beyond `--days`
-- `sudo sysctl vm.drop_caches=3` to release page-cache memory (cheap, safe, regenerates automatically)
+- `sudo sysctl vm.drop_caches=3` to release page-cache memory — asked interactively only, never auto-accepted by `-y` (it frees no disk and briefly slows the machine)
 
 Every `sudo` call is a separate, reviewable invocation. The script does not run a long-lived sudo session, does not edit `/etc/sudoers`, and does not modify any service.
 
@@ -89,7 +89,9 @@ Every `sudo` call is a separate, reviewable invocation. The script does not run 
 Only the following, and only when the relevant guards pass:
 
 - Package-manager **caches**: `~/.cache/yarn`, `~/.npm/_cacache`, `~/.local/share/pnpm/store`, `~/.cache/pip`, `~/.composer/cache`
-- App **caches**: Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, `~/.gradle/caches/`, `~/.cache/Cypress`, `~/.cache/ms-playwright`, `~/.zoom/Cache`, `~/.config/Code/CachedExtensionVSIXs`, `~/.config/Cursor/CachedExtensionVSIXs`
+- App **caches**: Chrome / Brave / Chromium / Edge / Vivaldi `Cache/`, Firefox `cache2/`, `~/.cache/Cypress`, `~/.cache/ms-playwright`, `~/.zoom/Cache`, `~/.config/Code/CachedExtensionVSIXs`, `~/.config/Cursor/CachedExtensionVSIXs`
+- Gradle distributions, per-version caches and old Android Studio versions as **whole units** idle ≥ N days (in-use distributions and the current IDE are never touched; Gradle's own stores such as `modules-2` and `transforms-*` are left to Gradle's built-in cleanup)
+- Docker build cache and dangling images older than N days, only when the daemon is already running
 - Dev-tool **data** that's both stale and unused: stale Android AVDs, stale Flutter pub cache, stale Dart analysis-server caches, stale flatpak user data
 - **System** caches (with sudo): apt cache, journal logs, snap revisions, old kernels, `/tmp` entries beyond N days, kernel page cache
 - **Stale `node_modules`**: only after you confirm each one

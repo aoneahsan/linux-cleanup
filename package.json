@@ -1,6 +1,6 @@
 {
   "name": "linux-cleanup",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Safe, modular disk and cache cleanup for Linux — prune by default, allowlist-guarded.",
   "bin": "bin/linux-cleanup.js",
   "main": "bin/linux-cleanup.js",

@@ -7,6 +7,62 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.5.0] — 2026-09-18
+
+The dev-cache safety release. Pruning at a short threshold (`-d 30`) could break
+an Android build; this release makes Gradle and Android Studio cleanup
+whole-unit only, and fixes a node_modules finder that could never delete.
+
+### Fixed
+
+- **Gradle is no longer pruned file by file.** Before, idle files inside an
+  in-use wrapper distribution were deleted individually — including rarely-loaded
+  JARs under `lib/plugins/` — while its `.ok` marker stayed, so Gradle never
+  re-downloaded them and builds that needed them failed. Files inside
+  per-version caches (`fileHashes`, `transforms`) and `modules-2` indexes were
+  thinned the same way. Now a distribution goes only as a whole unit when none of
+  its `lib/` JARs has been loaded in N days, a per-version cache or daemon dir
+  goes whole when idle, and the leftover download zip goes once `.ok` marks the
+  unpack complete. `modules-2`, `jars-*`, `transforms-*`, `build-cache-*`,
+  `journal-*`, `jdks` and `native` are left to Gradle's own cleanup.
+- **Android Studio caches are version units.** `~/.cache/Google` (listed as
+  "Chrome ancillary") holds one cache per Android Studio version and was pruned
+  file by file, including the current IDE's indexes. Now the newest version is
+  always kept and older versions (cache and plugins) go whole once idle; the
+  `.home` marker the current IDE reads at startup is ignored when judging idleness.
+- **`--node-modules` could never delete.** Every search root is under
+  `~/Documents`, which the general guard refuses as a whole, so each pick failed
+  with `REFUSE: protected path`. A dedicated guard now accepts only a real
+  `node_modules` directory with a `package.json` beside it, inside the search roots.
+- **`--node-modules` judged activity by the project directory's mtime**, which
+  does not change when files in `src/` are edited — active projects were listed
+  and idle ones hidden. It now uses the newest source file in the project, and in
+  the whole repository for a monorepo workspace.
+- **`--self-test` always exited 0** (ISSUE-001), so `npm test` could never fail.
+  `--self-test`, `--export` and `--doctor` now propagate their status, without the
+  crash handler mistaking a failed check for a crash.
+- **`--export` ignored the npx data directory** and looked only in the package's
+  own `reports/`, missing every report written by an `npx` run.
+- **Crash and debug bundles** are written only to an absolute, newline-free
+  directory, falling back to `~/.linux-cleanup/feedback` (ISSUE-004).
+- The weekly cron entry logs to `$LOG_DIR/cron.log`, as `--help` says.
+
+### Added
+
+- **Docker cleanup:** build cache and dangling images older than N days, in
+  all-safe and the developer-tools step. Skipped when the daemon is not already
+  running, so a socket-activated (on-demand) Docker is never started by a cleanup.
+  Containers, volumes, networks and tagged images are never touched.
+
+### Changed
+
+- `--system -y` no longer drops the kernel page cache: it frees no disk and
+  briefly slows the machine. Answer the prompt yourself to run it.
+- `--help` states exactly where the tool writes (ISSUE-002), and
+  `LINUX_CLEANUP_HOME` is documented (ISSUE-003).
+
+---
+
 ## [1.4.0] — 2026-07-11
 
 The relicensing release: linux-cleanup becomes permissive open source and opens

@@ -101,10 +101,52 @@ clean_flatpak_user() {
   clean_target "Flatpak user data (no installed apps, ${age}d idle)" "$root" "no user-scope flatpak apps installed and ≥${DAYS}d idle"
 }
 
+# _docker_ready — 0 when a Docker daemon is already up and reachable.
+# A socket-activated daemon that is not running is left asleep: a cleanup
+# run must not start a service the user keeps on demand.
+_docker_ready() {
+  command -v docker >/dev/null 2>&1 || { ui_info "Docker — not installed"; return 1; }
+  if command -v systemctl >/dev/null 2>&1 \
+     && systemctl is-active --quiet docker.socket 2>/dev/null \
+     && ! systemctl is-active --quiet docker.service 2>/dev/null; then
+    ui_info "Docker — daemon not running (on-demand); skipped rather than starting it"
+    return 1
+  fi
+  if ! timeout 15 docker info >/dev/null 2>&1; then
+    ui_info "Docker — daemon not reachable (stopped, or no permission); skipped"
+    return 1
+  fi
+}
+
+# docker_prune_regenerable — build cache + dangling images unused ≥${DAYS}d.
+# Never touches containers, volumes, networks or tagged images. No prompt:
+# callers confirm. Docker prints its own reclaimed-space figure.
+docker_prune_regenerable() {
+  _docker_ready || return 0
+  local filter=() out
+  (( ${PURGE_ALL:-0} == 1 )) || filter=(--filter "until=$(( ${DAYS:-100} * 24 ))h")
+  out=$(docker builder prune -f ${filter[@]+"${filter[@]}"} 2>&1 | tail -1)
+  ui_ok "Docker build cache — ${out:-nothing to prune}"
+  out=$(docker image prune -f ${filter[@]+"${filter[@]}"} 2>&1 | tail -1)
+  ui_ok "Docker dangling images — ${out:-nothing to prune}"
+}
+
+clean_docker() {
+  _docker_ready || return 0
+  local scope="unused ≥${DAYS}d"
+  (( ${PURGE_ALL:-0} == 1 )) && scope="ALL (FULL PURGE)"
+  if ui_confirm "Prune Docker build cache + dangling images, ${scope}? (containers, volumes and tagged images untouched)" n; then
+    docker_prune_regenerable
+  else
+    ui_info "Docker — skipped"
+  fi
+}
+
 run_dev_tools() {
   ui_section "Developer-tool data"
   clean_android_avd
   clean_pub_cache
   clean_dart_server
   clean_flatpak_user
+  clean_docker
 }

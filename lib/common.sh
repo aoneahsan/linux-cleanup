@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.4.0"
+LINUX_CLEANUP_VERSION="1.5.0"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -274,15 +274,19 @@ prune_stale() {
   printf '%d' "$freed"
 }
 
-# newest_access_age_days <path>
+# newest_access_age_days <path> [ignore-name...]
 #
 # For a file: prints the smaller of (now - atime) and (now - mtime), in days.
 # For a directory: walks recursively and prints the freshest atime/mtime
 # anywhere inside, in days. "How many days since this asset was last
 # touched in any way." Echoes a very large number if the path is missing
 # so callers can treat it as "definitely stale" without special-casing.
+#
+# Optional ignore-names skip marker files that other software reads without
+# using the asset — e.g. Android Studio reads every old version's `.home` at
+# startup, which would otherwise make a long-dead IDE cache look fresh.
 newest_access_age_days() {
-  local path="$1"
+  local path="$1"; shift
   [[ -e "$path" ]] || { printf '999999'; return; }
   local now newest
   now=$(date +%s)
@@ -292,10 +296,13 @@ newest_access_age_days() {
     mt=$(stat -c %Y -- "$path" 2>/dev/null || echo 0)
     newest=$(( at > mt ? at : mt ))
   else
+    local ignore=() name
+    for name in "$@"; do ignore+=( ! -name "$name" ); done
     # Look at FILES only — directory atimes/mtimes get bumped by routine
     # operations (creating, renaming, listing in some FS configs) and don't
     # reflect actual usage of the underlying asset. Files are the truth.
-    newest=$(find "$path" \( -type f -o -type l \) -printf '%A@\n%T@\n' 2>/dev/null \
+    newest=$(find "$path" \( -type f -o -type l \) ${ignore[@]+"${ignore[@]}"} \
+             -printf '%A@\n%T@\n' 2>/dev/null \
              | awk -F. '{print $1}' | sort -n | tail -1)
     if [[ -z "$newest" || "$newest" == "0" ]]; then
       # Empty dir or unreadable — fall back to dir's own mtime as last resort.
@@ -305,39 +312,62 @@ newest_access_age_days() {
   printf '%d' $(( (now - newest) / 86400 ))
 }
 
-# prune_stale_units <root> <days> [glob]
+# Bytes freed by whole-unit removals. Callers that need a total zero it first;
+# unit helpers print their own progress lines, so they cannot also return a
+# byte count on stdout.
+UNITS_FREED=0
+
+# remove_unit <path> <label> — delete one whole unit and add its size to UNITS_FREED.
+remove_unit() {
+  local path="$1" label="$2" b
+  b=$(dir_bytes "$path")
+  if safe_rm "$path"; then
+    UNITS_FREED=$(( UNITS_FREED + b ))
+    ui_ok "  removed ${label} ($(bytes_pretty "$b"))"
+  fi
+}
+
+# prune_stale_units <root> <days> <glob> [ignore-name...]
 #
-# Treats each top-level child of <root> matching <glob> (default *) as an
-# indivisible unit (e.g. one AVD, one tool installation, one Gradle distro).
-# A unit is deleted whole only when EVERY file inside it has atime AND mtime
-# older than <days>. Recently-used units survive intact. Echoes bytes freed.
-#
-# Use this for caches where partial-prune would corrupt state (Android AVDs,
-# editor extensions with sibling metadata files, etc.).
+# Treats each directory child of <root> matching <glob> as one indivisible
+# unit (a Gradle per-version cache, an old IDE version's cache). A unit is
+# deleted whole only when nothing inside it — ignoring the named marker
+# files — has been read or written for more than <days> days. Recently-used
+# units survive intact. Never deletes part of a unit: for caches like these a
+# half-deleted unit is corrupt, not smaller. Adds bytes freed to UNITS_FREED.
 prune_stale_units() {
-  local root="$1" days="${2:-${DAYS:-100}}" pattern="${3:-*}"
-  [[ -d "$root" ]] || { printf '0'; return 0; }
+  local root="$1" days="$2" pattern="$3"; shift 3
+  [[ -d "$root" ]] || return 0
   if is_protected "$root"; then
     ui_err "REFUSE: protected path: $root"
-    printf '0'; return 1
+    return 1
   fi
-  local freed=0 entry age b
+  local entry age
   shopt -s nullglob dotglob
   for entry in "$root"/$pattern; do
-    [[ -e "$entry" ]] || continue
-    age=$(newest_access_age_days "$entry")
+    [[ -d "$entry" ]] || continue
+    age=$(newest_access_age_days "$entry" "$@")
     if (( age > days )); then
-      b=$(dir_bytes "$entry")
-      if safe_rm "$entry"; then
-        freed=$(( freed + b ))
-        ui_ok "  pruned $(basename "$entry") (${age}d idle, $(bytes_pretty "$b") freed)"
-      fi
+      remove_unit "$entry" "${entry/#$HOME/\~} — ${age}d idle"
     else
-      ui_info "  kept $(basename "$entry") (${age}d idle — within ${days}d window)"
+      ui_info "  kept ${entry/#$HOME/\~} (${age}d idle — within ${days}d window)"
     fi
   done
   shopt -u nullglob dotglob
-  printf '%d' "$freed"
+}
+
+# prune_matching_files <root> <days> <name-glob> — delete only files matching
+# <name-glob> whose atime AND mtime are older than <days>. Adds bytes freed to
+# UNITS_FREED. For self-contained leftovers such as old daemon logs.
+prune_matching_files() {
+  local root="$1" days="$2" glob="$3" b
+  [[ -d "$root" ]] || return 0
+  b=$(find "$root" -type f -name "$glob" -atime +"$days" -mtime +"$days" -printf '%s\n' 2>/dev/null \
+      | awk '{s+=$1} END{printf "%d", s}')
+  (( b > 0 )) || return 0
+  find "$root" -type f -name "$glob" -atime +"$days" -mtime +"$days" -delete 2>/dev/null || true
+  UNITS_FREED=$(( UNITS_FREED + b ))
+  ui_ok "  removed old ${glob} files under ${root/#$HOME/\~} ($(bytes_pretty "$b"))"
 }
 
 # Generic interactive cleaner.

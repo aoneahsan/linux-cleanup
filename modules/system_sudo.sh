@@ -50,7 +50,13 @@ sys_old_kernels() {
 }
 
 sys_drop_pagecache() {
-  ui_info "Drop kernel page cache (frees buff/cache RAM, harmless)"
+  # Never auto-accepted: it frees no disk, and evicting hot files makes the
+  # next minutes SLOWER while everything is re-read from disk.
+  if (( ${ASSUME_YES:-0} )); then
+    ui_info "Page cache — not dropped under -y (it frees no disk and slows the next minutes; run without -y to choose)"
+    return 0
+  fi
+  ui_info "Drop kernel page cache (frees buff/cache RAM; the kernel reclaims it anyway, and re-reading makes things slower for a while)"
   if ui_confirm "Run sync && drop_caches=3?" n; then
     sudo sync
     sudo sysctl -w vm.drop_caches=3 >/dev/null

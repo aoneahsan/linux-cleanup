@@ -14,6 +14,10 @@ DAYS=100
 PURGE_ALL=0
 NO_REPORT=0
 CLEANUP_LOGS_ON_FINISH=0
+# Exit status of utility modes that can fail (--self-test, --export, --doctor).
+# Applied only after lclean_mark_finished, so a failing check exits non-zero
+# without the EXIT trap mistaking it for a crash and writing a bundle.
+EXIT_RC=0
 
 # Persistent data dirs. The Node launcher (bin/linux-cleanup.js) sets these
 # to ~/.linux-cleanup/{logs,reports}/ when run via npx so reports/logs survive
@@ -101,6 +105,8 @@ ${C_BLD}OPTIONS${C_RST}
   -d, --days N         Threshold for "stale" (default: 100). Files are deleted
                        only when BOTH atime and mtime are older than this many
                        days. Lower it (e.g. -d 30) for a more aggressive sweep.
+                       Gradle distros/caches and old Android Studio versions go
+                       only as WHOLE units idle that long — never file by file.
       --purge-all      Disable the staleness gate and wipe target caches in
                        full (pre-1.2.0 behavior). Use sparingly — kills
                        rarely-used assets like Gradle wrapper distros you
@@ -125,10 +131,12 @@ ${C_BLD}SAFETY${C_RST}
     ~/Videos, ~/Desktop, ~/.ssh, ~/.gnupg, ~/.claude, ~/.config, ~/Public, etc.
   • Personal-data scans are interactive only — no batch / no --yes for personal files.
 
-${C_BLD}OUTPUT${C_RST}  (everything stays inside the project folder)
+${C_BLD}OUTPUT${C_RST}  (where this tool writes)
   • Logs:    $LOG_DIR/
   • Reports: $REPORTS_DIR/
+  • Crash / debug bundles: $(_lclean_crash_dir)/
   • Cron log: $LOG_DIR/cron.log (when --install-cron is used)
+  • Shell rc files: only via --install-alias or --doctor, and only after you confirm
 
 ${C_BLD}ABOUT${C_RST}
   linux-cleanup v${LINUX_CLEANUP_VERSION}  ·  by ${LINUX_CLEANUP_AUTHOR} <${LINUX_CLEANUP_EMAIL}>
@@ -304,7 +312,7 @@ install_alias() {
 
 install_cron() {
   ui_section "Install weekly cron"
-  local cron_line="0 3 * * 0 $CLEANUP_ROOT/cleanup.sh --all-safe -y >>$CLEANUP_ROOT/logs/cron.log 2>&1"
+  local cron_line="0 3 * * 0 $CLEANUP_ROOT/cleanup.sh --all-safe -y >>$LOG_DIR/cron.log 2>&1"
   if crontab -l 2>/dev/null | grep -qF "$CLEANUP_ROOT/cleanup.sh"; then
     ui_info "cron entry already present:"
     crontab -l 2>/dev/null | grep -F "$CLEANUP_ROOT/cleanup.sh" | sed 's/^/  /'
@@ -313,7 +321,7 @@ install_cron() {
   ui_info "Will add: $cron_line"
   if ui_confirm "Add this entry to crontab?" y; then
     ( crontab -l 2>/dev/null; printf '%s\n' "$cron_line" ) | crontab -
-    ui_ok "cron installed (runs every Sunday 03:00, logs to logs/cron.log)"
+    ui_ok "cron installed (runs every Sunday 03:00, logs to $LOG_DIR/cron.log)"
   fi
 }
 
@@ -327,14 +335,14 @@ case "$MODE" in
   audit)         run_size_audit ;;
   nodemod)       run_stale_node_modules ;;
   globals)       run_global_packages_audit ;;
-  doctor)        run_doctor ;;
+  doctor)        run_doctor || EXIT_RC=1 ;;
   editorext)     run_editor_extensions ;;
   reports)       run_reports_manager ;;
-  export)        export_reports "$EXPORT_FMT" "$EXPORT_ID" ;;
+  export)        export_reports "$EXPORT_FMT" "$EXPORT_ID" || EXIT_RC=1 ;;
   feedback)      show_feedback ;;
   debug_bundle)  make_debug_bundle ;;
   list_targets)  list_targets ;;
-  self_test)     self_test ;;
+  self_test)     self_test || EXIT_RC=1 ;;
   version)       show_version ;;
   install_alias) install_alias ;;
   install_cron)  install_cron ;;
@@ -378,3 +386,4 @@ fi
 
 # Reached only on a clean run. Quiets the EXIT-trap crash bundler.
 lclean_mark_finished
+exit "$EXIT_RC"

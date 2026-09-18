@@ -13,8 +13,8 @@
 
 Walks a configured set of "project roots" (default: `~/code`, `~/projects`, `~/Documents/projects` if it exists, plus any roots you've added) looking for `node_modules/` directories where:
 
-- The `node_modules/` directory's `mtime` is older than `--days N` (default 100), AND
-- The *parent project* (the directory containing `node_modules/`) has not been modified in the same window, AND
+- No source file in the *parent project* (the directory containing `node_modules/`) has changed in `--days N` (default 100) — `node_modules`, `.git`, `dist`, `build`, `.yarn`, `.next` and `coverage` are skipped when looking; before 1.5.0 the project directory's own mtime was used, which does not move when you edit files in `src/`, AND
+- When a git repository tracks the project (a monorepo workspace), no source file anywhere in that repository has changed in the same window, AND
 - The path is not on the [protected allowlist](../safety.md).
 
 Each candidate is presented with size and idle days:
@@ -102,7 +102,7 @@ That would break active projects. The staleness gate is the whole point. Use `fi
 Yes. The mode targets per-project `node_modules/` trees only. The pnpm shared store lives at `~/.local/share/pnpm/store` and is handled by [`--all-safe`](./all-safe.md) and [package-manager caches](./all-safe.md#what-it-does) — separately, with its own staleness gate.
 
 **Does it understand workspaces / monorepos?**
-Yes — a yarn / pnpm / npm workspace's outer `node_modules/` is treated as the candidate; the staleness check uses the entire monorepo's `mtime`, not a single package's.
+Yes — a workspace's `node_modules/` counts as stale only when the whole repository has been idle, so an active monorepo never loses a workspace's dependencies. Deletion goes through a dedicated guard that accepts only a real `node_modules` directory with a `package.json` beside it, inside the search roots (before 1.5.0 the general guard refused every candidate under `~/Documents`).
 
 ---
 

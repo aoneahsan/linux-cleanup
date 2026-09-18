@@ -35,14 +35,16 @@ list_targets() {
 
   printf '\n%bApplication caches (regenerable)%b\n' "${C_BLD}" "${C_RST}"
   ui_target_row "Chrome cache"            "$HOME/.cache/google-chrome"
-  ui_target_row "Chrome ancillary"        "$HOME/.cache/Google"
+  ui_target_row "Android Studio caches (all versions)" "$HOME/.cache/Google"
+  ui_target_row "Android Studio plugins (all versions)" "$HOME/.local/share/Google"
   ui_target_row "Firefox/Mozilla cache"   "$HOME/.cache/mozilla"
   ui_target_row "Brave cache"             "$HOME/.cache/BraveSoftware"
   ui_target_row "Chromium cache"          "$HOME/.cache/chromium"
   ui_target_row "Microsoft Edge cache"    "$HOME/.cache/microsoft-edge"
   ui_target_row "Vivaldi cache"           "$HOME/.cache/vivaldi"
-  ui_target_row "Gradle build caches"     "$HOME/.gradle/caches"
+  ui_target_row "Gradle caches"           "$HOME/.gradle/caches"
   ui_target_row "Gradle wrapper distros"  "$HOME/.gradle/wrapper"
+  printf '  %b%s%b\n' "${C_DIM}" "  (Gradle + Android Studio: whole units idle ≥ DAYS only; the current IDE and in-use distros are never touched)" "${C_RST}"
   ui_target_row "Cypress binaries"        "$HOME/.cache/Cypress"
   ui_target_row "Playwright browsers"     "$HOME/.cache/ms-playwright"
   ui_target_row "Playwright-Go"           "$HOME/.cache/ms-playwright-go"
@@ -56,6 +58,7 @@ list_targets() {
   ui_target_row "Flatpak runtimes"        "$HOME/.local/share/flatpak"
   ui_target_row "VS Code old extensions"  "$HOME/.vscode/extensions"
   ui_target_row "Cursor old extensions"   "$HOME/.cursor/extensions"
+  printf '  %s\n' "  · Docker build cache + dangling images (only when the daemon is already running)"
 
   printf '\n%bProject node_modules%b (interactive only)\n' "${C_BLD}" "${C_RST}"
   printf '  %bsearched roots:%b\n' "${C_DIM}" "${C_RST}"
@@ -71,7 +74,7 @@ list_targets() {
   printf '  %s\n' "  · disabled snap revisions"
   printf '  %s\n' "  · superseded kernel packages"
   printf '  %s\n' "  · /tmp files older than 7 days"
-  printf '  %s\n' "  · kernel page cache (sysctl drop_caches)"
+  printf '  %s\n' "  · kernel page cache (sysctl drop_caches — asked interactively, never under -y)"
 
   printf '\n%bPROTECTED — script refuses to delete inside any of these:%b\n' "${C_RED}${C_BLD}" "${C_RST}"
   local p
@@ -167,15 +170,10 @@ self_test() {
 # Feedback + debug bundle
 # ─────────────────────────────────────────────────────────────────────────
 
-# Resolve a sibling "feedback" dir next to logs/reports.
+# Resolve the "feedback" dir next to logs/reports — one validated rule shared
+# with the crash trap (modules/crash_trap.sh).
 _feedback_dir() {
-  local parent
-  if [[ -n "${LINUX_CLEANUP_DATA_HOME:-}" ]]; then
-    parent="$LINUX_CLEANUP_DATA_HOME"
-  else
-    parent="$(dirname "$LOG_DIR")"
-  fi
-  printf '%s/feedback' "$parent"
+  _lclean_crash_dir
 }
 
 show_feedback() {
@@ -317,7 +315,9 @@ uninstall_cron() {
 # Returns 0 on success, 1 on error.
 export_reports() {
   local fmt="${1:-both}" target="${2:-latest}"
-  REPORTS_DIR="$CLEANUP_ROOT/reports"
+  # Honour the launcher's data dir (~/.linux-cleanup/reports under npx);
+  # hardcoding the package dir hid every npx user's reports from --export.
+  REPORTS_DIR="${REPORTS_DIR:-$CLEANUP_ROOT/reports}"
   mkdir -p "$REPORTS_DIR"
 
   if ! command -v jq >/dev/null 2>&1; then

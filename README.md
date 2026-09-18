@@ -30,7 +30,7 @@ network calls of any kind.
 
 | | |
 |---|---|
-| **Version** | `1.4.0` |
+| **Version** | `1.5.0` |
 | **License** | MIT |
 | **Node** | `>=14` (launcher only) |
 | **Runtime** | `bash >= 4.0` + GNU coreutils |
@@ -421,7 +421,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 <a id="changelog"></a>
 ## 🔄 Changelog&nbsp;[#](#changelog)
 
-Latest release: **`1.4.0`** — relicensed to MIT and opened to outside contributions.
+Latest release: **`1.5.0`** — Gradle and Android Studio are cleaned only as whole idle units, so an in-use toolchain is never damaged; `--node-modules` can delete again; Docker build-cache cleanup.
 Full history: [CHANGELOG.md](https://github.com/aoneahsan/linux-cleanup/blob/main/CHANGELOG.md).
 
 <a id="contributing"></a>
