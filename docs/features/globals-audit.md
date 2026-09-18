@@ -59,11 +59,10 @@ Copy-paste the lines you want, hit enter, done.
 
 For each global package, the audit checks (in order):
 
-1. **Recent invocation?** Last `mtime` on the global's bin shim (e.g., `~/.local/share/npm/bin/eslint`). Bin shims are touched by every invocation on most Linux setups.
-2. **Has any project depended on it recently?** Scans configured [project roots](./node-modules-finder.md#configuring-project-roots) for `package.json` entries that reference the global by name. Only counts projects modified in the last `--days N` window.
-3. **In `$PATH` and shadowed by a project's local install?** A common reason a global is "never invoked" is that every project ships its own `node_modules/.bin/<tool>` and the global is dead weight. The audit flags this case explicitly.
+1. **Does another global depend on it?** Each global's `dependencies` and `peerDependencies` are read; a package another global needs is reported as `needed by: …` and is never a candidate.
+2. **Was it installed or updated recently?** The age shown is the `mtime` of the package's install directory. That is the day it was installed or last updated — not the day it was last run, which nothing on disk records.
 
-If none of (1), (2), (3) put the package in active use within `--days N` (default 100), it's tagged as a candidate.
+A package with no dependent whose directory is older than `--days N` (default 100) is tagged as a candidate. The audit does not look inside your projects, so check the list before you uninstall anything: a tool you run weekly but installed a year ago will be on it.
 
 ---
 
@@ -111,4 +110,4 @@ Yes — both are detected from their default install dirs (`~/.bun/bin`, `~/.den
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# release_helpers.sh — version, list-targets, self-test, uninstall, non-interactive export.
+# release_helpers.sh — version, list-targets, self-test, feedback, non-interactive export.
 
 show_version() {
   cat <<EOF
@@ -61,12 +61,16 @@ list_targets() {
   printf '  %s\n' "  · Docker build cache + dangling images (only when the daemon is already running)"
 
   printf '\n%bProject node_modules%b (interactive only)\n' "${C_BLD}" "${C_RST}"
-  printf '  %bsearched roots:%b\n' "${C_DIM}" "${C_RST}"
-  printf '    · %s\n' "$HOME/Documents/01-code/projects" "$HOME/Documents/01-code/02-apps" "$HOME/Documents/01-code"
+  printf '  %bsearched roots%b (%s + the usual code folders that exist):\n' \
+    "${C_DIM}" "${C_RST}" "$(roots_config_dir)/project-roots.txt"
+  load_project_roots
+  if (( ${#ROOTS_LOADED[@]} )); then printf '    · %s\n' "${ROOTS_LOADED[@]}"; else printf '    · (none yet)\n'; fi
 
   printf '\n%bPersonal data%b (interactive only — never auto-deleted)\n' "${C_BLD}" "${C_RST}"
-  printf '  %bsearched roots:%b\n' "${C_DIM}" "${C_RST}"
-  printf '    · %s\n' "$HOME/Downloads" "$HOME/Desktop"
+  printf '  %bsearched roots%b (Downloads, Desktop + %s):\n' \
+    "${C_DIM}" "${C_RST}" "$(roots_config_dir)/personal-roots.txt"
+  load_personal_roots
+  if (( ${#ROOTS_LOADED[@]} )); then printf '    · %s\n' "${ROOTS_LOADED[@]}"; else printf '    · (none)\n'; fi
 
   printf '\n%bSystem (sudo required)%b\n' "${C_BLD}" "${C_RST}"
   ui_target_row "apt archives"            "/var/cache/apt/archives"
@@ -75,6 +79,11 @@ list_targets() {
   printf '  %s\n' "  · superseded kernel packages"
   printf '  %s\n' "  · /tmp files older than 7 days"
   printf '  %s\n' "  · kernel page cache (sysctl drop_caches — asked interactively, never under -y)"
+
+  printf '\n%bStartup & speed%b (--speed: asked one by one, undoable, never under -y, nothing deleted)\n' "${C_BLD}" "${C_RST}"
+  printf '  %s\n' "  · Docker: restart policy of auto-start containers; docker.service / containerd at boot"
+  printf '  %s\n' "  · systemd: databases, web servers and VM stacks enabled at boot; cloud-init on bare metal"
+  printf '  %s\n' "  · login items: a Hidden=true override in ~/.config/autostart; GNOME Software background settings"
 
   printf '\n%bPROTECTED — script refuses to delete inside any of these:%b\n' "${C_RED}${C_BLD}" "${C_RST}"
   local p
@@ -155,6 +164,13 @@ self_test() {
       ((fails++))
     fi
   done
+
+  printf '\n%b[ 7 ] Last-use times (the idle gate depends on them)%b\n' "${C_BLD}" "${C_RST}"
+  if atime_reliable "$HOME"; then
+    ui_ok "$HOME records access times — idle detection works"
+  else
+    ui_warn "$HOME is mounted noatime — idle-based pruning is switched off here; only --purge-all deletes"
+  fi
 
   ui_separator
   if (( fails == 0 )); then
@@ -276,39 +292,6 @@ make_debug_bundle() {
   printf '  %bExtract to inspect:%b   tar -tzf %s\n' "${C_DIM}" "${C_RST}" "$out"
   printf '  %bSend to:%b              %b%s%b\n\n' "${C_DIM}" "${C_RST}" \
     "${C_BLD}" "$LINUX_CLEANUP_EMAIL" "${C_RST}"
-}
-
-uninstall_alias() {
-  ui_section "Uninstall shell alias"
-  local found=0 file
-  for file in "$HOME/.bash_aliases" "$HOME/.zshrc" "$HOME/.bashrc"; do
-    [[ -f "$file" ]] || continue
-    if grep -qsF "$CLEANUP_ROOT/cleanup.sh" "$file"; then
-      found=1
-      if ui_confirm "Remove cleanup-related lines from $file ?" y; then
-        # Remove the comment line + alias line
-        sed -i.bak '/# linux-cleanup tool/d; \|alias cleanup=.*'"${CLEANUP_ROOT//\//\\/}"'.*|d' "$file"
-        ui_ok "removed (backup at ${file}.bak)"
-      fi
-    fi
-  done
-  (( found == 0 )) && ui_info "no cleanup alias found"
-}
-
-uninstall_cron() {
-  ui_section "Uninstall cron entry"
-  if ! command -v crontab >/dev/null 2>&1; then
-    ui_info "crontab not installed"
-    return
-  fi
-  if ! crontab -l 2>/dev/null | grep -qsF "$CLEANUP_ROOT/cleanup.sh"; then
-    ui_info "no cleanup cron entry found"
-    return
-  fi
-  if ui_confirm "Remove cleanup cron entry?" y; then
-    ( crontab -l 2>/dev/null | grep -vF "$CLEANUP_ROOT/cleanup.sh" ) | crontab -
-    ui_ok "cron entry removed"
-  fi
 }
 
 # Non-interactive export: cleanup.sh --export <md|html|both> <id|all|latest>

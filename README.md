@@ -30,7 +30,7 @@ network calls of any kind.
 
 | | |
 |---|---|
-| **Version** | `1.5.2` |
+| **Version** | `1.6.0` |
 | **License** | MIT |
 | **Node** | `>=14` (launcher only) |
 | **Runtime** | `bash >= 4.0` + GNU coreutils |
@@ -104,8 +104,13 @@ are looking for a security scanner — it will not find secrets, malware, or vul
 - **Symlink-aware** — paths are resolved with `realpath` before the guard runs, so a symlink into a protected
   directory cannot smuggle a deletion past it.
 - **Personal data is interactive only** — never batched, never covered by `--yes`.
-- **Guided walkthrough by default** — ten categories, each one asking before it acts, with a running total of
-  bytes reclaimed.
+- **Guided walkthrough by default** — every category in turn, each one asking before it acts, with a running
+  total of bytes reclaimed.
+- **Refuses to guess** — idle detection needs access times. On a filesystem mounted `noatime` they are not
+  recorded, so idle-based pruning switches itself off there instead of deleting a cache that is in use.
+- **Speed check** — `--speed` measures why a machine is slow (overheating, memory / CPU / IO pressure, boot
+  time) and offers undoable fixes for the containers, servers and apps that start by themselves. It deletes
+  nothing and never acts under `--yes`.
 - **Read-only modes** — `--scan`, `--list-targets`, `--audit` and `--globals` inspect and report without
   deleting anything.
 - **Offline by design** — zero network calls, no telemetry, no analytics, no update check. Verifiable in the
@@ -217,6 +222,15 @@ linux-cleanup --all-safe --yes
 linux-cleanup --all-safe -d 30   # anything idle 30+ days, instead of the default 100
 ```
 
+### Find what slows the machine down
+
+```bash
+linux-cleanup --speed         # measures first; each fix asks and prints its undo command
+```
+
+It reports thermal throttling, pressure, the heaviest processes and boot time, then looks for auto-start
+Docker containers, database / web / VM services enabled at boot, and login items. Nothing is deleted.
+
 ### System-level cleanup
 
 ```bash
@@ -235,7 +249,14 @@ linux-cleanup --export both latest   # export the newest report to Markdown + HT
 <a id="configuration"></a>
 ## ⚙️ Configuration&nbsp;[#](#configuration)
 
-There is no config file. Behaviour is set by [flags](#command-line) and these environment variables:
+Behaviour is set by [flags](#command-line), two optional plain-text lists, and these environment variables.
+
+| File (one absolute path per line, `#` comments) | Used by |
+|---|---|
+| `~/.config/linux-cleanup/project-roots.txt` | `--node-modules` — where your projects live. Searched in addition to whichever of `~/code`, `~/projects`, `~/dev`, `~/src`, `~/work`, `~/workspace`, `~/repos`, `~/git`, `~/Documents/projects`, `~/Documents/code` exist. |
+| `~/.config/linux-cleanup/personal-roots.txt` | `--stale` — extra folders to check besides `~/Downloads` and `~/Desktop`. |
+
+`/`, your whole home directory, and `~/.ssh`, `~/.gnupg`, `~/.config`, `~/.claude` are refused as roots.
 
 | Variable | Default | What it does |
 |---|---|---|
@@ -268,7 +289,7 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 
 | Mode | Flag | What it does |
 |---|---|---|
-| Walkthrough | *(default)* · `-w` | 🔥 Ten-step guided cleanup, prompting before each step |
+| Walkthrough | *(default)* · `-w` | 🔥 Guided cleanup through every category, prompting before each step |
 | Menu | `-m` | 🔥 Jump-to menu — run a single category |
 | TUI | `-t` `--tui` | 🔥 whiptail/dialog menu; falls back to the CLI menu if neither is installed |
 | All-safe | `-a` | 🔥 Every regenerable cache in one pass |
@@ -282,12 +303,13 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 | Home audit | `--audit` | Read-only — 20 largest entries in `$HOME` |
 | Globals audit | `--globals` | Read-only — stale global npm/pnpm/yarn/bun/deno packages |
 | Doctor | `--doctor` | Repairs missing shell-init blocks. Appends only, with confirmation |
+| Speed check | `--speed` | Why is this machine slow? Read-only report, then undoable fixes asked one by one. Never deletes; report-only under `-y` |
 | Reports | `--reports` | Manage past reports — list, view, convert |
 | Export | `--export FMT ID` | Export a report. `FMT` = `md`\|`html`\|`both`, `ID` = N\|`latest`\|`all` |
 | Self-test | `--self-test` | Verify dependencies, syntax, and safety guards |
 | Feedback | `--feedback` | Print bug-report instructions, offer a pre-filled `mailto:` draft |
 | Debug bundle | `--debug-bundle` | Package the latest log and report into a local `.tar.gz` |
-| Alias / cron | `--install-alias` `--install-cron` | Add the `cleanup` alias or a weekly run. `--uninstall-*` removes them |
+| Alias / cron | `--install-alias` `--install-cron` | Add the `cleanup` alias or a weekly run. Under `npx` or a global install they run a persistent copy in `~/.linux-cleanup/app`. `--uninstall-*` removes them |
 | Version | `-V` `--version` | Print version and author |
 | Help | `-h` `--help` | Print the full flag list |
 
@@ -295,7 +317,7 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 
 | Flag | Default | What it does |
 |---|---|---|
-| `-d N` `--days N` | `100` | Idle threshold. A file is deleted only when **both** `atime` and `mtime` exceed it. |
+| `-d N` `--days N` | `100` | Idle threshold. A file is deleted only when **both** `atime` and `mtime` exceed it. Ignored — nothing idle-based is deleted — on a `noatime` filesystem. |
 | `--purge-all` | off | 🔥 Disables the idle gate and empties cache targets completely. Removes rarely-used assets such as Gradle wrapper distributions. |
 | `-y` `--yes` | off | Auto-confirm regenerable caches. Valid with `--all-safe` only; never applies to personal files. |
 | `--no-report` | off | Skip JSON report generation. Logs are still written. |
@@ -370,8 +392,11 @@ Every symptom in full:
 - **`--system` needs `sudo`** and touches package manager state, journals and kernels. Review the prompts.
 - **Markdown and HTML export need `jq`.** Without it, JSON reports are still written; only conversion is
   unavailable.
-- **Not a backup tool, not a security scanner, not a performance optimiser.** It reclaims disk space; it will
-  not find secrets or malware, and freeing space rarely makes a machine faster.
+- **Idle detection needs access times.** On a filesystem mounted `noatime`, every idle-based prune is skipped
+  with a warning; only `--purge-all` deletes there. `relatime`, the Linux default, works.
+- **Not a backup tool, not a security scanner, not a tuner.** It will not find secrets or malware. `--speed`
+  finds the usual causes of a slow machine and offers a few undoable fixes; it does not tune the kernel, and
+  it cannot fix a CPU that overheats. Freeing disk space rarely makes a machine faster.
 - **No automated test suite.** Correctness rests on `--self-test`, ShellCheck, and manual verification on a
   real Linux system.
 
@@ -412,6 +437,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 | [Documentation index](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/README.md) | you want the full map |
 | [Quick start](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/quick-start.md) | running your first cleanup |
 | [Safety](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/safety.md) | you want to understand the guards before deleting anything |
+| [Speed check](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/features/speed.md) | the machine is slow and you want to know why |
 | [CLI flags](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/cli-flags.md) | you need an exact flag |
 | [Exit codes](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/exit-codes.md) | scripting around it in cron or CI |
 | [Report schema](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/report-schema.md) | parsing the JSON output |
@@ -421,7 +447,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 <a id="changelog"></a>
 ## 🔄 Changelog&nbsp;[#](#changelog)
 
-Latest release: **`1.5.2`** — snap rollback revisions follow the same idle rule, and every cache made of installed package directories (npx, yarn v1, pub, bun, Cypress, Playwright, TypeScript typings), plus Gradle and Android Studio, is cleaned only in whole idle entries, so a tool you use is never left half-deleted.
+Latest release: **`1.6.0`** — a `--speed` check for what slows a machine down, idle pruning that switches itself off on `noatime` filesystems, configurable project and personal folders, and an alias and cron entry that survive `npx` cache eviction.
 Full history: [CHANGELOG.md](https://github.com/aoneahsan/linux-cleanup/blob/main/CHANGELOG.md).
 
 <a id="contributing"></a>

@@ -85,6 +85,7 @@ sys_drop_pagecache() {
 
 sys_clean_tmp() {
   ui_info "/tmp size: $(dir_size /tmp)"
+  atime_reliable /tmp || { _atime_skip /tmp; return 0; }
   if ui_confirm "Remove files in /tmp older than 7 days?" y; then
     sudo find /tmp -mindepth 1 -atime +7 -delete 2>/dev/null || true
     ui_ok "/tmp cleaned (7+ day-old files)"

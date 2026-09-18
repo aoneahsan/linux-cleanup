@@ -1,6 +1,6 @@
 # Walkthrough mode (`--walkthrough` / `-w` / no flag)
 
-> The guided walkthrough is a ten-step interactive tour through every category linux-cleanup knows about. It runs by default — type `linux-cleanup` with no arguments and you're in it.
+> The guided walkthrough is a step-by-step interactive tour through every category linux-cleanup knows about. It runs by default — type `linux-cleanup` with no arguments and you're in it.
 
 **Type**: cleanup mode (interactive)
 **Default**: yes — this is what runs when you provide no flags
@@ -10,20 +10,21 @@
 
 ## What it does
 
-The walkthrough sequences through ten cleanup categories, asking before each destructive action and printing a per-step running total of bytes reclaimed. The order is fixed and chosen so the cheapest, safest deletions happen first.
+The walkthrough opens with a read-only pre-scan, then sequences through eleven numbered steps, asking before each destructive action and printing a per-step running total of bytes reclaimed. The order is fixed and chosen so the cheapest, safest deletions happen first.
 
 | Step | Category | Default action | Touches personal data? |
 |---|---|---|---|
-| 1 | Pre-flight scan | Read-only inventory | no |
-| 2 | Package-manager caches | yarn / npm / pnpm / pip / composer cache | no |
-| 3 | App caches | Chrome / Brave / Firefox / Gradle / Cypress / Playwright / Zoom / VSCode caches | no |
-| 4 | Dev-tool data | Stale AVDs, pub-cache, Dart analysis caches, flatpak user data | no (staleness-gated) |
-| 5 | Editor extension cleanup | Old VS Code / Cursor extension versions | no (staleness-gated) |
-| 6 | Stale `node_modules` | Old project `node_modules/` directories | confirms each one |
-| 7 | Partial downloads | `.fdmdownload`, `.crdownload`, `.part` | confirms each one |
-| 8 | Stale personal files | Files you haven't touched in N+ days | interactive-only |
-| 9 | System cleanup (optional) | apt / journal / snap / kernels / `/tmp` / page cache | requires `sudo` |
-| 10 | Session report | Save JSON + show summary | no |
+| 1 | Package-manager caches | yarn / npm / pnpm / pip / composer cache | no |
+| 2 | App caches | Chrome, Android Studio, Gradle, Cypress, Playwright, Zoom, TypeScript caches | no (whole idle units for Gradle / IDE) |
+| 3 | Dev-tool data | Stale AVDs, pub-cache, Dart analysis caches, flatpak user data, Docker build cache | no (staleness-gated) |
+| 4 | Editor extension cleanup | Old VS Code / Cursor extension versions | no (staleness-gated) |
+| 5 | Stale `node_modules` | Old project `node_modules/` directories | you pick which |
+| 6 | Partial downloads | `.fdmdownload`, `.crdownload`, `.part` | confirms first |
+| 7 | Stale personal files | Files you haven't touched in N+ days | interactive-only |
+| 8 | System cleanup (optional) | apt / journal / snap / kernels / `/tmp` / page cache | requires `sudo` |
+| 9 | [Speed check](./speed.md) | Why the machine is slow; undoable fixes for what starts by itself | each fix asked; deletes nothing |
+| 10 | Final size audit | The 20 largest entries left in `$HOME` | read-only |
+| 11 | Session report | Save JSON, offer Markdown / HTML | no |
 
 Each step shows a **running total**:
 
@@ -54,7 +55,7 @@ For repeated weekly cleanups, switch to [`--all-safe -y`](./all-safe.md) inside 
 |---|---|
 | `-d N` / `--days N` | Lower or raise the staleness threshold (default 100). Affects steps 4, 5, 6, 8, 9. |
 | `--purge-all` | Disable the staleness gate everywhere. Steps 4 and 5 wipe-everything instead of "wipe stale". Use sparingly — see [Safety](../safety.md). |
-| `--no-report` | Skip Step 10 (JSON report). Logs are still kept. |
+| `--no-report` | Skip Step 11 (JSON report). Logs are still kept. |
 | `--cleanup-logs` | Delete this run's log file at the end. Reports are always preserved. |
 | `--no-color` | Disable ANSI colour. Useful inside `script` / dumb terminals. |
 
@@ -122,4 +123,4 @@ Yes — use [`--menu` / `-m`](./menu.md) and pick that single step.
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

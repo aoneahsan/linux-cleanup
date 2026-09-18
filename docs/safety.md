@@ -44,6 +44,8 @@ For anything that is a **tool** rather than a regenerable cache (Android AVDs, V
 
 A Gradle wrapper distro you opened two weeks ago will be listed as "found" but not deleted. An AVD you booted last month survives. Lower the threshold (`-d 30`) when you're confident, or override with `--purge-all` when you really want pre-1.2.0 wipe-everything behaviour.
 
+**The gate needs access times.** "Idle" is read from `atime` and `mtime`. On a filesystem mounted `noatime` the kernel never updates `atime`, so a Gradle distribution launched this morning looks untouched since the day it was downloaded. Since 1.6.0 every idle-based prune checks the mount first (`findmnt`, falling back to `/proc/self/mountinfo`) and skips with a warning when it finds `noatime`; only `--purge-all`, which ignores idle time by design, deletes there. `relatime` — the Linux default — updates `atime` at most once a day, which is enough for a threshold counted in days. `--self-test` reports which one your home directory uses.
+
 **Why this guard**: caches like `~/.cache/yarn` are designed to be re-fetched on demand and cost nothing to delete. Tools like AVDs cost 6–30 GB to re-download and 30 minutes of your day. Treating the two the same is wrong; the staleness gate keeps the second category safe.
 
 ### Guard 3 — Interactive-only for personal data
@@ -149,4 +151,4 @@ This is the same reasoning Linux package managers use, and the same reasoning th
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — independent software engineer specialising in safe-by-default developer tooling. [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan).
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

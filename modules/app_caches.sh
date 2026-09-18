@@ -37,6 +37,7 @@ prune_gradle_home() {
     ui_info "Gradle — already absent"
     return 0
   fi
+  atime_reliable "$root" || { _atime_skip "$root"; return 0; }
   local dist inst zip age b
   shopt -s nullglob
 
@@ -103,6 +104,11 @@ clean_gradle() {
 # No prompt: callers confirm. Adds bytes freed to UNITS_FREED.
 prune_ide_caches() {
   local days="${DAYS:-100}" base newest d age keep_current
+  # Idle time decides everything below unless this is a full purge.
+  if (( ${PURGE_ALL:-0} != 1 )) && ! atime_reliable "$HOME/.cache"; then
+    _atime_skip "$HOME/.cache/Google"
+    return 0
+  fi
   shopt -s nullglob
   for base in "$HOME/.cache/Google" "$HOME/.local/share/Google"; do
     [[ -d "$base" ]] || continue

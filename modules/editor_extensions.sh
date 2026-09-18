@@ -51,6 +51,10 @@ clean_editor_old_extensions() {
   # Active superseded = "the editor still loads it occasionally" → keep.
   # The "newer version exists" check already covers condition #1
   # (no active software depends on this version); the idle gate covers #2.
+  if (( ${PURGE_ALL:-0} != 1 )) && ! atime_reliable "$ext_dir"; then
+    _atime_skip "$ext_dir"
+    return
+  fi
   local eligible=() ineligible=() v age
   for v in "${victims[@]}"; do
     age=$(newest_access_age_days "$ext_dir/$v")

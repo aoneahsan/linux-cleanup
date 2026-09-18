@@ -22,14 +22,22 @@ EXIT_RC=0
 # Persistent data dirs. The Node launcher (bin/linux-cleanup.js) sets these
 # to ~/.linux-cleanup/{logs,reports}/ when run via npx so reports/logs survive
 # npm cache eviction. Falls back to in-package dirs for direct git-clone use.
-LOG_DIR="${LINUX_CLEANUP_LOG_DIR:-$CLEANUP_ROOT/logs}"
-REPORTS_DIR="${LINUX_CLEANUP_REPORTS_DIR:-$CLEANUP_ROOT/reports}"
+# The persistent copy made by --install-alias / --install-cron
+# (<data-home>/app, marked .persistent) keeps its data beside it, not inside it.
+DATA_ROOT="$CLEANUP_ROOT"
+[[ -f "$CLEANUP_ROOT/.persistent" ]] && DATA_ROOT="$(dirname "$CLEANUP_ROOT")"
+LOG_DIR="${LINUX_CLEANUP_LOG_DIR:-$DATA_ROOT/logs}"
+REPORTS_DIR="${LINUX_CLEANUP_REPORTS_DIR:-$DATA_ROOT/reports}"
 LOG_FILE="$LOG_DIR/cleanup-$(date +%Y-%m-%d_%H%M%S).log"
 mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 export LOG_DIR REPORTS_DIR LOG_FILE NO_REPORT
 
 # shellcheck source=lib/common.sh
 source "$CLEANUP_ROOT/lib/common.sh"
+# shellcheck source=lib/prune.sh
+source "$CLEANUP_ROOT/lib/prune.sh"
+# shellcheck source=lib/roots.sh
+source "$CLEANUP_ROOT/lib/roots.sh"
 # shellcheck source=lib/scan.sh
 source "$CLEANUP_ROOT/lib/scan.sh"
 # shellcheck source=modules/pkg_managers.sh
@@ -58,6 +66,12 @@ source "$CLEANUP_ROOT/modules/release_helpers.sh"
 source "$CLEANUP_ROOT/modules/global_packages.sh"
 # shellcheck source=modules/doctor.sh
 source "$CLEANUP_ROOT/modules/doctor.sh"
+# shellcheck source=modules/self_install.sh
+source "$CLEANUP_ROOT/modules/self_install.sh"
+# shellcheck source=modules/speed.sh
+source "$CLEANUP_ROOT/modules/speed.sh"
+# shellcheck source=modules/speed_fixes.sh
+source "$CLEANUP_ROOT/modules/speed_fixes.sh"
 # shellcheck source=modules/tui.sh
 source "$CLEANUP_ROOT/modules/tui.sh"
 # shellcheck source=modules/crash_trap.sh
@@ -86,6 +100,9 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
       --node-modules   Find stale node_modules in projects untouched N+ days
       --globals        Audit (read-only) global npm/pnpm/yarn/bun/deno packages — show stale ones with no dependents
       --doctor         Detect & repair shell-init breakage (nvm/pnpm/bun/deno/cargo not sourced in ~/.bashrc)
+      --speed          Why is this machine slow? Overheating, memory pressure, boot time,
+                       containers / servers / apps that start by themselves. Fixes are
+                       asked one by one, undoable, never applied under -y. Nothing is deleted.
       --editor-ext     Clean superseded VS Code / Cursor extension versions
       --reports        Reports manager — list / convert (MD/HTML) / view past reports
       --export FMT ID  Non-interactive: export report to MD/HTML/both
@@ -125,6 +142,7 @@ ${C_BLD}EXAMPLES${C_RST}
   $(basename "$0") -p -d 60              # find personal files untouched 60+ days
   $(basename "$0") --system              # sudo system cleanup
   $(basename "$0") --partials            # cleanup orphan partial downloads
+  $(basename "$0") --speed               # find what slows this machine down
 
 ${C_BLD}SAFETY${C_RST}
   • Allowlist-based: refuses to delete inside ~/Documents, ~/Pictures, ~/Music,
@@ -160,6 +178,7 @@ while [[ $# -gt 0 ]]; do
     --node-modules)   MODE=nodemod ;;
     --globals)        MODE=globals ;;
     --doctor)         MODE=doctor ;;
+    --speed)          MODE=speed ;;
     --editor-ext)     MODE=editorext ;;
     --reports)        MODE=reports ;;
     --export)         MODE=export; EXPORT_FMT="${2:-both}"; EXPORT_ID="${3:-latest}"; shift 2 || true ;;
@@ -229,6 +248,7 @@ run_menu() {
     ${C_GRN}1${C_RST})  Scan & report (no deletes)
     ${C_GRN}9${C_RST})  Top 20 largest entries in \$HOME
     ${C_GRN}12${C_RST}) Show disk + memory usage
+    ${C_GRN}20${C_RST}) Speed check — why is this machine slow?
 
   ${C_BLD}Clean — safe / regenerable${C_RST}
     ${C_GRN}2${C_RST})  All regenerable caches (batch)
@@ -283,46 +303,11 @@ MENU
       17) make_debug_bundle ;;
       18) run_global_packages_audit ;;
       19) run_doctor ;;
+      20) run_speed ;;
       q|Q) break ;;
       *)  ui_warn "unknown choice: $choice" ;;
     esac
   done
-}
-
-install_alias() {
-  ui_section "Install shell alias"
-  local target_file="$HOME/.bash_aliases"
-  if [[ -f "$HOME/.zshrc" && ! -f "$HOME/.bash_aliases" ]]; then
-    target_file="$HOME/.zshrc"
-  fi
-  local line="alias cleanup='$CLEANUP_ROOT/cleanup.sh'"
-  if grep -qsF "$line" "$target_file" 2>/dev/null; then
-    ui_info "alias already present in $target_file"
-    return
-  fi
-  if ui_confirm "Add 'cleanup' alias to $target_file ?" y; then
-    {
-      printf '\n'
-      printf '# linux-cleanup tool\n'
-      printf '%s\n' "$line"
-    } >> "$target_file"
-    ui_ok "added. Run: source $target_file  (or open a new terminal), then 'cleanup'"
-  fi
-}
-
-install_cron() {
-  ui_section "Install weekly cron"
-  local cron_line="0 3 * * 0 $CLEANUP_ROOT/cleanup.sh --all-safe -y >>$LOG_DIR/cron.log 2>&1"
-  if crontab -l 2>/dev/null | grep -qF "$CLEANUP_ROOT/cleanup.sh"; then
-    ui_info "cron entry already present:"
-    crontab -l 2>/dev/null | grep -F "$CLEANUP_ROOT/cleanup.sh" | sed 's/^/  /'
-    return
-  fi
-  ui_info "Will add: $cron_line"
-  if ui_confirm "Add this entry to crontab?" y; then
-    ( crontab -l 2>/dev/null; printf '%s\n' "$cron_line" ) | crontab -
-    ui_ok "cron installed (runs every Sunday 03:00, logs to $LOG_DIR/cron.log)"
-  fi
 }
 
 case "$MODE" in
@@ -336,6 +321,7 @@ case "$MODE" in
   nodemod)       run_stale_node_modules ;;
   globals)       run_global_packages_audit ;;
   doctor)        run_doctor || EXIT_RC=1 ;;
+  speed)         run_speed ;;
   editorext)     run_editor_extensions ;;
   reports)       run_reports_manager ;;
   export)        export_reports "$EXPORT_FMT" "$EXPORT_ID" || EXIT_RC=1 ;;
@@ -359,7 +345,7 @@ RECOVERED=$(( DISK_AFTER_AVAIL - DISK_BEFORE_AVAIL ))
 
 # Walkthrough prints its own polished summary; utility modes don't need one.
 case "$MODE" in
-  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|uninstall_alias|uninstall_cron|install_alias|install_cron|tui) ;;
+  walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|uninstall_alias|uninstall_cron|install_alias|install_cron|tui|speed) ;;
   *)
   ui_section "Session summary"
   if (( RECOVERED > 0 )); then
@@ -374,13 +360,14 @@ case "$MODE" in
   ;;
 esac
 
-# ── Optional: clean up log files on finish (reports are NEVER auto-deleted) ──
+# ── Optional: delete THIS run's log on finish (reports are NEVER auto-deleted) ──
 if (( CLEANUP_LOGS_ON_FINISH )); then
-  # Sleep briefly so any deferred tee writes flush, then unlink all .log files.
+  # Sleep briefly so any deferred tee writes flush, then unlink this run's log
+  # only — earlier runs' logs are the record of what those runs deleted.
   # On Linux, deleting a file with an open fd is safe — fd stays valid until close.
   sleep 0.2 2>/dev/null || true
-  find "$LOG_DIR" -maxdepth 1 -type f -name 'cleanup-*.log' -delete 2>/dev/null
-  printf '%bℹ logs cleaned (--cleanup-logs)%b  reports preserved at: %s\n' \
+  rm -f -- "$LOG_FILE" 2>/dev/null
+  printf '%bℹ log of this run removed (--cleanup-logs)%b  reports preserved at: %s\n' \
     "${C_DIM}" "${C_RST}" "$REPORTS_DIR" >&2
 fi
 

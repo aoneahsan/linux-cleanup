@@ -62,15 +62,20 @@ scan_duplicates() {
 
 scan_stale_personal_data() {
   local days="${1:-${DAYS:-100}}"
-  ui_section "Personal files >${days}d unused (>10MB) in Downloads/Desktop"
+  load_personal_roots
+  local roots=(${ROOTS_LOADED[@]+"${ROOTS_LOADED[@]}"})
+  ui_section "Personal files >${days}d unused (>10MB)"
   ui_warn "Read-only — use menu option 7 to interactively delete."
+  (( ${#roots[@]} )) || { ui_info "None found."; return; }
+  atime_reliable "${roots[0]}" \
+    || ui_warn "Filesystem is mounted noatime: last-access dates below are not kept up to date."
   local found=0 f sz la
   while IFS= read -r f; do
     found=1
     sz=$(du -h -- "$f" 2>/dev/null | cut -f1)
     la=$(stat -c '%x' -- "$f" 2>/dev/null | cut -d' ' -f1)
     printf "  %8s  last-access %-12s  %s\n" "$sz" "$la" "$f"
-  done < <(find "$HOME/Downloads" "$HOME/Desktop" -maxdepth 4 -type f \
+  done < <(find "${roots[@]}" -maxdepth 4 -type f \
     -atime +"$days" -size +10M 2>/dev/null | head -50)
   (( found )) || ui_info "None found."
 }

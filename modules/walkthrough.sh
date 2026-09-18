@@ -160,8 +160,8 @@ quickstart_welcome() {
 }
 
 # ── Walkthrough state — total adjusts based on --no-report
-WALK_TOTAL=10
-[[ "${NO_REPORT:-0}" == 1 ]] && WALK_TOTAL=9
+WALK_TOTAL=11
+[[ "${NO_REPORT:-0}" == 1 ]] && WALK_TOTAL=10
 WALK_STEP=0
 WALK_FREED_TOTAL=0
 WALK_RAN=()
@@ -232,13 +232,13 @@ walk_run_step() {
   fi
 }
 
-# Step 10: write JSON report (always unless --no-report) + offer MD/HTML
+# Last step: write JSON report (always unless --no-report) + offer MD/HTML
 walk_step_generate_report() {
   if [[ "${NO_REPORT:-0}" == 1 ]]; then
     ui_info "Report generation disabled via --no-report"
     return
   fi
-  # Finalize JSON now so step 10 has a file to convert
+  # Finalize JSON now so this step has a file to convert
   session_report_finalize "$WALK_FREED_TOTAL"
   ui_ok "JSON report written: $REPORT_JSON"
 
@@ -269,7 +269,7 @@ walk_step_generate_report() {
 
 # ── Final summary screen + tips
 walkthrough_summary() {
-  # Belt-and-suspenders: ensure JSON is written even if step 10 never ran.
+  # Belt-and-suspenders: ensure JSON is written even if the report step never ran.
   session_report_finalize "$WALK_FREED_TOTAL"
 
   ui_box "Cleanup complete" "Session summary"
@@ -293,8 +293,8 @@ walkthrough_summary() {
   ui_show_disk
 
   local has_alias=0 has_cron=0 has_jq=1
-  grep -qsF "$CLEANUP_ROOT/cleanup.sh" "$HOME/.bash_aliases" "$HOME/.zshrc" 2>/dev/null && has_alias=1
-  crontab -l 2>/dev/null | grep -qsF "$CLEANUP_ROOT/cleanup.sh" && has_cron=1
+  self_alias_installed && has_alias=1
+  self_cron_installed && has_cron=1
   command -v jq >/dev/null 2>&1 || has_jq=0
 
   if (( has_alias == 0 || has_cron == 0 || has_jq == 0 )); then
@@ -336,6 +336,7 @@ guided_walkthrough() {
   walk_run_step "Partial / orphan downloads" run_partial_downloads  ; (( WALK_QUIT )) && { walkthrough_summary; return; }
   walk_run_step "Personal stale files"       run_stale_personal     ; (( WALK_QUIT )) && { walkthrough_summary; return; }
   walk_run_step "System cleanup (sudo)"      run_system             ; (( WALK_QUIT )) && { walkthrough_summary; return; }
+  walk_run_step "Speed check"                run_speed              ; (( WALK_QUIT )) && { walkthrough_summary; return; }
   walk_run_step "Final size audit"           run_size_audit         ; (( WALK_QUIT )) && { walkthrough_summary; return; }
   if [[ "${NO_REPORT:-0}" != 1 ]]; then
     walk_run_step "Generate readable report" walk_step_generate_report

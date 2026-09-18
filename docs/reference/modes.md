@@ -16,6 +16,7 @@ Every mode, what it does, what it touches, whether it's interactive, and what ca
 | `--node-modules` | Cleanup (project) | Always | No | Yes | [Node modules finder](../features/node-modules-finder.md) |
 | `--globals` | Inspection | No | No | No | [Globals audit](../features/globals-audit.md) |
 | `--doctor` | Repair | Yes | No (writes only `~/.bashrc` etc.) | No | [Doctor](../features/doctor.md) |
+| `--speed` | Inspection + repair | Report: no. Fixes: always | Only for an accepted systemd / cloud-init change | No | [Speed check](../features/speed.md) |
 | `--editor-ext` | Cleanup (regenerable) | Yes | No | Yes | [Editor extensions](../features/editor-extensions.md) |
 | `--reports` | Output | Yes | No | No | [Reports](../features/reports.md) |
 | `--export FMT ID` | Output | No | No | No | [Reports](../features/reports.md#exporting-to-markdown--html) |
@@ -32,4 +33,4 @@ Every mode, what it does, what it touches, whether it's interactive, and what ca
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

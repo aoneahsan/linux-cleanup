@@ -40,7 +40,8 @@ The per-install difference exists because `npx` runs the package from a temporar
 
 | Path | Auto-cleaned? | Notes |
 |---|---|---|
-| `logs/cleanup-*.log` | Optional | `--cleanup-logs` flag deletes the current run's log at finish. Past logs are kept. |
+| `logs/cleanup-*.log` | Optional | `--cleanup-logs` flag deletes the current run's log at finish. Past logs are kept. (Before 1.6.0 it deleted every log in the directory.) |
+| `app/` | No | Persistent copy of the tool, made by `--install-alias` / `--install-cron` under `npx` or a global install. Removed by `--uninstall-*` once nothing calls it. |
 | `logs/cron.log` | No | Never auto-rotated. Rotate manually if it grows large: `mv ~/.linux-cleanup/logs/cron.log ~/.linux-cleanup/logs/cron.log.old && touch ~/.linux-cleanup/logs/cron.log`. |
 | `reports/*.json` | **Never** | Reports are the durable audit trail. Delete manually if you want to. |
 | `reports/*.md` `*.html` | **Never** | Same — created on demand, deleted on demand. |
@@ -73,4 +74,4 @@ The tool does **not** chown / chmod anything outside `$DATA_HOME`.
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

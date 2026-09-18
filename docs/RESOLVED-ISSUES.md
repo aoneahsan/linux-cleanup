@@ -117,3 +117,54 @@ records the observation rather than a guess.
 (`modules/crash_trap.sh:20-26`) and `mkdir -p` creates whatever it is handed, so a bad value silently litters
 the user's working directory instead of failing. Reject a derived path that is non-absolute or contains a
 newline, and fall back to `~/.linux-cleanup/feedback`.
+
+---
+
+### ISSUE-005 — under npx, `--install-alias` and `--install-cron` point into the evictable npx cache
+
+**Resolved:** 2026-09-18 · fixed in 1.6.0 — not the stable `npx …` command first suggested below: cron has no `npx` on its PATH under nvm and would need the network at 03:00. Instead, when started by the Node launcher, `_self_target` (`modules/self_install.sh`) copies the tool to `~/.linux-cleanup/app/` and the alias and cron line point there; `cleanup.sh` keeps that copy's logs beside it. Entries are matched by marker or legacy shape (`SELF_ALIAS_RE`, `SELF_CRON_RE`). Verified in a scratch `$HOME` with a fake crontab: legacy npx-path entries were found and repointed; after deleting the fake npx cache the alias target still ran `--version`; a second install was a no-op; `--uninstall-*` run from a different copy removed both by marker and then the `app/` directory.
+
+**Severity:** Medium — the alias and the weekly cron break silently once the npx cache is pruned.
+**Affected:** 1.5.0 and earlier · **Found while working on:** the 1.5.0 dev-cache safety release (2026-09-18),
+while checking the `--help` OUTPUT section for ISSUE-002.
+
+**Symptom** — both write `$CLEANUP_ROOT/cleanup.sh` (`cleanup.sh:298` alias, `cleanup.sh:315` cron line). Under
+`npx`, `CLEANUP_ROOT` is `~/.npm/_npx/<hash>/node_modules/linux-cleanup`. That directory disappears when npm
+evicts it — and this tool's own all-safe run prunes `~/.npm/_npx` entries idle ≥ N days — leaving an alias
+and a cron entry that call a file that no longer exists. `--uninstall-*` and the walkthrough's "already
+installed" checks (`modules/release_helpers.sh:286,290,304,309`, `modules/walkthrough.sh:296-297`) match on the same
+path, so after the cache hash changes they cannot find the old entry either.
+
+**What to do** — when `LINUX_CLEANUP_NPX=1`, write a stable command instead of the cache path
+(`npx --yes linux-cleanup@latest …`, or the resolved global `linux-cleanup` binary when installed with
+`npm i -g`), and match existing entries by a fixed marker comment rather than by path.
+
+**Why not fixed in 1.5.0** — it changes how the tool installs itself for every npx user and needs its own
+design and test pass; 1.5.0 was scoped to cleanup safety. 1.5.0 did fix the cron *log* path, which now
+honours `LOG_DIR` (`~/.linux-cleanup/logs` under npx).
+
+---
+
+### ISSUE-006 — `--node-modules` searches only the author's own folders; the documented `project-roots.txt` is never read
+
+**Resolved:** 2026-09-18 · fixed in 1.6.0 — new `lib/roots.sh` (`load_roots`, `prompt_add_root`); `NM_SEARCH_ROOTS` is filled at run time from `project-roots.txt` plus the default code folders that exist, and `safe_rm_node_modules` and `--list-targets` read the same array. `--stale` reads `personal-roots.txt`. Verified in a scratch `$HOME`: no config and no default folder → no roots; a `node_modules` outside the roots → `REFUSE`; after adding `~/mycode` (tilde form) the same delete succeeded while `/` and the home directory in the file were ignored with a warning; `XDG_CONFIG_HOME` honoured.
+
+**Severity:** High — for every user but the author the mode finds nothing, and six docs describe a control that does not exist.
+**Affected:** 1.0.0 – 1.5.2 · **Found while working on:** the 1.6.0 speed-check release (2026-09-18), while checking which folders the finder actually covers.
+
+**Symptom** — `NM_SEARCH_ROOTS` was three literals, `$HOME/Documents/01-code/{projects,02-apps,}` (`modules/node_modules_finder.sh:6-10` in 1.5.2), repeated in `list_targets` (`modules/release_helpers.sh:65`). On any other machine: `No project roots found`. Meanwhile `README.md`, `docs/features/node-modules-finder.md`, `personal-stale-files.md`, `globals-audit.md`, `how-to/uninstall.md` and `reference/environment-variables.md` documented `~/.config/linux-cleanup/project-roots.txt` and `personal-roots.txt`, a first-run prompt and default roots of `~/code`, `~/projects`. `grep -rn "project-roots\|personal-roots" --include="*.sh" .` returned nothing.
+
+**What was done** — see Resolved. Two doc claims were wrong rather than unimplemented and were corrected instead: the globals audit never scanned project roots, and `--stale` never searched `~/tmp`, `~/scratch`, `~/temp`.
+
+---
+
+### ISSUE-007 — on a `noatime` filesystem, idle-based pruning deletes caches that are in use
+
+**Resolved:** 2026-09-18 · fixed in 1.6.0 — `atime_reliable` (`lib/prune.sh`) reads the mount options with `findmnt -T`, falling back to `/proc/self/mountinfo`; `prune_stale`, `prune_stale_units`, `prune_matching_files`, `prune_gradle_home`, `prune_ide_caches`, the AVD and Flatpak gates, superseded editor extensions and the `/tmp` sweep skip with a warning when it returns 1. Verified on two tmpfs mounts, each holding a unit read a moment earlier and a unit left alone, all files dated 60 days back: **1.5.2's code on the `noatime` mount removed both units, the in-use one included**; 1.6.0 on the same mount removed neither (`rc=1`); 1.6.0 on the `relatime` mount removed the idle unit and kept the in-use one. The mountinfo fallback gave the same answers with `findmnt` hidden.
+
+**Severity:** Critical (data safety) — silently deletes whole in-use units: Gradle distributions (1–2 GB each to re-download), npx trees, IDE caches, AVDs.
+**Affected:** every release that has an idle gate, 1.2.0 – 1.5.2 · **Found while working on:** the 1.6.0 speed-check release (2026-09-18), while checking this machine's mount options for the speed report.
+
+**Symptom** — `newest_access_age_days` takes the freshest of `atime` and `mtime`. `noatime` is common SSD advice; with it the kernel never moves `atime`, so a distribution launched this morning reports the age of its download. At `-d 30` it is removed whole, and the whole-unit rule of 1.5.x makes that more thorough, not less. Nothing in the output hinted at it.
+
+**Why it was not caught earlier** — the author's machines mount `relatime`, where reads move `atime` at most once a day and the gate works.

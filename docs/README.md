@@ -30,6 +30,7 @@ Every cleanup mode and helper is documented in its own page so you can jump stra
 - [Scan mode](./features/scan.md) — read-only audit, no deletes
 - [Home audit](./features/home-audit.md) — show the 20 largest things in `$HOME`
 - [Doctor](./features/doctor.md) — detect and repair broken shell-init for `nvm`, `pnpm`, `bun`, `deno`, `cargo`
+- [Speed check](./features/speed.md) — why the machine is slow, and undoable fixes for what starts by itself
 
 ### Cleanup — regenerable / safe
 
@@ -103,4 +104,4 @@ Understanding-oriented background. Read these once, refer back rarely.
 
 ---
 
-**Last updated**: 2026-07-11 · **Tool version**: 1.4.0 · **License**: MIT
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0 · **License**: MIT

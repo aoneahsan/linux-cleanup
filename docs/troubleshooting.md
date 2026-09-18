@@ -124,6 +124,16 @@ If you see new lines every 5–10 seconds, it's working — just slow.
 
 ---
 
+## "SKIPPED … its filesystem is mounted noatime"
+
+**Cause**: the filesystem holding that cache is mounted `noatime`, so the kernel never records when a file was last read. The tool decides "idle" from access times; without them a cache you use daily looks untouched since the day it was written. Rather than guess, every idle-based prune skips that location (since 1.6.0).
+
+**Check**: `findmnt -no OPTIONS -T ~/.gradle` — look for `noatime`. `linux-cleanup --self-test` shows the same for your home directory.
+
+**Fix**: either keep `noatime` and clean those caches deliberately with `--purge-all` (it ignores idle time and empties the target), or switch the mount to `relatime` in `/etc/fstab` — the Linux default, which costs at most one small write per file per day — and let a few weeks of access history build up before pruning.
+
+---
+
 ## "Disk usage grew during session"
 
 **Cause**: the `RECOVERED = DISK_AFTER - DISK_BEFORE` calculation is negative because another process wrote significantly during your cleanup session (e.g., a journal rotation, browser update, IDE re-indexing).
@@ -230,4 +240,4 @@ The bundle has everything the author needs. Email it with a one-paragraph descri
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) — Reach me at [aoneahsan@gmail.com](mailto:aoneahsan@gmail.com), [LinkedIn](https://linkedin.com/in/aoneahsan), [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

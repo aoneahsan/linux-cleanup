@@ -135,7 +135,7 @@ Not in v1.3.0. The closest is `--scan`, which estimates apt cache + journal + sn
 ## See also
 
 - [All-safe](./all-safe.md) — the user-space counterpart, explicitly excludes sudo for cron-safety
-- [Walkthrough](./walkthrough.md) — `--system` is offered as the optional Step 9
+- [Walkthrough](./walkthrough.md) — `--system` is offered as the optional Step 8
 - [Safety](../safety.md#guard-4--sudo-confinement) — why the script's sudo use is narrowly scoped
 - [Exit codes](../reference/exit-codes.md)
 

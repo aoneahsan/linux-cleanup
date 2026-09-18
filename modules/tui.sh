@@ -43,7 +43,7 @@ run_tui() {
     choice="$("$tool" \
       --title "linux-cleanup v${LINUX_CLEANUP_VERSION}" \
       --backtitle "Safe modular disk + cache cleanup  ·  ${LINUX_CLEANUP_AUTHOR}" \
-      --menu "Pick an action — Esc / Cancel to quit" 22 78 14 \
+      --menu "Pick an action — Esc / Cancel to quit" 23 78 15 \
         "scan"        "Scan & report (read-only, no deletes)" \
         "walkthrough" "Guided walkthrough — every category, with prompts" \
         "all-safe"    "All regenerable caches in one shot" \
@@ -56,6 +56,7 @@ run_tui() {
         "stale"       "Personal files unused N+ days (interactive)" \
         "system"      "System cleanup (sudo: apt, journal, kernels, snap)" \
         "doctor"      "Doctor — repair shell-init breakage" \
+        "speed"       "Speed check — why is this machine slow?" \
         "reports"     "Reports manager (list / convert / view)" \
         "feedback"    "Send feedback / report a bug (offline)" \
         "bundle"      "Create debug bundle for emailing" \
@@ -77,6 +78,7 @@ run_tui() {
       stale)       run_stale_personal ;;
       system)      run_system ;;
       doctor)      run_doctor ;;
+      speed)       run_speed ;;
       reports)     run_reports_manager ;;
       feedback)    show_feedback ;;
       bundle)      make_debug_bundle ;;

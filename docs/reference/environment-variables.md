@@ -10,8 +10,9 @@
 | `LINUX_CLEANUP_REPORTS_DIR` | `~/.linux-cleanup/reports/` (npx / npm-global) or `<repo>/reports/` (git clone) | Where JSON reports go. Created if missing. |
 | `LINUX_CLEANUP_HOME` | `~/.linux-cleanup` | **Node launcher only** (`npx` / `npm install -g`): the data directory the launcher derives `LINUX_CLEANUP_LOG_DIR`, `LINUX_CLEANUP_REPORTS_DIR` and `LINUX_CLEANUP_DATA_HOME` from. A git-clone run of `cleanup.sh` never reads it — set the three variables it feeds instead. |
 | `LINUX_CLEANUP_DATA_HOME` | unset (falls back to `dirname $LINUX_CLEANUP_LOG_DIR`) | Parent directory for `logs/`, `reports/`, and `feedback/` subdirectories. Lets you point everything at e.g. an encrypted volume. A value that is not an absolute path, or that contains a newline or other control character, falls back to `~/.linux-cleanup`. |
-| `LINUX_CLEANUP_NPX` | unset | Set to `1` by the Node launcher (`bin/linux-cleanup.js`) when invoked via `npx` or `npm install -g`. Triggers a one-line note in the log header. Don't set this manually — it's an internal marker. |
-| `XDG_CONFIG_HOME` | `~/.config` | Where personal-roots config files live (`personal-roots.txt`, `project-roots.txt`). Honours the [XDG Base Directory spec](https://specifications.freedesktop.org/basedir-spec/). |
+| `LINUX_CLEANUP_NPX` | unset | Set to `1` by the Node launcher (`bin/linux-cleanup.js`) when it runs from the npx cache. Adds a one-line note to the log header and the walkthrough welcome. Don't set this manually. |
+| `LINUX_CLEANUP_LAUNCHER` | unset | Set to `node` by the Node launcher for both `npx` and `npm install -g`. When set, `--install-alias` and `--install-cron` first copy the tool to `<data-home>/app/` and point there, because neither install location is stable. Don't set this manually. |
+| `XDG_CONFIG_HOME` | `~/.config` | Where the two root lists live: `linux-cleanup/project-roots.txt` ([`--node-modules`](../features/node-modules-finder.md)) and `linux-cleanup/personal-roots.txt` ([`--stale`](../features/personal-stale-files.md)). One absolute path per line; a line starting with `#` is a comment. |
 
 ---
 
@@ -55,4 +56,4 @@ NO_COLOR=1 linux-cleanup --scan --no-report > /tmp/scan.log
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

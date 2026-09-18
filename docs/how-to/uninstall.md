@@ -77,7 +77,9 @@ rmdir ~/.config/linux-cleanup/ 2>/dev/null
 
 ## What stays
 
-After a complete uninstall, **nothing** related to linux-cleanup remains on your machine. The tool never wrote outside the locations above. No system services, no `/etc/*` modifications, no kernel modules, no global PATH entries beyond what `npm install -g` adds (and `npm uninstall -g` removes).
+After a complete uninstall, **nothing** of linux-cleanup itself remains on your machine: no system service, no kernel module, no global PATH entry beyond what `npm install -g` adds (and `npm uninstall -g` removes). `rm -rf ~/.linux-cleanup/` in Step 3 also removes the persistent copy in `~/.linux-cleanup/app/` that `--install-alias` and `--install-cron` make under `npx` or a global install.
+
+The one thing an uninstall does not revert is a change you accepted in [`--speed`](../features/speed.md) — a service disabled at boot, a login item switched off, `/etc/cloud/cloud-init.disabled`. Those are settings of your system, not parts of the tool. Each printed its undo command when it was made, and the session log under `logs/` keeps them.
 
 ---
 
@@ -94,4 +96,4 @@ Your previous reports survive the uninstall + reinstall cycle (since `~/.linux-c
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

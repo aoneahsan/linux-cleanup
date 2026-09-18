@@ -7,6 +7,62 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.6.0] — 2026-09-18
+
+A speed check, and three defects that made the tool unsafe or useless outside the
+machine it was written on.
+
+### Added
+
+- **`--speed` — why is this machine slow?** Measures first: thermal-throttle
+  counters with a 2-second live reading, CPU / memory / IO pressure, the heaviest
+  processes and boot time. Then it looks for what starts by itself — Docker
+  containers with an `always` / `unless-stopped` restart policy, a Docker daemon
+  enabled at boot, database / web / VM services enabled at boot, cloud-init on a
+  machine that is not a VM, login items, and GNOME Software working in the
+  background. Each fix is asked separately, prints its undo command, and deletes
+  nothing. Under `-y` it reports and changes nothing. It never starts a Docker
+  daemon that is kept on demand. Also in the menu (20), the TUI and the walkthrough.
+- **`project-roots.txt` and `personal-roots.txt`** under
+  `${XDG_CONFIG_HOME:-~/.config}/linux-cleanup/` — one absolute path per line.
+- `--self-test` check 7 reports whether your home directory records access times.
+
+### Fixed
+
+- **Idle detection trusted access times on filesystems that do not record them.**
+  On a `noatime` mount a cache read every day keeps the atime of the day it was
+  written, so at `-d 30` an in-use Gradle distribution, npx tree or IDE cache
+  looked idle and was deleted whole. Every idle-based prune now checks the mount
+  and skips it with a warning; `--purge-all` is unchanged. `relatime`, the Linux
+  default, is unaffected.
+- **`--node-modules` only searched the author's own folders.** The search roots
+  were three hardcoded paths, while the docs described a `project-roots.txt` that
+  no code read. Roots now come from that file plus the usual code folders that
+  exist (`~/code`, `~/projects`, `~/dev`, `~/src`, `~/work`, …), with a first-run
+  prompt when none is found. `/`, the whole home directory and credential /
+  config directories are refused as roots. `--stale` reads `personal-roots.txt`
+  the same way.
+- **Under `npx`, `--install-alias` and `--install-cron` pointed into the npx
+  cache**, which npm evicts and this tool's own all-safe run prunes. When started
+  by the Node launcher the tool now copies itself to `~/.linux-cleanup/app/` and
+  points both there — no `node`, `npx` or network needed when cron fires. Entries
+  are recognised by marker (`# linux-cleanup tool`, `# linux-cleanup`), so one
+  written by an older version is found, repointed and uninstalled.
+- **`--cleanup-logs` deleted every log in the directory**, not "this run's log" as
+  its help text said. It now removes only the current run's.
+
+### Changed
+
+- The pruning helpers moved from `lib/common.sh` to `lib/prune.sh`; alias and cron
+  code moved to `modules/self_install.sh`. No behaviour change.
+- Docs corrected where they described features that did not exist: the globals
+  audit does not scan your projects, and `--stale` never searched `~/tmp`,
+  `~/scratch` or `~/temp`.
+
+**Deprecated:** every release before 1.6.0 carries the `noatime` defect.
+
+---
+
 ## [1.5.2] — 2026-09-18
 
 ### Fixed

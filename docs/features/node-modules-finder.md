@@ -11,7 +11,7 @@
 
 ## What it does
 
-Walks a configured set of "project roots" (default: `~/code`, `~/projects`, `~/Documents/projects` if it exists, plus any roots you've added) looking for `node_modules/` directories where:
+Walks your "project roots" — every directory listed in `~/.config/linux-cleanup/project-roots.txt`, plus whichever of `~/code`, `~/projects`, `~/Projects`, `~/dev`, `~/src`, `~/work`, `~/workspace`, `~/repos`, `~/git`, `~/Documents/projects` and `~/Documents/code` exist — looking for `node_modules/` directories where:
 
 - No source file in the *parent project* (the directory containing `node_modules/`) has changed in `--days N` (default 100) — `node_modules`, `.git`, `dist`, `build`, `.yarn`, `.next` and `coverage` are skipped when looking; before 1.5.0 the project directory's own mtime was used, which does not move when you edit files in `src/`, AND
 - When a git repository tracks the project (a monorepo workspace), no source file anywhere in that repository has changed in the same window, AND
@@ -51,7 +51,9 @@ No project roots found. Add one now? (e.g., /home/you/code)
 →
 ```
 
-Your answer is appended to `~/.config/linux-cleanup/project-roots.txt`. To add more later, just edit that file (one path per line).
+Your answer is appended to `~/.config/linux-cleanup/project-roots.txt` (`$XDG_CONFIG_HOME` is honoured). To add more later, just edit that file: one absolute path per line, a leading `~` is expanded, a line starting with `#` is a comment. The prompt appears only in an interactive session, never under `-y`.
+
+Before 1.6.0 this file was documented but never read, and the search was limited to the author's own folder layout.
 
 To **add** a root permanently:
 
@@ -73,7 +75,8 @@ echo "$HOME/work" >> ~/.config/linux-cleanup/project-roots.txt
 ## What it will NOT delete
 
 - `node_modules/` outside your configured project roots.
-- Anything in `~/Documents` (allowlist guard) unless you explicitly added it as a project root *and* its `node_modules/` ancestor is below `~/Documents/projects/<thing>/node_modules`.
+- Anything that is not a real directory named exactly `node_modules` with a `package.json` beside it. That one shape is the only delete this mode can perform inside a root, including a root under `~/Documents`; a symlink, or any other name, is refused.
+- Roots that are too broad or sensitive: `/`, your whole home directory, `~/.ssh`, `~/.gnupg`, `~/.config`, `~/.claude`. A line naming one is ignored with a warning.
 - Active projects.
 - Anything you press `n` on.
 
@@ -116,4 +119,4 @@ Yes — a workspace's `node_modules/` counts as stale only when the whole reposi
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

@@ -26,6 +26,8 @@ What it does:
    ```
 5. Reminds you to `source` the rc or open a new terminal.
 
+**Which `cleanup.sh`?** From a git clone, the clone's own. Under `npx` or `npm install -g`, the tool first copies itself (`cleanup.sh`, `lib/`, `modules/`, `VERSION`, `LICENSE`) to `~/.linux-cleanup/app/` and points the alias there. The npx cache is evicted by npm — and pruned by this tool's own all-safe run — and a global install lives under one Node version; the copy depends on neither. Run `--install-alias` again after an upgrade to refresh the copy. (Before 1.6.0 the alias pointed into the npx cache and broke when that was cleared. 1.6.0 finds such an entry by its `# linux-cleanup tool` marker and offers to repoint it.)
+
 After the alias is installed, you can type `cleanup` instead of `linux-cleanup` (or instead of the absolute path to `cleanup.sh`).
 
 ### Removal
@@ -34,7 +36,7 @@ After the alias is installed, you can type `cleanup` instead of `linux-cleanup` 
 linux-cleanup --uninstall-alias
 ```
 
-Walks `~/.bash_aliases`, `~/.zshrc`, and `~/.bashrc`, looks for any line referencing `cleanup.sh` from this install, asks for confirmation, removes the line + the comment header. A `.bak` backup is written first (`~/.bashrc.bak`, etc.).
+Walks `~/.bash_aliases`, `~/.zshrc`, and `~/.bashrc`, looks for the `# linux-cleanup tool` marker or any `alias cleanup='…/cleanup.sh'` line — whatever path it holds — asks for confirmation, and removes the line + the comment header. A `.bak` backup is written first (`~/.bashrc.bak`, etc.). Once neither an alias nor a cron entry is left, it offers to remove `~/.linux-cleanup/app/` too.
 
 If you've installed the alias multiple times across rc files, run `--uninstall-alias` once per file.
 
@@ -50,9 +52,10 @@ What it does:
 
 1. Adds a single line to your user crontab:
    ```
-   0 3 * * 0 /path/to/cleanup.sh --all-safe -y >>~/.linux-cleanup/logs/cron.log 2>&1
+   0 3 * * 0 /path/to/cleanup.sh --all-safe -y >>~/.linux-cleanup/logs/cron.log 2>&1 # linux-cleanup
    ```
-2. Refuses to add a duplicate if any line referencing `cleanup.sh` already exists.
+   The path follows the same rule as the alias: the persistent copy in `~/.linux-cleanup/app/` under `npx` or a global install, so the job needs no `node`, `npx` or network when it fires.
+2. Recognises an existing entry by the trailing `# linux-cleanup` marker (or the older `cleanup.sh --all-safe` shape). An identical entry is left alone; a different one is shown and replaced only if you confirm.
 
 Schedule: every Sunday at **03:00 local time**, runs [`--all-safe -y`](./all-safe.md), appends both stdout and stderr to `~/.linux-cleanup/logs/cron.log`.
 
@@ -72,7 +75,7 @@ Schedule: every Sunday at **03:00 local time**, runs [`--all-safe -y`](./all-saf
 linux-cleanup --uninstall-cron
 ```
 
-Reads your crontab, removes any line referencing `cleanup.sh`, asks for confirmation, writes the modified crontab back. Other cron entries are preserved untouched.
+Reads your crontab, finds the entry by its `# linux-cleanup` marker (or the older `cleanup.sh --all-safe` shape), asks for confirmation, and writes the crontab back without it. Other cron entries are preserved untouched.
 
 ---
 
@@ -94,7 +97,7 @@ The structured JSON report from each cron run is at `~/.linux-cleanup/reports/re
 
 - Will **not** modify any rc file you don't have. If you're a `fish` / `nushell` user without `~/.bashrc` or `~/.zshrc`, the alias install reports "no compatible rc file found" and exits cleanly.
 - Will **not** install a system-wide cron entry (`/etc/cron.d/*`). Only your user crontab.
-- Will **not** survive a Node version manager re-install. If you wipe `~/.nvm` and your alias points to a node-version-specific install path, you'll need to re-run `--install-alias`.
+- Will **not** update themselves. The persistent copy in `~/.linux-cleanup/app/` stays at the version that installed it until you run `--install-alias` or `--install-cron` again from a newer one.
 - Will **not** run as root, even if the script is invoked with `sudo`. The alias and cron entries are explicitly scoped to the invoking user.
 
 ---
@@ -124,4 +127,4 @@ That's a bad idea — `--all-safe` rebuilds caches that you've actively been usi
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

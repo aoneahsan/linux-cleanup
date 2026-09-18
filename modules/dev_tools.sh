@@ -25,6 +25,7 @@ clean_android_avd() {
     return
   fi
 
+  atime_reliable "$avd_root" || { _atime_skip "$avd_root"; return 0; }
   shopt -s nullglob dotglob
   local pruned_freed=0 inspected=0 kept=0 pruned=0
   local avd ini base age b
@@ -113,6 +114,7 @@ clean_flatpak_user() {
   fi
 
   # No active apps: gate on global ≥${DAYS}d idle before nuking the tree.
+  atime_reliable "$root" || { _atime_skip "$root"; return 0; }
   local age; age=$(newest_access_age_days "$root")
   if (( age <= DAYS )); then
     ui_info "Flatpak user data — touched ${age}d ago (within ${DAYS}d window); keeping"

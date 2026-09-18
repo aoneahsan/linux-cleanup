@@ -37,12 +37,11 @@ By default:
 ```
 $HOME/Downloads
 $HOME/Desktop
-$HOME/tmp
-$HOME/scratch
-$HOME/temp
 ```
 
-Plus, on first run, it prompts for any extra directories you want to include. Your answer is stored in `~/.config/linux-cleanup/personal-roots.txt` for future runs.
+Plus every directory listed in `~/.config/linux-cleanup/personal-roots.txt` (one absolute path per line; a line starting with `#` is a comment). The tool never writes that file for this mode — you add to it yourself. `/`, your whole home directory, and `~/.ssh`, `~/.gnupg`, `~/.config`, `~/.claude` are refused as roots.
+
+On a filesystem mounted `noatime` the LAST-ACCESS column is not kept up to date. The mode says so at the top and still lists by the stale date, so read each entry before confirming.
 
 It does **not** look inside:
 
@@ -167,4 +166,4 @@ find ~/Downloads -type f -atime +100 -mtime +100 -printf '%s\t%p\n' | sort -rn |
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-05-10 · **Tool version**: 1.3.1
+**Last updated**: 2026-09-18 · **Tool version**: 1.6.0

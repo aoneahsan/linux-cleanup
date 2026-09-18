@@ -25,14 +25,23 @@ run_partial_downloads() {
   fi
 }
 
-# Stale personal files >N days unaccessed, >10MB, in Downloads/Desktop only.
+# Stale personal files >N days unaccessed, >10MB, in Downloads, Desktop and
+# any directory listed in personal-roots.txt (lib/roots.sh).
 # Always interactive — never auto.
 run_stale_personal() {
   local days="${DAYS:-100}"
-  ui_section "Personal files unused ${days}+ days (>10MB) in ~/Downloads + ~/Desktop"
+  load_personal_roots
+  local roots=(${ROOTS_LOADED[@]+"${ROOTS_LOADED[@]}"})
+  ui_section "Personal files unused ${days}+ days (>10MB)"
   ui_warn "Personal data — interactive only. Nothing is deleted without your confirmation."
+  if (( ${#roots[@]} == 0 )); then
+    ui_info "No personal directories found (~/Downloads, ~/Desktop, or $(roots_config_dir)/personal-roots.txt)."
+    return
+  fi
+  ui_info "Searching: ${roots[*]/#$HOME/\~}"
+  atime_reliable "${roots[0]}" \
+    || ui_warn "This filesystem is mounted noatime: LAST-ACCESS below is not kept up to date, so a file you opened yesterday can be listed. Check each one."
 
-  local roots=("$HOME/Downloads" "$HOME/Desktop")
   local found=() f
   while IFS= read -r -d '' f; do found+=("$f"); done < <(
     find "${roots[@]}" -maxdepth 4 -type f -atime +"$days" -size +10M -print0 2>/dev/null
