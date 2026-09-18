@@ -25,15 +25,34 @@ sys_old_snaps() {
     ui_info "snap not installed — skipping."
     return
   fi
-  local revs
-  revs="$(snap list --all 2>/dev/null | awk '/disabled/ {print $1, $3}')"
-  if [[ -z "$revs" ]]; then
+  local all revs="" kept="" name rev cur age
+  all="$(snap list --all 2>/dev/null | awk '/disabled/ {print $1, $3}')"
+  if [[ -z "$all" ]]; then
     ui_info "No disabled snap revisions."
     return
   fi
+  # A disabled revision is the rollback copy of the version that was RUNNING
+  # until its replacement arrived. Keep it until the current revision has been
+  # installed for ≥${DAYS}d — the same idle rule as every other target.
+  # --purge-all removes every disabled revision (legacy behaviour).
+  while read -r name rev; do
+    [[ -z "$name" ]] && continue
+    cur="$(snap list "$name" 2>/dev/null | awk 'NR==2 {print $3}')"
+    age="$(dir_age_days "/var/lib/snapd/snaps/${name}_${cur}.snap")"
+    if (( ${PURGE_ALL:-0} == 1 )) || { [[ "$age" =~ ^[0-9]+$ ]] && (( age >= ${DAYS:-100} )); }; then
+      revs+="$name $rev"$'\n'
+    else
+      kept+="  $name rev $rev (replaced ${age}d ago — kept as rollback)"$'\n'
+    fi
+  done <<<"$all"
+  [[ -n "$kept" ]] && { echo "Kept (replaced within ${DAYS:-100}d):"; printf '%s' "$kept"; }
+  if [[ -z "$revs" ]]; then
+    ui_info "No disabled snap revisions older than ${DAYS:-100}d."
+    return
+  fi
   echo "Disabled revisions:"
-  echo "$revs" | awk '{printf "  %s rev %s\n", $1, $2}'
-  if ui_confirm "Remove all disabled snap revisions above?" y; then
+  echo "$revs" | awk 'NF {printf "  %s rev %s\n", $1, $2}'
+  if ui_confirm "Remove the disabled snap revisions above?" y; then
     while read -r name rev; do
       [[ -z "$name" ]] && continue
       sudo snap remove "$name" --revision="$rev" 2>&1 | tail -1

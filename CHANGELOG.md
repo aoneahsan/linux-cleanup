@@ -7,6 +7,21 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [1.5.2] — 2026-09-18
+
+### Fixed
+
+- **`--system` kept no snap rollback.** It removed every disabled snap revision,
+  including the copy of an app that was the running version until yesterday's
+  refresh. A disabled revision is now removed only once the revision that
+  replaced it has been installed for N days (`-d`); newer ones are listed as kept
+  rollbacks. `--purge-all` still removes them all.
+- **`--node-modules` listed Yarn PnP internals.** `.yarn/unplugged/<pkg>/node_modules`
+  directories are part of a Yarn install, not a project's dependencies; the search
+  now skips `.yarn` and `.git`. (1.5.1's delete guard already refused them.)
+
+---
+
 ## [1.5.1] — 2026-09-18
 
 Completes 1.5.0's fix. The whole-unit rule it introduced for Gradle and Android

@@ -18,7 +18,7 @@
 | 1 | Remove orphaned packages | `sudo apt autoremove --purge` |
 | 2 | Clean apt cache | `sudo apt clean` |
 | 3 | Vacuum journal | `sudo journalctl --vacuum-size=200M` (configurable) |
-| 4 | Trim snap revisions | `sudo snap set system refresh.retain=2; sudo snap remove --revision <old>` per snap |
+| 4 | Remove old snap revisions | `sudo snap remove <name> --revision <rev>` for each disabled revision whose replacement has been installed ≥ `--days N`; newer ones stay as rollback copies |
 | 5 | Remove old kernels | `sudo apt-get autoremove --purge linux-image-*` (skipped on non-deb distros) |
 | 6 | Age `/tmp` | Removes entries older than `--days N` from `/tmp/` (uses `find -mtime`) |
 | 7 | Drop kernel page cache | `sudo sync; sudo sysctl vm.drop_caches=3` |
