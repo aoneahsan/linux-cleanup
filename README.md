@@ -39,6 +39,12 @@ network calls of any kind.
 | **Undo** | None — deletion is one-way |
 | **Status** | Stable · actively maintained |
 
+**Documentation status (2026-10-14):** The package source and npm release
+are at 1.6.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
+was last fact-checked against 1.4.0 and needs a 1.6.0 review. Use this
+repository's source and changelog for the current behavior until that
+review is complete.
+
 <a id="table-of-contents"></a>
 ## 🧭 Table of Contents&nbsp;[#](#table-of-contents)
 
