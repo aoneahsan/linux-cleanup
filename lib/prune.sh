@@ -59,6 +59,12 @@ prune_stale() {
   before=$(dir_bytes "$root")
   # Only delete a file if it's untouched (atime) AND unmodified (mtime) for >days.
   # -depth ensures we process contents before parents; -delete then nukes file/symlink.
+  if (( ${DRY_RUN:-0} )); then
+    find "$root" -depth -mindepth 1 \( -type f -o -type l \) \
+         -atime +"$days" -mtime +"$days" -printf '%s\n' 2>/dev/null \
+      | awk '{s+=$1} END{printf "%d", s}'
+    return 0
+  fi
   find "$root" -depth -mindepth 1 \
        \( -type f -o -type l \) \
        -atime +"$days" -mtime +"$days" \
@@ -216,7 +222,8 @@ prune_matching_files() {
   b=$(find "$root" -type f -name "$glob" -atime +"$days" -mtime +"$days" -printf '%s\n' 2>/dev/null \
       | awk '{s+=$1} END{printf "%d", s}')
   (( b > 0 )) || return 0
-  find "$root" -type f -name "$glob" -atime +"$days" -mtime +"$days" -delete 2>/dev/null || true
+  lclean_do "remove old ${glob} files under ${root/#$HOME/\~}" \
+    find "$root" -type f -name "$glob" -atime +"$days" -mtime +"$days" -delete 2>/dev/null || true
   UNITS_FREED=$(( UNITS_FREED + b ))
   ui_ok "  removed old ${glob} files under ${root/#$HOME/\~} ($(bytes_pretty "$b"))"
 }

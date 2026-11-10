@@ -147,6 +147,10 @@ docker_prune_regenerable() {
   _docker_ready || return 0
   local filter=() out
   (( ${PURGE_ALL:-0} == 1 )) || filter=(--filter "until=$(( ${DAYS:-100} * 24 ))h")
+  if (( ${DRY_RUN:-0} )); then
+    ui_info "[dry-run] would prune Docker build cache + dangling images (${filter[*]:-all})"
+    return 0
+  fi
   out=$(docker builder prune -f ${filter[@]+"${filter[@]}"} 2>&1 | tail -1)
   ui_ok "Docker build cache — ${out:-nothing to prune}"
   out=$(docker image prune -f ${filter[@]+"${filter[@]}"} 2>&1 | tail -1)

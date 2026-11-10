@@ -31,7 +31,7 @@ Prints:
 - Author contact (email, web, LinkedIn).
 - A "what to include in your report" checklist (distro, bash version, tool version, exact command, expected vs actual).
 - A pointer to `--debug-bundle` for the easy-mode log packaging.
-- A reminder that the tool makes **no network calls** — privacy guarantee in plain language.
+- A reminder that the tool sends nothing about you — its only network use is reading the public release record.
 - An offer to open a **pre-filled `mailto:` draft** in your default mail client (via `xdg-open`). The draft body includes auto-filled system info: tool version, distro, kernel, bash. You add the description above the auto-filled section before sending.
 
 Decline the mailto offer and you can copy-paste the address yourself.
@@ -84,7 +84,7 @@ If the script exits unexpectedly — uncaught error, signal kill (other than `Ct
     2. Email it to aoneahsan@gmail.com
     3. Or run linux-cleanup --feedback for a pre-filled draft.
 
-  Nothing was sent. linux-cleanup makes no network calls.
+  Nothing was sent. linux-cleanup never uploads logs or reports.
 ```
 
 The bundle contents are similar to `--debug-bundle`, plus a `CRASH_MANIFEST.txt` with:
@@ -106,7 +106,7 @@ For everything else (signal kills like `SIGKILL=137`, syntax errors during sourc
 
 ### Privacy
 
-The crash trap is a local file write only. There is no network code, no upload step, no automated submission. The bundle stays in `~/.linux-cleanup/feedback/` until you delete it or email it. The script's "no network calls" guarantee is preserved literally — `grep -r "curl\|wget\|http" cleanup.sh lib/ modules/` returns matches only inside this documentation and inside the `--feedback` mailto helper, never as live network code.
+The crash trap is a local file write only. There is no network code in it, no upload step, no automated submission. The bundle stays in `~/.linux-cleanup/feedback/` until you delete it or email it. Since 2.0.0 the only live network code in the tool is `modules/update_check.sh`, which reads the public release record and sends nothing.
 
 ---
 

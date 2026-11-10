@@ -7,6 +7,51 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [2.0.0] — 2026-11-10
+
+The rebuild. linux-cleanup is a production project again, and 2.0.0 is its
+first release since: everything 1.6.0 did, plus a dry run you can trust and a
+way to hear about fixes.
+
+### Added
+
+- **`-n` / `--dry-run`.** Add it to any cleanup mode. The run walks the same
+  steps and asks the same questions; every delete, package-manager command,
+  `sudo` step, Docker prune and speed fix prints `[dry-run] would …` instead of
+  running. Nothing on disk, in a service or in a setting changes, and no session
+  report is written. Settings-only modes (`--install-alias`, `--install-cron`,
+  `--doctor`, the reports manager) say they do nothing under a dry run.
+- **`--self-test` check 8** puts a probe file through `safe_rm` and the dry-run
+  wrapper with the dry run on, and fails if the file is gone.
+- **Update notices.** At start the tool reads `release/stable.env` from this
+  repository (version, urgency, one-line reason). A **normal** release is
+  announced once and required from the next start; an **urgent** one stops an
+  older copy at once. Either way it prints the one command that updates the copy
+  you are running (npx, global npm, the persistent alias/cron copy, or a git
+  clone) and, when you are at a terminal, offers to run it and carry on with the
+  same arguments. Offline, or without `curl`/`wget`, it carries on silently.
+  `LINUX_CLEANUP_CHANNEL=test` reads `release/test.env` instead.
+- **`--refresh-app`** brings the persistent copy in `~/.linux-cleanup/app`
+  (used by the alias and the weekly cron) up to the running version.
+
+### Changed
+
+- **Network use.** 1.x made no network calls. 2.0.0 makes one: the GET of the
+  public release record above, with no query string or identifier. Nothing about
+  your machine or your run is sent; there is still no telemetry or analytics.
+  README, `--feedback` and the docs say so.
+- `package.json` licence field now reads `MIT`, matching `LICENSE`; `bugs` points
+  at GitHub issues. New gates: `lint:bash`, `version:check` (package.json,
+  `VERSION`, `lib/common.sh` and `release/stable.env` must agree) and
+  `prepublishOnly`.
+
+### Fixed
+
+- The walkthrough counted 11 steps under `--no-report` because the total was
+  set before flags were parsed. It now counts 10.
+
+---
+
 ## [1.6.0] — 2026-09-18
 
 A speed check, and three defects that made the tool unsafe or useless outside the

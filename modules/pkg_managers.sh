@@ -22,7 +22,7 @@ clean_npm_cache() {
     local size; size="$(dir_size "$HOME/.npm/_cacache")"
     if ui_confirm "Run npm cache clean --force ($size, FULL PURGE)?" n; then
       if command -v npm >/dev/null 2>&1; then
-        npm cache clean --force >/dev/null 2>&1 && ui_ok "npm cache cleared ($size freed)"
+        lclean_do "run npm cache clean --force" npm cache clean --force --loglevel=error && ui_ok "npm cache cleared ($size freed)"
       else
         safe_rm "$HOME/.npm/_cacache" && ui_ok "npm cache dir removed ($size freed)"
       fi

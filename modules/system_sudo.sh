@@ -4,8 +4,8 @@
 sys_apt_clean() {
   ui_info "apt autoremove --purge -y && apt clean"
   if ui_confirm "Run apt autoremove + clean?" y; then
-    sudo apt autoremove --purge -y 2>&1 | tail -20
-    sudo apt clean
+    lclean_do "run apt autoremove --purge" sudo apt autoremove --purge -y 2>&1 | tail -20
+    lclean_do "run apt clean" sudo apt clean
     ui_ok "apt cleaned"
   fi
 }
@@ -15,7 +15,7 @@ sys_journal_vacuum() {
   cur="$(journalctl --disk-usage 2>/dev/null | grep -oE '[0-9.]+[GMK]' | head -1 || echo '?')"
   ui_info "Journal currently uses $cur"
   if ui_confirm "Vacuum journal to 100M?" y; then
-    sudo journalctl --vacuum-size=100M 2>&1 | tail -5
+    lclean_do "vacuum the journal to 100M" sudo journalctl --vacuum-size=100M 2>&1 | tail -5
     ui_ok "journal vacuumed"
   fi
 }
@@ -55,7 +55,7 @@ sys_old_snaps() {
   if ui_confirm "Remove the disabled snap revisions above?" y; then
     while read -r name rev; do
       [[ -z "$name" ]] && continue
-      sudo snap remove "$name" --revision="$rev" 2>&1 | tail -1
+      lclean_do "remove snap $name rev $rev" sudo snap remove "$name" --revision="$rev" 2>&1 | tail -1
     done <<<"$revs"
     ui_ok "old snap revisions removed"
   fi
@@ -77,8 +77,8 @@ sys_drop_pagecache() {
   fi
   ui_info "Drop kernel page cache (frees buff/cache RAM; the kernel reclaims it anyway, and re-reading makes things slower for a while)"
   if ui_confirm "Run sync && drop_caches=3?" n; then
-    sudo sync
-    sudo sysctl -w vm.drop_caches=3 >/dev/null
+    lclean_do "drop the page cache" sudo sync
+    lclean_do "set vm.drop_caches=3" sudo sysctl -q -w vm.drop_caches=3
     ui_ok "page cache dropped"
   fi
 }
@@ -87,7 +87,7 @@ sys_clean_tmp() {
   ui_info "/tmp size: $(dir_size /tmp)"
   atime_reliable /tmp || { _atime_skip /tmp; return 0; }
   if ui_confirm "Remove files in /tmp older than 7 days?" y; then
-    sudo find /tmp -mindepth 1 -atime +7 -delete 2>/dev/null || true
+    lclean_do "remove /tmp files older than 7 days" sudo find /tmp -mindepth 1 -atime +7 -delete 2>/dev/null || true
     ui_ok "/tmp cleaned (7+ day-old files)"
   fi
 }

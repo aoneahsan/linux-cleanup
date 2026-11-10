@@ -1,13 +1,16 @@
 {
   "name": "linux-cleanup",
-  "version": "1.6.0",
-  "description": "Safe, modular disk and cache cleanup for Linux — prune by default, allowlist-guarded.",
+  "version": "2.0.0",
+  "description": "Safe, modular disk + cache cleanup for Linux: idle-only pruning of yarn/npm/pnpm, browser, Gradle, Cypress, Playwright and Android caches, stale node_modules, journals and old snaps — allowlist-guarded, with a real --dry-run.",
   "bin": "bin/linux-cleanup.js",
   "main": "bin/linux-cleanup.js",
   "scripts": {
     "test": "bash cleanup.sh --self-test",
     "scan": "bash cleanup.sh --scan",
-    "version-check": "bash cleanup.sh --version"
+    "dry-run": "bash cleanup.sh --all-safe --yes --dry-run",
+    "lint:bash": "bash -c 'for f in cleanup.sh lib/*.sh modules/*.sh; do bash -n \"$f\" || exit 1; done' && node -c bin/linux-cleanup.js",
+    "version:check": "node -e \"const fs=require('fs');const v=require('./package.json').version;const ok=fs.readFileSync('VERSION','utf8').trim()===v&&fs.readFileSync('lib/common.sh','utf8').includes('LINUX_CLEANUP_VERSION=\\\"'+v+'\\\"')&&fs.readFileSync('release/stable.env','utf8').includes('version='+v);if(!ok){console.error('version mismatch: package.json '+v+' must equal VERSION, lib/common.sh and release/stable.env');process.exit(1)}console.log('version parity OK: '+v)\"",
+    "prepublishOnly": "npm run --silent lint:bash && test -x cleanup.sh && test -x bin/linux-cleanup.js && npm run --silent version:check"
   },
   "files": [
     "bin/",
@@ -17,7 +20,10 @@
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
-    "VERSION"
+    "VERSION",
+    "SECURITY.md",
+    "!**/CLAUDE.md",
+    "!**/AGENTS.md"
   ],
   "engines": {
     "node": ">=14"
@@ -45,14 +51,13 @@
     "url": "https://aoneahsan.com"
   },
   "license": "MIT",
-  "homepage": "https://github.com/aoneahsan/linux-cleanup",
+  "homepage": "https://github.com/aoneahsan/linux-cleanup#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aoneahsan/linux-cleanup.git"
   },
   "bugs": {
-    "url": "https://github.com/aoneahsan/linux-cleanup/issues",
-    "email": "aoneahsan@gmail.com"
+    "url": "https://github.com/aoneahsan/linux-cleanup/issues"
   },
   "funding": {
     "type": "individual",

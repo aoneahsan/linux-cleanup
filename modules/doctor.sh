@@ -115,6 +115,7 @@ _check_cargo() {
 }
 
 run_doctor() {
+  dry_run_refuse "Doctor" && return 0
   ui_section "Doctor — detect & repair shell-init breakage for dev runtimes"
   ui_info "This checks if installed runtimes are properly wired into ~/.bashrc."
   ui_info "Will only APPEND missing init blocks (with your confirmation). Never deletes."

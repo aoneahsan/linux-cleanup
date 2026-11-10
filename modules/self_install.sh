@@ -41,6 +41,17 @@ _self_persist() {
   mv -- "$app.new" "$app"
 }
 
+# self_refresh_app — bring <data-home>/app up to this version (used by the
+# update flow for the copy the alias and cron call).
+self_refresh_app() {
+  if [[ "${LINUX_CLEANUP_LAUNCHER:-}" != node ]]; then
+    ui_err "--refresh-app runs from the npm package:  npx -y linux-cleanup@latest --refresh-app"
+    return 1
+  fi
+  _self_persist || { ui_err "could not refresh $(_self_app_dir)"; return 1; }
+  ui_ok "persistent copy at $(_self_app_dir) is now v${LINUX_CLEANUP_VERSION}"
+}
+
 # _self_target — the cleanup.sh path an alias or cron line should call.
 _self_target() {
   if [[ "${LINUX_CLEANUP_LAUNCHER:-}" == node && ! -f "$CLEANUP_ROOT/.persistent" ]]; then
@@ -71,6 +82,7 @@ _self_strip_alias() {
 }
 
 install_alias() {
+  dry_run_refuse "--install-alias" && return 0
   ui_section "Install shell alias"
   local target_file="$HOME/.bash_aliases"
   if [[ -f "$HOME/.zshrc" && ! -f "$HOME/.bash_aliases" ]]; then
@@ -102,6 +114,7 @@ install_alias() {
 }
 
 install_cron() {
+  dry_run_refuse "--install-cron" && return 0
   ui_section "Install weekly cron"
   if ! command -v crontab >/dev/null 2>&1; then
     ui_warn "crontab is not installed — nothing scheduled"
@@ -141,6 +154,7 @@ _self_drop_app() {
 }
 
 uninstall_alias() {
+  dry_run_refuse "--uninstall-alias" && return 0
   ui_section "Uninstall shell alias"
   local found=0 file
   for file in "$HOME/.bash_aliases" "$HOME/.zshrc" "$HOME/.bashrc"; do
@@ -158,6 +172,7 @@ uninstall_alias() {
 }
 
 uninstall_cron() {
+  dry_run_refuse "--uninstall-cron" && return 0
   ui_section "Uninstall cron entry"
   if ! command -v crontab >/dev/null 2>&1; then
     ui_info "crontab not installed"

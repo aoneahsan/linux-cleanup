@@ -1,26 +1,13 @@
-## 🔴 CRITICAL — PROJECT FROZEN (2026-10-21)
-
-**This is an idea project. It was frozen on 2026-10-21 at commit `af6e6a0c1a9029ac72de639d4fa4aa8fca8c1f0b` on branch `main`.**
-
-- Do **NOT** edit, fix, upgrade, build, deploy, document or "improve" anything in this repository.
-- It will only ever be **rebuilt from scratch** as `~/Documents/01-code/production-projects/linux-cleanup-root/`
-  (this code cloned beside it as `linux-cleanup-old/` for reference), with a click dummy, a Story Bible, a Supabase
-  backend and a docs site — and **only when the owner types, in ALL CAPS, an explicit request naming this
-  project**.
-- Any other request to work here is refused. Rule: `~/.claude/rules/idea-projects-frozen.md`.
-- Ledger: private repo `aoneahsan/projects-finalization-record` → `idea-projects/FREEZE-LEDGER.md`.
-
----
-
 # linux-cleanup — project guide
 
-**Last Updated:** 2026-10-20
+**Last Updated:** 2026-11-10
 
-**Last verified:** 2026-10-14 · **Next routine context pass:** 2026-11-13
+**Status:** production (reopened by the owner 2026-11-10, rebuilt as 2.0.0). Category: desktop app + CLI —
+this repo is the CLI; the desktop app, website and docs follow. Plan and open work: `../PENDING-TASKS.md`.
 
 | Context | Value |
 |---|---|
-| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 1.6.0 |
+| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.0.0 |
 | Docs site | Public `../linux-cleanup-docs/` on its own `main` |
 | Container | Private `../` on `aoneahsan/linux-cleanup-website` `project-root` |
 | Fleet record | `../../../docs/tracking/fleet-maintenance-tracker.json` |
@@ -44,9 +31,11 @@ to a temporary directory.
 | User documentation | `docs/` scoped guide; public docs site is an independent repository |
 | Known doc contradictions | `../linux-cleanup-docs/docs/MANUAL-TASKS.md` findings A–F |
 | Release history | `CHANGELOG.md`, package registry and the current tag; verify before publishing |
+| Dry run | `lib/dryrun.sh` — every delete/change goes through `lclean_do`/`safe_rm` |
+| Update flow | `modules/update_check.sh` reads `release/<channel>.env` at start |
 
-The public docs site was last fact-checked against 1.4.0 and needs a
-1.6.0 review in the package pass. Do not copy its old npm version claim
+The public docs site was last fact-checked against 1.4.0 and is owed a
+2.0 rewrite (`../PENDING-TASKS.md`). Do not copy its old npm version claim
 into this package. Technical documentation must state deletion and
 non-reversibility plainly. Keep package and docs histories independent.
 
@@ -54,7 +43,7 @@ non-reversibility plainly. Keep package and docs histories independent.
 
 Use Yarn for local work. `yarn test` runs the built-in self-test;
 `bash -n cleanup.sh lib/*.sh modules/*.sh` checks shell syntax;
-`yarn version-check` reports the packaged version. Inspect changes
+`yarn run version:check` proves package.json, VERSION, lib/common.sh and release/stable.env agree. Inspect changes
 against the safety guards before any npm or GitHub release. The package
 has no app browser surface; the separate docs site has a build and
 controlled-browser deployment gate. No cleanup command, npm publish
@@ -63,6 +52,16 @@ or public claim is implied by a passing self-test.
 Fetch/merge `o/main` before editing and immediately before a direct
 commit/push. The private container ignores this public repository.
 Never merge `project-root` into `main` or force-push.
+
+## Dry run and the release record
+
+Any new command that deletes or changes something must go through
+`lclean_do "<what>" cmd…` or `safe_rm`, never a bare `rm`/`sudo`; a
+settings-only mode starts with `dry_run_refuse`. Self-test check 8 proves
+the dry run on a probe file. On every publish, update `release/stable.env`
+(version, `urgency=normal|urgent`, one-sentence reason) in the same commit;
+an urgent record stops every older copy at start. Test the flow with
+`LINUX_CLEANUP_RELEASE_URL=file://…` and `LINUX_CLEANUP_CHANNEL=test`.
 
 ## ORCID / BibTeX record
 

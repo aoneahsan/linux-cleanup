@@ -12,7 +12,7 @@
 #
 # On crash: write a minimal manifest + bundle the active log/report into
 # ~/.linux-cleanup/feedback/crash-<stamp>.tar.gz and print a one-liner the
-# user can email. No network calls — ever.
+# user can email. The crash path never touches the network.
 
 LCLEAN_FINISHED=${LCLEAN_FINISHED:-0}
 
@@ -99,7 +99,7 @@ _lclean_on_exit() {
       "${C_BLD:-}" "${LINUX_CLEANUP_EMAIL:-aoneahsan@gmail.com}" "${C_RST:-}"
     printf '    3. Or run %slinux-cleanup --feedback%s for a pre-filled draft.\n' \
       "${C_BLD:-}" "${C_RST:-}"
-    printf '\n  %sNothing was sent. linux-cleanup makes no network calls.%s\n\n' \
+    printf '\n  %sNothing was sent. linux-cleanup never uploads logs or reports.%s\n\n' \
       "${C_DIM:-}" "${C_RST:-}"
   } >&2 2>/dev/null
 

@@ -58,7 +58,7 @@ Markdown/HTML report export). The tool is Linux-only by design.
 - **Safety first.** Never delete outside the `PROTECTED_PATHS` allowlist. Keep
   interactive confirmation for anything touching personal data — `--yes` must never
   apply to personal files.
-- **Stay offline.** The tool makes **zero network calls** (no telemetry, no analytics).
+- **Send nothing.** The only network code is the release-record read in `modules/update_check.sh` — a GET of a public file, no identifiers. No telemetry, no analytics; a PR adding any is refused.
   Do not add any. That verifiable no-network stance is a core promise.
 - **Use the existing helpers** for logging and output rather than raw `echo`/`printf`
   where a helper already exists (see `lib/common.sh`).

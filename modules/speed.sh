@@ -16,6 +16,10 @@ _speed_finding() {
 # _speed_confirm <prompt> — like ui_confirm, but a change to services, login
 # items or containers is never auto-accepted: under -y it is reported only.
 _speed_confirm() {
+  if (( ${DRY_RUN:-0} )); then
+    ui_info "  [dry-run] would ask: $1"
+    return 1
+  fi
   if (( ${ASSUME_YES:-0} )); then
     ui_info "  not changed under -y — run --speed without -y to decide"
     return 1

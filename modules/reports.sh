@@ -256,6 +256,7 @@ reports_convert_all() {
 }
 
 run_reports_manager() {
+  dry_run_refuse "The reports manager" && return 0
   ui_box "Reports manager" "Browse / convert / view session reports"
   if ! reports_list; then return; fi
 

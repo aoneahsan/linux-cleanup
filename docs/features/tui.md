@@ -93,7 +93,7 @@ Both menus dispatch to the **exact same** `run_*` functions internally. There's 
 
 The TUI does not change anything about the tool's privacy model:
 
-- No network calls, ever.
+- Sends nothing; the only network read is the public release record at start.
 - No telemetry, no analytics.
 - Logs and reports stay on your machine.
 - Only what you explicitly email leaves the computer.

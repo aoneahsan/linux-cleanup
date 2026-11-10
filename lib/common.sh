@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="1.6.0"
+LINUX_CLEANUP_VERSION="2.0.0"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -73,7 +73,10 @@ json_str() {
   printf '"%s"' "$s"
 }
 ui_info()    { printf '%s\n' "${C_CYN}ℹ${C_RST} $*"; }
-ui_ok()      { printf '%s\n' "${C_GRN}✓${C_RST} $*"; }
+ui_ok()      {
+  if (( ${DRY_RUN:-0} )); then printf '%s\n' "${C_GRN}✓${C_RST} ${C_DIM}[dry-run]${C_RST} $*"; return; fi
+  printf '%s\n' "${C_GRN}✓${C_RST} $*"
+}
 ui_warn()    { printf '%s\n' "${C_YLW}!${C_RST} $*"; }
 ui_err()     { printf '%s\n' "${C_RED}✗${C_RST} $*" >&2; }
 
@@ -184,7 +187,7 @@ safe_rm() {
   if [[ ! -e "$target" && ! -L "$target" ]]; then
     return 0
   fi
-  rm -rf -- "$target"
+  lclean_do "remove ${target/#$HOME/\~}" rm -rf -- "$target"
 }
 
 # Human-readable size of a path (du -sh) or "—" if missing
@@ -225,6 +228,7 @@ bytes_pretty() {
 }
 
 require_sudo() {
+  (( ${DRY_RUN:-0} )) && return 0
   if sudo -n true 2>/dev/null; then return 0; fi
   ui_warn "Sudo password needed."
   sudo -v || { ui_err "sudo failed"; return 1; }

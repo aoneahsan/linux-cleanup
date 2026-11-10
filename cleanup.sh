@@ -34,6 +34,8 @@ export LOG_DIR REPORTS_DIR LOG_FILE NO_REPORT
 
 # shellcheck source=lib/common.sh
 source "$CLEANUP_ROOT/lib/common.sh"
+# shellcheck source=lib/dryrun.sh
+source "$CLEANUP_ROOT/lib/dryrun.sh"
 # shellcheck source=lib/prune.sh
 source "$CLEANUP_ROOT/lib/prune.sh"
 # shellcheck source=lib/roots.sh
@@ -76,6 +78,8 @@ source "$CLEANUP_ROOT/modules/speed_fixes.sh"
 source "$CLEANUP_ROOT/modules/tui.sh"
 # shellcheck source=modules/crash_trap.sh
 source "$CLEANUP_ROOT/modules/crash_trap.sh"
+# shellcheck source=modules/update_check.sh
+source "$CLEANUP_ROOT/modules/update_check.sh"
 
 # Arm crash trap as early as possible so even sourcing-time failures get caught.
 lclean_arm_crash_trap
@@ -117,8 +121,12 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
       --install-cron   Schedule weekly all-safe run (Sunday 3 AM)
       --uninstall-alias  Remove the shell alias
       --uninstall-cron   Remove the cron entry
+      --refresh-app      Refresh the persistent copy used by the alias and cron
 
 ${C_BLD}OPTIONS${C_RST}
+  -n, --dry-run        Walk the same steps and questions, print what a real run
+                       would delete or change, and change nothing. Settings-only
+                       modes (alias, cron, doctor, reports manager) do nothing.
   -d, --days N         Threshold for "stale" (default: 100). Files are deleted
                        only when BOTH atime and mtime are older than this many
                        days. Lower it (e.g. -d 30) for a more aggressive sweep.
@@ -143,11 +151,18 @@ ${C_BLD}EXAMPLES${C_RST}
   $(basename "$0") --system              # sudo system cleanup
   $(basename "$0") --partials            # cleanup orphan partial downloads
   $(basename "$0") --speed               # find what slows this machine down
+  $(basename "$0") -a -y --dry-run       # preview a full all-safe run, delete nothing
 
 ${C_BLD}SAFETY${C_RST}
   • Allowlist-based: refuses to delete inside ~/Documents, ~/Pictures, ~/Music,
     ~/Videos, ~/Desktop, ~/.ssh, ~/.gnupg, ~/.claude, ~/.config, ~/Public, etc.
   • Personal-data scans are interactive only — no batch / no --yes for personal files.
+
+${C_BLD}UPDATES${C_RST}
+  • At start the tool reads one public text file (release/stable.env in the
+    GitHub repository) to learn the newest version. Nothing is sent. Offline,
+    it carries on. An urgent release stops an older copy until it is updated;
+    a normal one is announced once, then required from the next start.
 
 ${C_BLD}OUTPUT${C_RST}  (where this tool writes)
   • Logs:    $LOG_DIR/
@@ -164,6 +179,7 @@ EOF
 }
 
 MODE="walkthrough"
+ORIG_ARGS=("$@")
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -w|--walkthrough) MODE=walkthrough ;;
@@ -192,6 +208,8 @@ while [[ $# -gt 0 ]]; do
     --install-cron)   MODE=install_cron ;;
     --uninstall-alias) MODE=uninstall_alias ;;
     --uninstall-cron)  MODE=uninstall_cron ;;
+    --refresh-app)     MODE=refresh_app ;;
+    -n|--dry-run)      DRY_RUN=1 ;;
     -d|--days)        DAYS="${2:?missing days value}"; shift ;;
     --purge-all)      PURGE_ALL=1 ;;
     -y|--yes)         ASSUME_YES=1 ;;
@@ -202,7 +220,15 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
-export ASSUME_YES DAYS PURGE_ALL
+export ASSUME_YES DAYS PURGE_ALL DRY_RUN
+# A dry run changes nothing, so it writes no session report either.
+(( DRY_RUN )) && NO_REPORT=1 && export NO_REPORT
+
+# Release record — once per run, before anything is cleaned.
+case "$MODE" in
+  version|self_test|list_targets|export|feedback|debug_bundle|refresh_app) ;;
+  *) update_check ${ORIG_ARGS[@]+"${ORIG_ARGS[@]}"} ;;
+esac
 
 # Write a credit header to the log BEFORE tee starts. Every log file is
 # self-attributing so it's clear who/what produced it, even years later.
@@ -214,6 +240,7 @@ export ASSUME_YES DAYS PURGE_ALL
   printf '# License: %s\n' "$LINUX_CLEANUP_LICENSE"
   printf '# Started: %s\n' "$(date '+%Y-%m-%d %H:%M:%S %z')"
   printf '# Mode:    %s\n' "$MODE"
+  (( DRY_RUN )) && printf '# Dry run: yes — nothing deleted or changed\n'
   printf '# Host:    %s\n' "$(hostname)"
   printf '# User:    %s\n' "$USER"
   [[ "${LINUX_CLEANUP_NPX:-0}" == 1 ]] && printf '# Runner:  npx (ephemeral install)\n'
@@ -236,6 +263,9 @@ case "$MODE" in
     ui_info "Log: $LOG_FILE"
     ;;
 esac
+if (( DRY_RUN )); then
+  ui_warn "DRY RUN — nothing is deleted or changed. Lines marked [dry-run] show what a real run would do."
+fi
 
 DISK_BEFORE_AVAIL=$(df --output=avail -B1 / 2>/dev/null | tail -1 | tr -d ' ')
 DISK_BEFORE_AVAIL=${DISK_BEFORE_AVAIL:-0}
@@ -334,6 +364,7 @@ case "$MODE" in
   install_cron)  install_cron ;;
   uninstall_alias) uninstall_alias ;;
   uninstall_cron)  uninstall_cron ;;
+  refresh_app)     self_refresh_app || EXIT_RC=1 ;;
   menu)          run_menu ;;
   tui)           run_tui ;;
   *) ui_err "unknown mode: $MODE"; exit 2 ;;
@@ -348,7 +379,9 @@ case "$MODE" in
   walkthrough|version|list_targets|self_test|export|feedback|debug_bundle|uninstall_alias|uninstall_cron|install_alias|install_cron|tui|speed) ;;
   *)
   ui_section "Session summary"
-  if (( RECOVERED > 0 )); then
+  if (( DRY_RUN )); then
+    ui_info "Dry run — nothing was deleted or changed."
+  elif (( RECOVERED > 0 )); then
     ui_ok "Recovered: $(bytes_pretty "$RECOVERED")"
   elif (( RECOVERED < 0 )); then
     ui_warn "Disk usage grew during session: $(bytes_pretty $(( -RECOVERED )))"

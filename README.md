@@ -1,17 +1,3 @@
-## 🔴 CRITICAL — PROJECT FROZEN (2026-10-21)
-
-**This is an idea project. It was frozen on 2026-10-21 at commit `af6e6a0c1a9029ac72de639d4fa4aa8fca8c1f0b` on branch `main`.**
-
-- Do **NOT** edit, fix, upgrade, build, deploy, document or "improve" anything in this repository.
-- It will only ever be **rebuilt from scratch** as `~/Documents/01-code/production-projects/linux-cleanup-root/`
-  (this code cloned beside it as `linux-cleanup-old/` for reference), with a click dummy, a Story Bible, a Supabase
-  backend and a docs site — and **only when the owner types, in ALL CAPS, an explicit request naming this
-  project**.
-- Any other request to work here is refused. Rule: `~/.claude/rules/idea-projects-frozen.md`.
-- Ledger: private repo `aoneahsan/projects-finalization-record` → `idea-projects/FREEZE-LEDGER.md`.
-
----
-
 <div align="center">
 
 <img src="https://raw.githubusercontent.com/aoneahsan/linux-cleanup/main/assets/logo.svg" alt="linux-cleanup logo" width="120" />
@@ -39,25 +25,24 @@
 caches, browser caches, build caches, emulator images, stale `node_modules`, orphan downloads, system journals
 and superseded kernels. It is a Bash tool with a thin Node launcher, so `npx linux-cleanup` runs it with
 nothing to install. What sets it apart from a one-button cleaner is restraint — by default it deletes only
-files untouched for 100+ days, refuses outright to operate inside your personal directories, and makes no
-network calls of any kind.
+files untouched for 100+ days, refuses outright to operate inside your personal directories, and sends nothing about your machine
+anywhere.
 
 | | |
 |---|---|
-| **Version** | `1.6.0` |
+| **Version** | `2.0.0` |
 | **License** | MIT |
 | **Node** | `>=14` (launcher only) |
 | **Runtime** | `bash >= 4.0` + GNU coreutils |
 | **Platform** | Linux only, including WSL2 |
-| **Install size** | ~55 kB packed · ~174 kB unpacked |
+| **Install size** | ~82 kB packed · ~253 kB unpacked |
 | **Undo** | None — deletion is one-way |
 | **Status** | Stable · actively maintained |
 
-**Documentation status (2026-10-14):** The package source and npm release
-are at 1.6.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
-was last fact-checked against 1.4.0 and needs a 1.6.0 review. Use this
-repository's source and changelog for the current behavior until that
-review is complete.
+**Documentation status (2026-11-10):** The package source and npm release
+are at 2.0.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
+was last fact-checked against 1.4.0 and is being rewritten for 2.0. Until then, this
+repository's README, `--help` and changelog describe the current behaviour.
 
 <a id="table-of-contents"></a>
 ## 🧭 Table of Contents&nbsp;[#](#table-of-contents)
@@ -104,7 +89,7 @@ that project. `linux-cleanup` takes the narrower path:
 | **Knows dev caches** | Yarn, pnpm, Gradle, Cypress, Playwright, AVDs, pub-cache | varies | you maintain the list |
 | **Personal directories** | hard refusal, no flag bypasses it | usually configurable | nothing stops you |
 | **Unattended use** | `--all-safe -y`, cron-friendly | GUI-first | scriptable |
-| **Network calls** | none | varies | none |
+| **Network calls** | one: reads the public release record at start | varies | none |
 | **Undo** | none | none | none |
 
 Nothing here can tell you how much you will reclaim — that depends entirely on what is on your disk. Run
@@ -133,8 +118,13 @@ are looking for a security scanner — it will not find secrets, malware, or vul
   nothing and never acts under `--yes`.
 - **Read-only modes** — `--scan`, `--list-targets`, `--audit` and `--globals` inspect and report without
   deleting anything.
-- **Offline by design** — zero network calls, no telemetry, no analytics, no update check. Verifiable in the
-  source; see [Safety](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/safety.md).
+- **A real dry run** — `--dry-run` walks the same steps and asks the same questions, prints `[dry-run]` beside
+  everything a real run would delete or change, and touches nothing. `--self-test` proves it on a probe file.
+- **Tells you when to update** — at start it reads one public text file
+  ([`release/stable.env`](https://github.com/aoneahsan/linux-cleanup/blob/main/release/stable.env)) for the newest
+  version. An urgent release stops an older copy until it updates (it offers to do it for you); a normal one is
+  announced once and required from the next start. Offline, it carries on. Nothing about your machine is sent —
+  no telemetry, no analytics.
 - **Session reports** — every run writes a schema-versioned JSON record, exportable to Markdown or HTML.
 - **Self-test** — verifies dependencies, shell syntax, and that the safety guards actually fire.
 - **Crash bundles** — an unexpected failure packages the log, latest report and a system manifest locally for
@@ -319,6 +309,7 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 | Stale `node_modules` | `--node-modules` | 🔥 `node_modules` in projects untouched N+ days |
 | Editor extensions | `--editor-ext` | 🔥 Superseded VS Code / Cursor extension versions |
 | Scan | `-s` `--scan` | Read-only audit — no deletions |
+| Dry run | `-n` `--dry-run` | Add to any cleanup mode: same steps and questions, prints what it would delete, deletes nothing |
 | List targets | `--list-targets` | Read-only — prints every path the tool can touch |
 | Home audit | `--audit` | Read-only — 20 largest entries in `$HOME` |
 | Globals audit | `--globals` | Read-only — stale global npm/pnpm/yarn/bun/deno packages |
@@ -342,6 +333,7 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 | `-y` `--yes` | off | Auto-confirm regenerable caches. Valid with `--all-safe` only; never applies to personal files. |
 | `--no-report` | off | Skip JSON report generation. Logs are still written. |
 | `--cleanup-logs` | off | Delete this run's logs at the end. Reports are always kept. |
+| `-n` `--dry-run` | off | Change nothing; print what a real run would delete or change. Settings-only modes (alias, cron, doctor, reports manager) do nothing. No report is written. |
 | `--no-color` | off | Disable ANSI colour. |
 
 Full list: [CLI flags reference](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/cli-flags.md).
@@ -428,9 +420,10 @@ Not from a protected directory, and not without asking. `node_modules` is the on
 is interactive, and it regenerates from your lockfile.
 
 **Does it phone home?**
-No. Zero network calls — no telemetry, no analytics, no update check. Verify it yourself with
-`grep -rE 'curl|wget|http(s)?://[^/]' cleanup.sh lib/ modules/`; the only matches are comments, the
-`--feedback` `mailto:` helper, and documentation.
+It reads one public file and sends nothing. At start it downloads `release/stable.env` from this repository to
+learn the newest version — a plain GET with no query string, no identifier and no data about your machine. There
+is no telemetry and no analytics. The only network code is `modules/update_check.sh`; read it, or run offline and
+the tool carries on without it.
 
 **Why is there no undo?**
 Because an undo log would be write amplification on the disk you are trying to free, and it would create a
@@ -467,7 +460,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 <a id="changelog"></a>
 ## 🔄 Changelog&nbsp;[#](#changelog)
 
-Latest release: **`1.6.0`** — a `--speed` check for what slows a machine down, idle pruning that switches itself off on `noatime` filesystems, configurable project and personal folders, and an alias and cron entry that survive `npx` cache eviction.
+Latest release: **`2.0.0`** — the rebuild: a real `--dry-run` that changes nothing anywhere, update notices from a public release record (urgent releases stop older copies until updated), `--refresh-app` for the copy the alias and cron use, and a self-test check proving the dry run cannot delete.
 Full history: [CHANGELOG.md](https://github.com/aoneahsan/linux-cleanup/blob/main/CHANGELOG.md).
 
 <a id="contributing"></a>

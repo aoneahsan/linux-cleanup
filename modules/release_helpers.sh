@@ -172,6 +172,22 @@ self_test() {
     ui_warn "$HOME is mounted noatime — idle-based pruning is switched off here; only --purge-all deletes"
   fi
 
+  printf '\n%b[ 8 ] Dry run deletes nothing%b\n' "${C_BLD}" "${C_RST}"
+  local probe_dir probe_old="${DRY_RUN:-0}"
+  probe_dir="$(mktemp -d "${TMPDIR:-/tmp}/linux-cleanup-probe.XXXXXX")"
+  : >"$probe_dir/probe"
+  DRY_RUN=1
+  safe_rm "$probe_dir/probe" >/dev/null 2>&1
+  lclean_do "probe" rm -f -- "$probe_dir/probe" >/dev/null 2>&1
+  DRY_RUN="$probe_old"
+  if [[ -e "$probe_dir/probe" ]]; then
+    ui_ok "safe_rm and lclean_do left the probe file in place under --dry-run"
+  else
+    ui_err "a probe file was deleted under --dry-run — DANGEROUS"
+    ((fails++))
+  fi
+  rm -rf -- "$probe_dir"
+
   ui_separator
   if (( fails == 0 )); then
     ui_ok "${C_BLD}all checks passed${C_RST} — script is ready."
@@ -216,7 +232,7 @@ show_feedback() {
     "${C_DIM}" "${C_RST}"
 
   printf '\n%bPrivacy guarantee%b\n' "${C_BLD}" "${C_RST}"
-  printf '  linux-cleanup makes %bno network calls%b. No telemetry. No analytics.\n' \
+  printf '  linux-cleanup %bsends nothing about you%b — it only reads the public release record. No telemetry. No analytics.\n' \
     "${C_BLD}" "${C_RST}"
   printf '  Logs and reports are written %bonly%b to your local %s/\n' \
     "${C_BLD}" "${C_RST}" "$(dirname "$LOG_DIR")"

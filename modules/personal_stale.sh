@@ -20,7 +20,7 @@ run_partial_downloads() {
   if ui_confirm "Delete all ${#files[@]} partial downloads?" n; then
     for f in "${files[@]}"; do
       if is_protected "$f"; then ui_warn "skip protected: $f"; continue; fi
-      rm -f -- "$f" && ui_ok "deleted $f"
+      lclean_do "delete $f" rm -f -- "$f" && ui_ok "deleted $f"
     done
   fi
 }
@@ -74,7 +74,7 @@ run_stale_personal() {
         if is_protected "$f"; then ui_warn "protected, skipping: $f"; continue; fi
         ls -lh -- "$f" 2>/dev/null
         if ui_confirm "Delete this file?" n; then
-          rm -f -- "$f" && ui_ok "deleted"
+          lclean_do "delete $f" rm -f -- "$f" && ui_ok "deleted"
         fi
       done
       ;;
@@ -99,7 +99,7 @@ run_stale_personal() {
           local target="${found[$((k-1))]:-}"
           [[ -z "$target" ]] && continue
           if is_protected "$target"; then ui_warn "protected, skipping: $target"; continue; fi
-          rm -f -- "$target" && ui_ok "deleted $target"
+          lclean_do "delete $target" rm -f -- "$target" && ui_ok "deleted $target"
         done
       fi
       ;;

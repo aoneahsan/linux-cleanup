@@ -319,6 +319,9 @@ walkthrough_summary() {
 
 # ── Main walkthrough
 guided_walkthrough() {
+  # Set here, not at source time: --no-report / --dry-run are parsed after sourcing.
+  WALK_TOTAL=11
+  [[ "${NO_REPORT:-0}" == 1 ]] && WALK_TOTAL=10
   WALK_START_TS=$(date +%s)
   session_report_init
   quickstart_welcome
