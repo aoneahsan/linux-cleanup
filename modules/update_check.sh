@@ -3,7 +3,7 @@
 #
 # The record lives in this repository at release/<channel>.env and is changed
 # only when a version is published. It holds three lines:
-#   version=2.0.0
+#   version=2.1.0
 #   urgency=normal        (normal | urgent)
 #   reason=One sentence shown to the person running an older copy.
 #

@@ -48,6 +48,9 @@ prune_stale() {
   local root="$1" days="${2:-${DAYS:-100}}"
   [[ -e "$root" ]] || { printf '0'; return 0; }
   if is_protected "$root"; then
+    if (( ${JSON_EVENTS:-0} )); then
+      lclean_event_item "$root" skip 0 'protected path'
+    fi
     ui_err "REFUSE: protected path: $root"
     printf '0'; return 1
   fi
@@ -55,20 +58,36 @@ prune_stale() {
     _atime_skip "$root"
     printf '0'; return 1
   fi
-  local before after freed
+  local before after freed path size estimate=0
   before=$(dir_bytes "$root")
   # Only delete a file if it's untouched (atime) AND unmodified (mtime) for >days.
   # -depth ensures we process contents before parents; -delete then nukes file/symlink.
   if (( ${DRY_RUN:-0} )); then
+    if (( ${JSON_EVENTS:-0} )); then
+      while IFS= read -r -d '' path && IFS= read -r -d '' size; do
+        lclean_event_item "$path" delete "$size" 'dry-run candidate'
+        estimate=$(( estimate + size ))
+      done < <(find "$root" -depth -mindepth 1 \( -type f -o -type l \) \
+        -atime +"$days" -mtime +"$days" -printf '%p\0%s\0' 2>/dev/null)
+      printf '%d' "$estimate"
+      return 0
+    fi
     find "$root" -depth -mindepth 1 \( -type f -o -type l \) \
          -atime +"$days" -mtime +"$days" -printf '%s\n' 2>/dev/null \
       | awk '{s+=$1} END{printf "%d", s}'
     return 0
   fi
-  find "$root" -depth -mindepth 1 \
-       \( -type f -o -type l \) \
-       -atime +"$days" -mtime +"$days" \
-       -delete 2>/dev/null || true
+  if (( ${JSON_EVENTS:-0} )); then
+    while IFS= read -r -d '' path && IFS= read -r -d '' size; do
+      lclean_event_item "$path" delete "$size"
+    done < <(find "$root" -depth -mindepth 1 \( -type f -o -type l \) \
+      -atime +"$days" -mtime +"$days" -delete -printf '%p\0%s\0' 2>/dev/null)
+  else
+    find "$root" -depth -mindepth 1 \
+         \( -type f -o -type l \) \
+         -atime +"$days" -mtime +"$days" \
+         -delete 2>/dev/null || true
+  fi
   # Sweep up directories that became empty.
   find "$root" -depth -mindepth 1 -type d -empty -delete 2>/dev/null || true
   after=$(dir_bytes "$root")

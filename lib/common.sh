@@ -2,7 +2,7 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="2.0.0"
+LINUX_CLEANUP_VERSION="2.1.0"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
@@ -78,13 +78,18 @@ ui_ok()      {
   printf '%s\n' "${C_GRN}✓${C_RST} $*"
 }
 ui_warn()    { printf '%s\n' "${C_YLW}!${C_RST} $*"; }
-ui_err()     { printf '%s\n' "${C_RED}✗${C_RST} $*" >&2; }
+ui_err()     {
+  if (( ${JSON_EVENTS:-0} )) && declare -F lclean_event_error >/dev/null; then
+    lclean_event_error "$*"
+  fi
+  printf '%s\n' "${C_RED}✗${C_RST} $*" >&2
+}
 
 # ui_confirm "prompt" [default-y|n]   — returns 0 on yes, 1 on no
 ui_confirm() {
   local prompt="${1:-Proceed?}" default="${2:-n}" reply hint="[y/N]"
   [[ "$default" == "y" ]] && hint="[Y/n]"
-  if (( ${ASSUME_YES:-0} )); then
+  if (( ${ASSUME_YES:-0} )) && [[ "${MODE:-}" == allsafe ]]; then
     printf '%s\n' "${C_DIM}[auto-yes] $prompt${C_RST}"
     return 0
   fi
@@ -172,6 +177,9 @@ safe_rm() {
     ui_err "REFUSE: unsafe path: '${target}'"; return 1
   fi
   if is_protected "$target"; then
+    if (( ${JSON_EVENTS:-0} )); then
+      lclean_event_item "$target" skip 0 'protected path'
+    fi
     ui_err "REFUSE: protected path: $target"; return 1
   fi
   # Last-ditch basename guard: never delete shell-init / history files,
@@ -187,7 +195,11 @@ safe_rm() {
   if [[ ! -e "$target" && ! -L "$target" ]]; then
     return 0
   fi
-  lclean_do "remove ${target/#$HOME/\~}" rm -rf -- "$target"
+  local bytes=0
+  (( ${JSON_EVENTS:-0} )) && bytes=$(dir_bytes "$target")
+  lclean_do "remove ${target/#$HOME/\~}" rm -rf -- "$target" || return 1
+  (( ${JSON_EVENTS:-0} )) && lclean_event_item "$target" delete "$bytes"
+  return 0
 }
 
 # Human-readable size of a path (du -sh) or "—" if missing
@@ -243,4 +255,69 @@ ui_target_row() {
   local label="$1" path="$2" size
   size="$(dir_size "$path")"
   printf "  %-44s %10s  %s\n" "$label" "$size" "${C_DIM}$path${C_RST}"
+  if (( ${JSON_EVENTS:-0} )) && [[ "${MODE:-}" == scan && -e "$path" ]]; then
+    lclean_event_item "$path" report "$(dir_bytes "$path")" "$label"
+  fi
+}
+
+# Machine-readable events are kept with the shared CLI output helpers.
+lclean_json_string() {
+  local value="${1:-}" char escaped i
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  for (( i=1; i<32; i++ )); do
+    printf -v char '%b' "$(printf '\\x%02x' "$i")"
+    printf -v escaped '\\u%04x' "$i"
+    value="${value//"$char"/$escaped}"
+  done
+  printf '"%s"' "$value"
+}
+
+lclean_event() {
+  (( ${JSON_EVENTS:-0} )) || return 0
+  local type="$1" fields="${2:-}"
+  printf '{"v":1,"type":%s,"ts":%s%s}\n' \
+    "$(lclean_json_string "$type")" "$(date +%s%3N)" "$fields" >&3
+}
+
+lclean_event_plan() {
+  local dry=false stamp=routine
+  (( DRY_RUN )) && dry=true
+  [[ "$MODE" == scan ]] && stamp=read
+  lclean_event plan ",\"version\":$(lclean_json_string "$LINUX_CLEANUP_VERSION"),\"dry_run\":$dry,\"profile\":null,\"sections\":[{\"id\":$(lclean_json_string "$MODE"),\"title\":$(lclean_json_string "$MODE"),\"stamp\":$(lclean_json_string "$stamp"),\"sudo\":false,\"deep\":false}]"
+}
+
+lclean_event_disk() {
+  local phase="$1" free_bytes="$2" total_kb
+  total_kb="$(df --output=size -k / 2>/dev/null | tail -1 | tr -d ' ')"
+  [[ "$total_kb" =~ ^[0-9]+$ ]] || total_kb=0
+  lclean_event disk ",\"phase\":$(lclean_json_string "$phase"),\"total_kb\":$total_kb,\"free_kb\":$(( free_bytes / 1024 )),\"purgeable_kb\":null,\"snapshots\":null,\"snapshot_note\":false"
+}
+
+lclean_event_item() {
+  local path="$1" action="$2" size_bytes="${3:-0}" reason="${4:-}"
+  [[ "$size_bytes" =~ ^[0-9]+$ ]] || size_bytes=0
+  lclean_event item ",\"id\":$(lclean_json_string "$MODE"),\"path\":$(lclean_json_string "$path"),\"kb\":$(( size_bytes / 1024 )),\"action\":$(lclean_json_string "$action"),\"unique\":false,\"age_days\":null,\"reason\":$(lclean_json_string "$reason")"
+}
+
+lclean_event_error() {
+  lclean_event error ",\"id\":$(lclean_json_string "$MODE"),\"message\":$(lclean_json_string "$1")"
+}
+
+lclean_event_finish() {
+  local status=completed reason=null dry=false completed='[]' failed='[]' log
+  (( DRY_RUN )) && dry=true
+  log="$(lclean_json_string "$LOG_FILE")"
+  (( CLEANUP_LOGS_ON_FINISH )) && log=null
+  if (( EXIT_RC != 0 )); then
+    status=failed
+    reason="$(lclean_json_string 'mode returned a failure')"
+    failed="[$(lclean_json_string "$MODE")]"
+  else
+    completed="[$(lclean_json_string "$MODE")]"
+  fi
+  lclean_event progress ",\"id\":$(lclean_json_string "$MODE"),\"done\":1,\"total\":1"
+  lclean_event section_result ",\"id\":$(lclean_json_string "$MODE"),\"status\":$(lclean_json_string "$status"),\"freed_kb\":null,\"items\":null,\"reason\":$reason"
+  lclean_event_disk after "$DISK_AFTER_AVAIL"
+  lclean_event summary ",\"attempted\":[$(lclean_json_string "$MODE")],\"completed\":$completed,\"skipped\":[],\"failed\":$failed,\"freed_kb\":null,\"disk_free_before_kb\":$(( DISK_BEFORE_AVAIL / 1024 )),\"disk_free_after_kb\":$(( DISK_AFTER_AVAIL / 1024 )),\"elapsed_s\":$(( $(date +%s) - EVENT_STARTED_AT )),\"reports\":[],\"log\":$log,\"dry_run\":$dry"
 }

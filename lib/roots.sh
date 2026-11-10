@@ -87,5 +87,16 @@ prompt_add_root() {
 # load_project_roots — ROOTS_LOADED = project-roots.txt + existing defaults.
 load_project_roots() { load_roots project-roots.txt "${PROJECT_ROOT_DEFAULTS[@]}"; }
 
-# load_personal_roots — ROOTS_LOADED = Downloads + Desktop + personal-roots.txt.
-load_personal_roots() { load_roots personal-roots.txt "$HOME/Downloads" "$HOME/Desktop"; }
+# load_personal_roots — omit roots the deletion guard will always refuse.
+load_personal_roots() {
+  load_roots personal-roots.txt "$HOME/Downloads"
+  local root allowed=()
+  for root in "${ROOTS_LOADED[@]}"; do
+    if is_protected "$root"; then
+      ui_warn "ignoring protected personal root $root"
+    else
+      allowed+=("$root")
+    fi
+  done
+  ROOTS_LOADED=("${allowed[@]}")
+}

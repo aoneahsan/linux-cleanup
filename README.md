@@ -30,18 +30,18 @@ anywhere.
 
 | | |
 |---|---|
-| **Version** | `2.0.0` |
+| **Version** | `2.1.0` |
 | **License** | MIT |
 | **Node** | `>=14` (launcher only) |
 | **Runtime** | `bash >= 4.0` + GNU coreutils |
 | **Platform** | Linux only, including WSL2 |
-| **Install size** | ~82 kB packed · ~253 kB unpacked |
+| **Install size** | ~84 kB packed · ~259 kB unpacked |
 | **Undo** | None — deletion is one-way |
 | **Status** | Stable · actively maintained |
 
 **Documentation status (2026-11-10):** The package source and npm release
-are at 2.0.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
-was last fact-checked against 1.4.0 and is being rewritten for 2.0. Until then, this
+are at 2.1.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
+was last fact-checked against 1.4.0 and is being rewritten for the current CLI. Until then, this
 repository's README, `--help` and changelog describe the current behaviour.
 
 <a id="table-of-contents"></a>
@@ -118,14 +118,14 @@ are looking for a security scanner — it will not find secrets, malware, or vul
   nothing and never acts under `--yes`.
 - **Read-only modes** — `--scan`, `--list-targets`, `--audit` and `--globals` inspect and report without
   deleting anything.
-- **A real dry run** — `--dry-run` walks the same steps and asks the same questions, prints `[dry-run]` beside
-  everything a real run would delete or change, and touches nothing. `--self-test` proves it on a probe file.
+- **A real dry run** — `--dry-run` walks the selected cleanup and prints `[dry-run]` beside proposed changes.
+  Cleanup targets stay in place; a local log and update-check state may still be written. `--self-test` checks a probe file.
 - **Tells you when to update** — at start it reads one public text file
   ([`release/stable.env`](https://github.com/aoneahsan/linux-cleanup/blob/main/release/stable.env)) for the newest
   version. An urgent release stops an older copy until it updates (it offers to do it for you); a normal one is
   announced once and required from the next start. Offline, it carries on. Nothing about your machine is sent —
   no telemetry, no analytics.
-- **Session reports** — every run writes a schema-versioned JSON record, exportable to Markdown or HTML.
+- **Walkthrough reports** — the guided walkthrough writes a schema-versioned JSON step record unless reporting is disabled. Other modes keep a local log but do not create that record.
 - **Self-test** — verifies dependencies, shell syntax, and that the safety guards actually fire.
 - **Crash bundles** — an unexpected failure packages the log, latest report and a system manifest locally for
   you to review and email. Nothing is ever sent for you.
@@ -264,7 +264,7 @@ Behaviour is set by [flags](#command-line), two optional plain-text lists, and t
 | File (one absolute path per line, `#` comments) | Used by |
 |---|---|
 | `~/.config/linux-cleanup/project-roots.txt` | `--node-modules` — where your projects live. Searched in addition to whichever of `~/code`, `~/projects`, `~/dev`, `~/src`, `~/work`, `~/workspace`, `~/repos`, `~/git`, `~/Documents/projects`, `~/Documents/code` exist. |
-| `~/.config/linux-cleanup/personal-roots.txt` | `--stale` — extra folders to check besides `~/Downloads` and `~/Desktop`. |
+| `~/.config/linux-cleanup/personal-roots.txt` | `--stale` — extra folders to check besides `~/Downloads`. Protected roots are ignored. |
 
 `/`, your whole home directory, and `~/.ssh`, `~/.gnupg`, `~/.config`, `~/.claude` are refused as roots.
 
@@ -292,7 +292,7 @@ Running it with no mode starts the guided walkthrough. **Every mode marked 🔥 
 Before using one, run the read-only equivalent:
 
 ```bash
-linux-cleanup --scan          # the dry run: reports what would be reclaimed, deletes nothing
+linux-cleanup --scan          # read-only audit; deletes nothing
 ```
 
 ### Modes
@@ -333,8 +333,9 @@ linux-cleanup --scan          # the dry run: reports what would be reclaimed, de
 | `-y` `--yes` | off | Auto-confirm regenerable caches. Valid with `--all-safe` only; never applies to personal files. |
 | `--no-report` | off | Skip JSON report generation. Logs are still written. |
 | `--cleanup-logs` | off | Delete this run's logs at the end. Reports are always kept. |
-| `-n` `--dry-run` | off | Change nothing; print what a real run would delete or change. Settings-only modes (alias, cron, doctor, reports manager) do nothing. No report is written. |
+| `-n` `--dry-run` | off | Preview the selected cleanup without deleting files or changing settings. A local log and update-check state may still be written; no JSON session report is written. |
 | `--no-color` | off | Disable ANSI colour. |
+| `--json-events` | off | Stream version 1 NDJSON on stdout for `--scan` or `--all-safe --yes`; human output goes to stderr. [Event reference](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/json-events.md). |
 
 Full list: [CLI flags reference](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/reference/cli-flags.md).
 
@@ -349,7 +350,8 @@ Full list: [CLI flags reference](https://github.com/aoneahsan/linux-cleanup/blob
 | Free space before re-imaging a machine | `linux-cleanup --all-safe -y --purge-all` |
 | Find forgotten project dependencies | `linux-cleanup --node-modules -d 180` |
 | Weekly unattended run via cron | `linux-cleanup --all-safe -y --no-report --cleanup-logs` |
-| Machine-readable output for CI | `NO_COLOR=1 linux-cleanup --scan --no-report > scan.log` |
+| Machine-readable scan | `linux-cleanup --scan --json-events > scan.ndjson` |
+| Preview machine-readable cleanup | `linux-cleanup --all-safe --yes --dry-run --json-events > preview.ndjson` |
 
 Longer recipes:
 [Reclaim the most space](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/how-to/reclaim-the-most-space.md).
@@ -460,7 +462,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 <a id="changelog"></a>
 ## 🔄 Changelog&nbsp;[#](#changelog)
 
-Latest release: **`2.0.0`** — the rebuild: a real `--dry-run` that changes nothing anywhere, update notices from a public release record (urgent releases stop older copies until updated), `--refresh-app` for the copy the alias and cron use, and a self-test check proving the dry run cannot delete.
+Latest release: **`2.1.0`** — local JSON events for read-only scans and non-interactive all-safe runs, including dry-run previews and refusal events.
 Full history: [CHANGELOG.md](https://github.com/aoneahsan/linux-cleanup/blob/main/CHANGELOG.md).
 
 <a id="contributing"></a>

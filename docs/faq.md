@@ -6,20 +6,20 @@
 
 ## Will it delete my code?
 
-No. The script refuses any path inside `~/Documents`, `~/Pictures`, `~/Music`, `~/Videos`, `~/Desktop`, `~/Public`, `~/.ssh`, `~/.gnupg`, `~/.config`, `~/.claude`, `/`, `/etc`, `/usr`, `/boot`, `/sys`, or `/proc` — see [Safety](./safety.md). The closest the tool comes to "code" is finding stale `node_modules/` directories inside your project roots, and those are interactive-only with explicit per-project confirmation.
+The protected-path guard refuses the listed personal and system paths; `--node-modules` can offer project dependency directories for separate confirmation. Review the exact targets and a dry run before deleting. See [Safety](./safety.md).
 
 ---
 
 ## Does it phone home?
 
-No. linux-cleanup makes **zero network calls**. There's no telemetry, no analytics, no crash reporter that auto-uploads, no update check that pings a server. The only data that leaves your machine is what you explicitly email.
+It checks a public release record for updates when online. Cleanup results, logs and crash bundles are kept locally; none is uploaded by the update check.
 
 ```bash
 # Verify yourself:
 grep -rE 'curl|wget|http(s)?://[^/]' cleanup.sh lib/ modules/
 ```
 
-You'll find URLs only in comments, the `--feedback` mailto helper, and this documentation — never in live network code.
+The live release check is in `modules/update_check.sh`; inspect it to see the network request.
 
 ---
 
@@ -32,10 +32,10 @@ Bash is already on every Linux system the script targets. Adding a runtime depen
 ## I'm scared. What's the safest way to try it?
 
 1. `linux-cleanup --self-test` — verifies syntax and safety guards, deletes nothing.
-2. `linux-cleanup --scan` — read-only audit, prints what *would* be reclaimed.
+2. `linux-cleanup --scan` — read-only inventory of target roots and sizes, not a reclaim estimate.
 3. `linux-cleanup --list-targets` — shows every path the script can touch.
 
-After those three, you've seen the safety model in action without losing a byte. Then run `linux-cleanup` (the guided walkthrough) and answer `n` to anything that surprises you.
+Then run `linux-cleanup --all-safe --dry-run` to preview the batch cleanup. A local log and update-check state may be written. Run the guided walkthrough only when you are ready to review each step.
 
 ---
 
@@ -60,7 +60,7 @@ The honest answer: the speedup is in your developer flow ("disk full" no longer 
 
 ## What happens if I `Ctrl-C` mid-cleanup?
 
-The current `safe_rm` finishes (typically <100 ms — Linux unlinks are fast), then the script exits with code `130`. The session log captures everything up to the abort. The JSON report is **not** written if the abort is mid-walkthrough — only the log. The crash trap does **not** fire on `Ctrl-C`; it's deliberately suppressed.
+The process exits with code `130` after interruption. A log may contain output up to that point; do not treat it as a complete receipt. A walkthrough report may be absent or incomplete if interrupted.
 
 ---
 
@@ -72,22 +72,13 @@ You can, but you shouldn't. The tool is designed to run as a normal user. Runnin
 
 ## My distro isn't Debian/Ubuntu. Will it work?
 
-Yes. The cleanup tool is distro-aware:
-
-| Distro family | `--system` step support |
-|---|---|
-| Debian / Ubuntu / Mint | full (apt, journal, snap, kernels, /tmp, page cache) |
-| Fedora / RHEL / Rocky | mostly (dnf substitutes for apt; no kernel-removal step on RPM-based systems by default) |
-| Arch / Manjaro | most (pacman + pacman-contrib's paccache; otherwise listed as candidates only) |
-| openSUSE | some (zypper orphan listing only; no auto-removal) |
-
-Cleanup of caches in `$HOME` works identically on every Linux distro.
+Home cache cleanup uses GNU utilities and paths from installed tools. The `--system` mode calls `apt` and `dpkg` directly, so use it only on a Debian-family system with those tools. Run `--self-test` first on other distributions.
 
 ---
 
 ## What about WSL?
 
-It works fine. linux-cleanup runs on the Linux side of WSL — its safety model and behaviour are identical to a native Linux box. The `/mnt/c/` mount is not on the protected allowlist (it's not your `$HOME`), but the tool also doesn't go looking inside it. If you've manually configured `~/Downloads` to point at `/mnt/c/Users/<you>/Downloads` via symlink, the [allowlist guard](./safety.md) follows the symlink and rejects deletions inside Windows-side Documents/Pictures.
+It runs on the Linux side of WSL. The path guard resolves symlinks but does not recognize Windows personal folders as protected Linux folders. Inspect configured roots and a dry run if they point into `/mnt/`.
 
 ---
 

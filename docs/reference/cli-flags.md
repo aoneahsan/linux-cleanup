@@ -13,10 +13,10 @@
 | _(no flag)_ | `-w`, `--walkthrough` | Default — guided 10-step walkthrough through every category | [Walkthrough](../features/walkthrough.md) |
 | `-m` | `--menu`, `-i`, `--interactive` | Numbered jump-to CLI menu | [Menu](../features/menu.md) |
 | `-t` | `--tui`, `-g`, `--gui` | Visual whiptail / dialog menu (1.3.0+) | [TUI](../features/tui.md) |
-| `-a` | `--all-safe` | Batch wipe of every regenerable cache | [All-safe](../features/all-safe.md) |
+| `-a` | `--all-safe` | Batch cleanup of selected regenerable caches; idle gate by default | [All-safe](../features/all-safe.md) |
 | `-s` | `--scan` | Read-only audit | [Scan](../features/scan.md) |
 | `-p` | `--stale` | Personal files unused N+ days (interactive only) | [Stale personal files](../features/personal-stale-files.md) |
-| | `--system` | Sudo cleanup: apt, journal, snap, kernels, /tmp, page cache | [System cleanup](../features/system-cleanup.md) |
+| | `--system` | Sudo cleanup: apt, journal, snap, /tmp and page cache; lists kernels | [System cleanup](../features/system-cleanup.md) |
 | | `--partials` | Partial / orphan downloads | [Partial downloads](../features/partial-downloads.md) |
 | | `--audit` | Top 20 largest entries in `$HOME` | [Home audit](../features/home-audit.md) |
 | | `--node-modules` | Stale `node_modules/` finder | [Node modules finder](../features/node-modules-finder.md) |
@@ -47,6 +47,8 @@
 | `-y`, `--yes` | off | Auto-confirm regenerable-cache deletions. Only valid with `--all-safe`. **Personal modes ignore `-y` by policy.** |
 | `--no-report` | off | Skip JSON session report generation. Logs are still written. |
 | `--cleanup-logs` | off | Delete this run's log file at finish. **Reports are always preserved.** |
+| `--json-events` | off | [Stream local NDJSON](./json-events.md) for `--scan` or `--all-safe --yes`; human output goes to stderr. |
+| `-n`, `--dry-run` | off | Walk the selected cleanup without changing cleanup targets or settings. A local log and update-check state may still be written; no session report is written. |
 | `--no-color` | off | Disable ANSI colour. Also respects `NO_COLOR` env var (de-facto standard). |
 | `-h`, `--help` | — | Print help and exit. |
 
@@ -57,6 +59,8 @@
 | Goal | Command |
 |---|---|
 | First run, see what's reclaimable | `linux-cleanup --scan` |
+| Machine-readable read-only scan | `linux-cleanup --scan --json-events` |
+| Machine-readable all-safe preview | `linux-cleanup --all-safe --yes --dry-run --json-events` |
 | Guided cleanup with prompts | `linux-cleanup` |
 | One-shot batch, no prompts | `linux-cleanup --all-safe -y` |
 | Aggressive sweep | `linux-cleanup --all-safe -y -d 30` |
@@ -88,6 +92,7 @@ See [Exit codes](./exit-codes.md). Summary:
 
 - `0` — clean run
 - `2` — argument parse error
+- `3` — an update is required before this mode can continue
 - `130` — `Ctrl-C`
 - `143` — `SIGTERM`
 - anything else — unexpected; auto-creates a [crash bundle](../features/feedback-and-crash-bundles.md)
@@ -95,4 +100,4 @@ See [Exit codes](./exit-codes.md). Summary:
 ---
 
 **Author**: [Ahsan Mahmood](https://aoneahsan.com) · [LinkedIn](https://linkedin.com/in/aoneahsan) · [GitHub](https://github.com/aoneahsan)
-**Last updated**: 2026-09-18 · **Tool version**: 1.6.0
+**Last updated**: 2026-11-10 · **Tool version**: 2.1.0

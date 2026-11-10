@@ -1,6 +1,6 @@
 {
   "name": "linux-cleanup",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Safe, modular disk + cache cleanup for Linux: idle-only pruning of yarn/npm/pnpm, browser, Gradle, Cypress, Playwright and Android caches, stale node_modules, journals and old snaps — allowlist-guarded, with a real --dry-run.",
   "bin": "bin/linux-cleanup.js",
   "main": "bin/linux-cleanup.js",

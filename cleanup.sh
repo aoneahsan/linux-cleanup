@@ -6,6 +6,16 @@
 set -u
 set -o pipefail
 
+# Machine output has its own descriptor. Preserve stdout before any banner,
+# update notice or usage text can reach it.
+JSON_EVENTS=0
+for arg in "$@"; do
+  [[ "$arg" == --json-events ]] && JSON_EVENTS=1
+done
+if (( JSON_EVENTS )); then
+  exec 3>&1 1>&2
+fi
+
 CLEANUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export CLEANUP_ROOT
 
@@ -125,8 +135,10 @@ ${C_BLD}MODES${C_RST} (pick one; default = guided walkthrough through every cate
 
 ${C_BLD}OPTIONS${C_RST}
   -n, --dry-run        Walk the same steps and questions, print what a real run
-                       would delete or change, and change nothing. Settings-only
-                       modes (alias, cron, doctor, reports manager) do nothing.
+                       would delete or change. No cleanup target is changed.
+                       A local log and update-check state may still be written.
+                       Settings-only modes (alias, cron, doctor, reports
+                       manager) do nothing.
   -d, --days N         Threshold for "stale" (default: 100). Files are deleted
                        only when BOTH atime and mtime are older than this many
                        days. Lower it (e.g. -d 30) for a more aggressive sweep.
@@ -139,6 +151,8 @@ ${C_BLD}OPTIONS${C_RST}
   -y, --yes            Auto-confirm regenerable-cache deletions (with --all-safe only)
       --no-report      Skip JSON session report generation (logs still kept)
       --cleanup-logs   Delete this run's log files at finish (reports always kept)
+      --json-events    NDJSON on stdout for non-interactive --scan or
+                       --all-safe --yes; human output stays on stderr
   -h, --help           Show this help
 
 ${C_BLD}EXAMPLES${C_RST}
@@ -215,11 +229,24 @@ while [[ $# -gt 0 ]]; do
     -y|--yes)         ASSUME_YES=1 ;;
     --no-report)      NO_REPORT=1 ;;
     --cleanup-logs)   CLEANUP_LOGS_ON_FINISH=1 ;;
+    --json-events)    ;;
     -h|--help)        usage; exit 0 ;;
     *) printf '%s\n' "Unknown arg: $1"; usage; exit 2 ;;
   esac
   shift
 done
+if (( JSON_EVENTS )); then
+  case "$MODE" in
+    scan) ;;
+    allsafe)
+      if (( ! ASSUME_YES )); then
+        ui_err "--json-events --all-safe requires --yes to avoid an interactive prompt"
+        exit 2
+      fi
+      ;;
+    *) ui_err "--json-events supports --scan or --all-safe --yes"; exit 2 ;;
+  esac
+fi
 export ASSUME_YES DAYS PURGE_ALL DRY_RUN
 # A dry run changes nothing, so it writes no session report either.
 (( DRY_RUN )) && NO_REPORT=1 && export NO_REPORT
@@ -248,7 +275,11 @@ esac
 } > "$LOG_FILE"
 
 # Tee all subsequent output to log (preserves terminal colors via -t check in common.sh)
-exec > >(tee -a "$LOG_FILE") 2>&1
+if (( JSON_EVENTS )); then
+  exec > >(tee -a "$LOG_FILE" >&2) 2>&1
+else
+  exec > >(tee -a "$LOG_FILE") 2>&1
+fi
 
 # Suppress banner + log spam for utility modes that have their own output.
 case "$MODE" in
@@ -269,6 +300,13 @@ fi
 
 DISK_BEFORE_AVAIL=$(df --output=avail -B1 / 2>/dev/null | tail -1 | tr -d ' ')
 DISK_BEFORE_AVAIL=${DISK_BEFORE_AVAIL:-0}
+if (( JSON_EVENTS )); then
+  EVENT_STARTED_AT=$(date +%s)
+  lclean_event_plan
+  lclean_event_disk before "$DISK_BEFORE_AVAIL"
+  lclean_event section_start ",\"id\":$(lclean_json_string "$MODE"),\"title\":$(lclean_json_string "$MODE"),\"stamp\":$(lclean_json_string "$([[ "$MODE" == scan ]] && printf read || printf routine)")"
+  lclean_event progress ",\"id\":$(lclean_json_string "$MODE"),\"done\":0,\"total\":1"
+fi
 
 run_menu() {
   while true; do
@@ -342,8 +380,14 @@ MENU
 
 case "$MODE" in
   walkthrough)   guided_walkthrough ;;
-  scan)          run_scan_all ;;
-  allsafe)       run_all_safe ;;
+  scan)
+    if (( JSON_EVENTS )); then run_scan_all || EXIT_RC=1
+    else run_scan_all
+    fi ;;
+  allsafe)
+    if (( JSON_EVENTS )); then run_all_safe || EXIT_RC=1
+    else run_all_safe
+    fi ;;
   stale)         run_stale_personal ;;
   system)        run_system ;;
   partials)      run_partial_downloads ;;
@@ -392,6 +436,8 @@ case "$MODE" in
   ui_info "Log saved: $LOG_FILE"
   ;;
 esac
+
+(( JSON_EVENTS )) && lclean_event_finish
 
 # ── Optional: delete THIS run's log on finish (reports are NEVER auto-deleted) ──
 if (( CLEANUP_LOGS_ON_FINISH )); then
