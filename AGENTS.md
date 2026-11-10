@@ -7,7 +7,7 @@ this repo is the CLI; the desktop app, website and docs follow. Plan and open wo
 
 | Context | Value |
 |---|---|
-| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.0.0 |
+| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.1.0 |
 | Docs site | Public `../linux-cleanup-docs/` on its own `main` |
 | Container | Private `../` on `aoneahsan/linux-cleanup-website` `project-root` |
 | Fleet record | `../../../docs/tracking/fleet-maintenance-tracker.json` |

@@ -43,6 +43,7 @@ scan_partial_downloads() {
     found=1
     sz=$(du -h -- "$f" 2>/dev/null | cut -f1)
     printf "  %10s  %s\n" "$sz" "$f"
+    (( ${JSON_EVENTS:-0} )) && lclean_event_item "$f" report "$(dir_bytes "$f")" 'partial download'
   done < <(find "$HOME/Downloads" -maxdepth 4 -type f \
     \( -name "*.fdmdownload" -o -name "*.crdownload" -o -name "*.part" -o -name "*.aria2" \) 2>/dev/null)
   (( found )) || ui_info "None found."
@@ -55,6 +56,7 @@ scan_duplicates() {
     found=1
     sz=$(du -h -- "$f" 2>/dev/null | cut -f1)
     printf "  %10s  %s\n" "$sz" "$f"
+    (( ${JSON_EVENTS:-0} )) && lclean_event_item "$f" report "$(dir_bytes "$f")" 'possible duplicate'
   done < <(find "$HOME/Downloads" -maxdepth 3 -type f -regextype posix-extended \
     -regex '.* \([0-9]+\)\.[A-Za-z0-9]+$' 2>/dev/null | head -30)
   (( found )) || ui_info "None found."
@@ -75,6 +77,7 @@ scan_stale_personal_data() {
     sz=$(du -h -- "$f" 2>/dev/null | cut -f1)
     la=$(stat -c '%x' -- "$f" 2>/dev/null | cut -d' ' -f1)
     printf "  %8s  last-access %-12s  %s\n" "$sz" "$la" "$f"
+    (( ${JSON_EVENTS:-0} )) && lclean_event_item "$f" report "$(dir_bytes "$f")" 'stale personal file; read only'
   done < <(find "${roots[@]}" -maxdepth 4 -type f \
     -atime +"$days" -size +10M 2>/dev/null | head -50)
   (( found )) || ui_info "None found."

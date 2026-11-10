@@ -17,15 +17,15 @@ run_partial_downloads() {
   for f in "${files[@]}"; do
     printf "  %10s  %s\n" "$(du -h -- "$f" 2>/dev/null | cut -f1)" "$f"
   done
-  if ui_confirm "Delete all ${#files[@]} partial downloads?" n; then
-    for f in "${files[@]}"; do
-      if is_protected "$f"; then ui_warn "skip protected: $f"; continue; fi
+  for f in "${files[@]}"; do
+    if is_protected "$f"; then ui_warn "skip protected: $f"; continue; fi
+    if ui_confirm "Delete this partial file: $f?" n; then
       lclean_do "delete $f" rm -f -- "$f" && ui_ok "deleted $f"
-    done
-  fi
+    fi
+  done
 }
 
-# Stale personal files >N days unaccessed, >10MB, in Downloads, Desktop and
+# Stale personal files >N days unaccessed, >10MB, in Downloads and
 # any directory listed in personal-roots.txt (lib/roots.sh).
 # Always interactive — never auto.
 run_stale_personal() {
@@ -35,7 +35,7 @@ run_stale_personal() {
   ui_section "Personal files unused ${days}+ days (>10MB)"
   ui_warn "Personal data — interactive only. Nothing is deleted without your confirmation."
   if (( ${#roots[@]} == 0 )); then
-    ui_info "No personal directories found (~/Downloads, ~/Desktop, or $(roots_config_dir)/personal-roots.txt)."
+    ui_info "No personal directories found (~/Downloads or $(roots_config_dir)/personal-roots.txt)."
     return
   fi
   ui_info "Searching: ${roots[*]/#$HOME/\~}"

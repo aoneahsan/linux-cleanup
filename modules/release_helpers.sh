@@ -67,7 +67,7 @@ list_targets() {
   if (( ${#ROOTS_LOADED[@]} )); then printf '    · %s\n' "${ROOTS_LOADED[@]}"; else printf '    · (none yet)\n'; fi
 
   printf '\n%bPersonal data%b (interactive only — never auto-deleted)\n' "${C_BLD}" "${C_RST}"
-  printf '  %bsearched roots%b (Downloads, Desktop + %s):\n' \
+  printf '  %bsearched roots%b (Downloads + %s):\n' \
     "${C_DIM}" "${C_RST}" "$(roots_config_dir)/personal-roots.txt"
   load_personal_roots
   if (( ${#ROOTS_LOADED[@]} )); then printf '    · %s\n' "${ROOTS_LOADED[@]}"; else printf '    · (none)\n'; fi
