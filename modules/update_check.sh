@@ -102,6 +102,9 @@ _update_block() {
 # any cleanup step, with the run's original arguments.
 update_check() {
   local record ver urgency reason state seen
+  # The desktop app bundles its own copy of this CLI and runs its own release gate
+  # (app_releases, read on start and resume), so its engine never blocks on npm releases.
+  [[ "${LINUX_CLEANUP_LAUNCHER:-}" == desktop ]] && return 0
   record="$(_update_fetch)" || return 0
   ver="$(_update_field "$record" version)"
   [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 0

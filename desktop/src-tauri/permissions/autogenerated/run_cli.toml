@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-run-cli"
+description = "Enables the run_cli command without any pre-configured scope."
+commands.allow = ["run_cli"]
+
+[[permission]]
+identifier = "deny-run-cli"
+description = "Denies the run_cli command without any pre-configured scope."
+commands.deny = ["run_cli"]

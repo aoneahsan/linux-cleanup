@@ -1,0 +1,121 @@
+/* macleanup desktop app — window shell and core vocabulary. */
+@layer base {
+  * { box-sizing: border-box; }
+  html { font-size: calc(100% * var(--type-scale)); background: var(--canvas); }
+  body { margin: 0; height: 100vh; overflow: hidden; background: var(--canvas); color: var(--ink);
+    font: 400 .875rem/1.5 var(--font-body); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, p { margin: 0; }
+  button { font: inherit; color: inherit; }
+  a { color: inherit; text-underline-offset: .2em; }
+  code, .mono { font-family: var(--font-code); font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 4px var(--focus-inner); }
+  ::selection { background: var(--accent-soft); }
+}
+
+/* ── Window: titlebar / rail + canvas / status bar ─────────────────────── */
+.window { display: grid; height: 100vh; grid-template-rows: var(--titlebar-h) minmax(0, 1fr) var(--status-h);
+  grid-template-columns: var(--rail-w) minmax(0, 1fr); grid-template-areas: "title title" "rail canvas" "status status"; }
+.titlebar { grid-area: title; display: flex; align-items: center; gap: var(--sp-4); padding-inline: var(--sp-4);
+  background: var(--chrome); border-bottom: 1px solid var(--line); user-select: none; }
+.traffic { display: flex; gap: .5rem; width: 4.25rem; flex: none; }
+.traffic span { width: .75rem; height: .75rem; border-radius: 50%; background: var(--line-strong); opacity: .55; }
+.mark { display: inline-flex; align-items: center; gap: .55rem; font-weight: 700; letter-spacing: -.02em; font-size: .95rem; }
+.mark img { width: 1.5rem; height: 1.5rem; border-radius: .4rem; }
+.crumb { color: var(--muted); font-size: .8rem; }
+.crumb b { color: var(--ink); font-weight: 600; }
+.search-key { flex: 1; max-width: 30rem; margin-inline: auto; display: flex; align-items: center; gap: var(--sp-2);
+  min-height: 2.1rem; padding: 0 var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--panel); color: var(--muted); cursor: pointer; text-align: left; font-size: .8rem;
+  transition: border-color var(--dur) var(--ease-out); }
+.search-key:hover { border-color: var(--line-strong); }
+.search-key svg { width: 1rem; height: 1rem; flex: none; }
+.search-key span { flex: 1; }
+.kbd { font: 600 .68rem var(--font-code); padding: .1rem .35rem; border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: var(--r-xs); color: var(--muted); background: var(--canvas); white-space: nowrap; }
+.title-actions { display: flex; align-items: center; gap: var(--sp-2); }
+.dial-button { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid var(--line);
+  border-radius: 50%; background: var(--panel); cursor: pointer; transition: transform var(--dur) var(--ease-out); }
+.dial-button:hover { transform: rotate(-30deg); }
+.dial-button svg { width: 1.1rem; height: 1.1rem; }
+.account-chip { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 2.25rem; padding: 0 var(--sp-3) 0 .3rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--panel); cursor: pointer; font-size: .8rem; }
+.account-chip .avatar { display: grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font: 700 .7rem var(--font-code); }
+
+/* Source list — every destination carries its plate number or key. */
+.rail { grid-area: rail; display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-4) var(--sp-3);
+  background: var(--rail); border-right: 1px solid var(--line); overflow-y: auto; }
+.rail-group { display: grid; gap: 1px; }
+.rail-label { padding: 0 var(--sp-2) var(--sp-1); color: var(--muted); font: 700 .66rem var(--font-code);
+  letter-spacing: .12em; text-transform: uppercase; }
+.rail-link { display: flex; align-items: center; gap: var(--sp-2); min-height: 2.1rem; padding: 0 var(--sp-2);
+  border-radius: var(--r-sm); color: var(--ink); text-decoration: none; font-size: .84rem; cursor: pointer;
+  border: 1px solid transparent; background: none; width: 100%; text-align: left; }
+.rail-link svg { width: 1.05rem; height: 1.05rem; flex: none; color: var(--muted); }
+.rail-link:hover { background: var(--panel-2); }
+.rail-link[aria-current="page"] { background: var(--panel); border-color: var(--line); box-shadow: inset 3px 0 0 var(--accent); font-weight: 650; }
+.rail-link[aria-current="page"] svg { color: var(--accent); }
+.rail-link .count { margin-left: auto; font: 600 .68rem var(--font-code); color: var(--muted); }
+.rail-link .pro { margin-left: auto; }
+.rail-foot { margin-top: auto; padding: var(--sp-3); border: 1px dashed var(--line-strong); border-radius: var(--r-md);
+  font-size: .75rem; color: var(--muted); }
+.rail-foot b { display: block; color: var(--ink); font-size: .8rem; margin-bottom: var(--sp-1); }
+
+.canvas { grid-area: canvas; overflow-y: auto; scroll-behavior: smooth; }
+.statusbar { grid-area: status; display: flex; align-items: center; gap: var(--sp-5); padding-inline: var(--sp-4);
+  background: var(--chrome); border-top: 1px solid var(--line); font: 500 .7rem var(--font-code); color: var(--muted);
+  white-space: nowrap; overflow: hidden; }
+.statusbar .lamp { display: inline-block; width: .45rem; height: .45rem; margin-right: .35rem; border-radius: 50%; background: var(--st-trash); }
+.statusbar .lamp.warn { background: var(--seg-snap); }
+.statusbar button { border: 0; background: none; padding: 0; cursor: pointer; font: inherit; color: var(--ink); text-decoration: underline dotted; }
+.statusbar .proto { margin-left: auto; padding: .05rem .45rem; border: 1px dashed var(--line-strong); border-radius: var(--r-xs); }
+
+/* ── Buttons: dashed = preview (changes nothing) · solid = changes files ── */
+.btn { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 2.35rem; padding: 0 var(--sp-4);
+  border-radius: var(--r-sm); font-weight: 650; font-size: .84rem; cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: transform var(--dur) var(--ease-out), background var(--dur) var(--ease-out), border-color var(--dur); }
+.btn:active { transform: translateY(1px); }
+.btn .tag { font: 700 .62rem var(--font-code); letter-spacing: .1em; text-transform: uppercase; padding: .1rem .35rem;
+  border-radius: var(--r-xs); }
+.btn-preview { border: 1.5px dashed var(--accent); background: var(--accent-soft); color: var(--accent); }
+.btn-preview .tag { background: var(--panel); }
+.btn-preview:hover { border-style: solid; }
+.btn-run { border: 1.5px solid var(--accent); background: var(--accent); color: var(--accent-ink); box-shadow: 0 2px 0 var(--accent-hover); }
+.btn-run .tag { background: var(--accent-hover); color: var(--accent-ink); }
+.btn-run:hover { background: var(--accent-hover); }
+.btn-quiet { border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.btn-quiet:hover { border-color: var(--line-strong); }
+.btn svg { width: 1rem; height: 1rem; }
+.link-arrow { display: inline-flex; align-items: center; gap: .3rem; color: var(--accent); font-weight: 650; font-size: .8rem;
+  text-decoration: none; border: 0; background: none; padding: 0; cursor: pointer; }
+.link-arrow:hover { text-decoration: underline; }
+
+/* ── Section plate: the numbered unit of every cleanup ──────────────────── */
+.plate { display: inline-grid; place-items: center; min-width: 2.15rem; height: 1.7rem; padding: 0 .3rem; position: relative;
+  border: 1px solid var(--line-strong); border-radius: var(--r-xs); background: linear-gradient(var(--panel), var(--panel-2));
+  font: 700 .74rem var(--font-code); color: var(--ink); box-shadow: inset 0 -2px 0 var(--line); }
+.plate::after { content: ""; position: absolute; top: 2px; right: 2px; width: .3rem; height: .3rem; border-radius: 50%; background: var(--tier, var(--st-read)); }
+.plate[data-tier="routine"] { --tier: var(--st-routine); }
+.plate[data-tier="trash"] { --tier: var(--st-trash); }
+.plate[data-tier="permanent"] { --tier: var(--st-permanent); }
+.plate[data-tier="read"] { --tier: var(--st-read); }
+.plate-row { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+
+/* ── Recovery stamp: four shapes, four meanings, never colour alone ────── */
+.stamp { display: inline-flex; align-items: center; gap: .3rem; padding: .1rem .45rem; font: 800 .62rem var(--font-code);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--c); border: 1.5px solid var(--c); border-radius: var(--r-xs);
+  transform: rotate(-2deg); white-space: nowrap; }
+.stamp[data-tier="routine"] { --c: var(--st-routine); border-style: solid; }
+.stamp[data-tier="trash"] { --c: var(--st-trash); border-radius: 999px; }
+.stamp[data-tier="permanent"] { --c: var(--st-permanent); border-width: 3px; border-style: double; }
+.stamp[data-tier="read"] { --c: var(--st-read); border-style: dotted; }
+
+/* Luggage tag chip: the punched hole marks it as a label, not a button. */
+.tagchip { display: inline-flex; align-items: center; gap: .35rem; padding: .08rem .5rem .08rem .35rem; border: 1px solid var(--line);
+  border-radius: var(--r-xs) 999px 999px var(--r-xs); background: var(--panel); font: 600 .68rem var(--font-code); color: var(--muted); }
+.tagchip::before { content: ""; width: .32rem; height: .32rem; border-radius: 50%; border: 1px solid currentColor; }
+.tagchip.pro { color: var(--accent); border-color: var(--accent); }
+.tagchip.note { color: var(--seg-snap); border-color: var(--seg-snap); border-style: dashed; }
+
+/* Perforation: the divider used between ledger and receipt parts. */
+.perf { height: 0; border: 0; border-top: 2px dotted var(--line-strong); margin: var(--sp-3) 0; }

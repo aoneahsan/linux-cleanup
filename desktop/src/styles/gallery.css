@@ -1,0 +1,82 @@
+/* macleanup desktop app — component library, emails, first launch and the
+   small layout helpers the later screens share. */
+
+/* Lite window: title bar and canvas, no source list (gallery, first launch, emails). */
+.window.lite { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "canvas" "status"; }
+.span-9 { grid-column: span 9; } .span-6 { grid-column: span 6; }
+.detail-title { font: 600 1.2rem/1.2 var(--font-display); }
+.field-inline { font: 700 .64rem var(--font-code); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.card-opt small { display: block; font-size: .66rem; color: var(--muted); font-weight: 400; }
+.ledger tr.is-focus td { background: var(--accent-soft); }
+.kbd-group { margin-top: var(--sp-4); font: 700 .64rem var(--font-code); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.vertical-tabs { flex-direction: column; border-bottom: 0; border-left: 1.5px solid var(--ink); }
+.vertical-tabs [role="tab"] { border: 1px solid var(--line); border-left: 0; border-radius: 0 var(--r-sm) var(--r-sm) 0; text-align: left; }
+.vertical-tabs [role="tab"][aria-selected="true"] { box-shadow: inset 3px 0 0 var(--accent); }
+.progress i.indeterminate { width: 40%; animation: slide calc(var(--dur) * 8) linear infinite; }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.faq-kv dd { font-family: var(--font-body); }
+.ref-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.profile-cards .plan-card h3 { font-family: var(--font-code); font-size: 1.1rem; }
+
+/* Receipt page: a long slip and the before/after gauge pair. */
+.slip-big { font-size: .78rem; }
+.slip-line { display: flex; justify-content: space-between; gap: var(--sp-3); padding: .15rem 0; }
+.ba-row { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 6rem; gap: var(--sp-3); align-items: center; font: 600 .8rem var(--font-code); }
+.ba-row b { text-align: right; }
+.ba-bar { margin: var(--sp-2) 0; height: 1.6rem; }
+.ba-bar .seg { cursor: default; }
+
+/* First launch: one centred step at a time under the step plates. */
+.onboard { display: grid; gap: var(--sp-6); max-width: 76rem; margin-inline: auto; padding: var(--sp-6); }
+
+/* Component library: nav strip, state rows and playgrounds. */
+.gallery { max-width: 104rem; margin-inline: auto; padding: var(--sp-6); display: grid; gap: var(--sp-6); }
+.gallery-nav { display: flex; flex-wrap: wrap; gap: var(--sp-1); padding-bottom: var(--sp-3); border-bottom: 1.5px solid var(--ink); }
+.gallery-nav a { padding: var(--sp-1) var(--sp-3); border-radius: var(--r-sm); text-decoration: none; font: 650 .8rem var(--font-code); text-transform: capitalize; }
+.gallery-nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.gallery-nav .gal-back { margin-left: auto; text-transform: none; color: var(--accent); }
+.gallery-head h1 { font: 600 2rem/1.1 var(--font-display); letter-spacing: -.02em; margin: var(--sp-2) 0; }
+.srow, .pg { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); padding: var(--sp-5); }
+.srow h3, .pg h3 { font: 600 1.1rem var(--font-display); }
+.srow-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: var(--sp-4); margin-top: var(--sp-4); }
+.srow figure { margin: 0; display: grid; gap: var(--sp-2); }
+.srow-cell { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2); min-height: 4.5rem; padding: var(--sp-3); background: var(--canvas); border: 1px dashed var(--line); border-radius: var(--r-sm); }
+.srow figcaption { font: 600 .68rem var(--font-code); color: var(--muted); }
+.pg-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.pg-body { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; gap: var(--sp-5); }
+.pg-stage { min-height: 10rem; padding: var(--sp-5); background: var(--canvas); border: 1px dashed var(--line-strong); border-radius: var(--r-md); min-width: 0; overflow: hidden; }
+.pg-dials { display: grid; gap: var(--sp-4); align-content: start; }
+.pg-scroll { max-height: 22rem; overflow: auto; }
+.dial { display: flex; flex-wrap: wrap; gap: 2px; }
+.dial button { border: 1px solid var(--line); background: var(--canvas); padding: .2rem .5rem; font: 600 .7rem var(--font-code); cursor: pointer; border-radius: var(--r-xs); }
+.dial button[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.narrow { max-width: 12rem; }
+.narrow .btn { white-space: normal; text-align: left; }
+.ty-display { font: 600 2.1rem/1.05 var(--font-display); letter-spacing: -.03em; overflow-wrap: anywhere; }
+.ty-panel { font: 600 1.18rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.btn-run[data-force="hover"] { background: var(--accent-hover); }
+[data-force="focus"] { outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 4px var(--focus-inner); }
+.btn[data-force="active"] { transform: translateY(1px); box-shadow: none; }
+.btn[aria-busy="true"] { cursor: progress; }
+.error { font-size: .74rem; color: var(--st-permanent); }
+
+/* Emails: one composer, drawn on a mail-client page. */
+.mail-frame { display: grid; gap: var(--sp-3); padding: var(--sp-5); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.mail-meta { display: grid; gap: var(--sp-1); font-size: .76rem; color: var(--muted); }
+.mail-meta b { color: var(--ink); margin-right: .4rem; }
+.mail { width: min(36rem, 100%); margin-inline: auto; padding: var(--sp-6); background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: var(--r-md); display: grid; gap: var(--sp-4); }
+.mail-head { display: flex; align-items: center; gap: var(--sp-2); font-weight: 700; }
+.mail-head img { border-radius: var(--r-xs); }
+.mail h2 { font: 600 1.5rem/1.15 var(--font-display); }
+.mail p { color: var(--muted); }
+.mail-facts { width: 100%; border-collapse: collapse; font-size: .8rem; background: var(--canvas); border-radius: var(--r-sm); }
+.mail-facts td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px dashed var(--line); }
+.mail-facts td:last-child { text-align: right; font-family: var(--font-code); }
+.mail-btn { justify-self: start; padding: var(--sp-3) var(--sp-5); background: var(--accent); color: var(--accent-ink); border-radius: var(--r-sm); font-weight: 700; text-decoration: none; }
+.mail-foot { font-size: .7rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: var(--sp-3); }
+.mail-text { margin: 0; padding: var(--sp-5); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); font: 500 .78rem/1.7 var(--font-code); white-space: pre-wrap; }
+
+@media (max-width: 1180px) {
+  .span-9, .span-6 { grid-column: span 12; }
+  .pg-body { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,16 @@
+# macleanup desktop — project instructions (AGENTS mirror of CLAUDE.md)
+
+Private repository `aoneahsan/macleanup-desktop`, branch `main`, remote `o`. It holds the macleanup desktop app for macOS (Tauri 2 + React) and its Supabase backend. The product name is `macleanup`, lowercase, everywhere. Installers and updater files are published to the PUBLIC `aoneahsan/macleanup` GitHub Releases.
+
+- **Design source:** the approved click dummy in `../macleanup-click-dummy/` (GATE 3 approved 2026-10-30). Layout, words, states and tokens come from it; a divergence is recorded there first.
+- **Contracts:** `docs/CONTRACTS.md` is the one agreement between `src/` (UI), `src-tauri/` (Rust core) and `supabase/` (backend). The CLI event stream is `../macleanup/docs/json-events.md`. Change the contract first, then the code.
+- **Program record:** `../docs/features/macleanup-5/` (PLAN.md, 00-tracker.json) in the root `project-root` branch.
+- **Stack:** Tauri 2, React 19, Vite (`logLevel: 'info'`, `sourcemap: false`, port 5900), Tailwind v4 tokens, React Aria Components, TanStack Router + Query, Zustand, RHF + Zod, strata-storage, i18n catalogue, Supabase (hosted only; Drizzle authors the schema; `supabase db push` is the only applier). Yarn only.
+- **Gates:** `yarn gates` (typecheck `tsc -b`, lint, test, i18n check, build) and, in `src-tauri/`, `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`.
+- **Privacy:** file paths never leave the Mac. Signed-in sync carries only section ids, byte counts, statuses and macOS version; the assistant receives only allow-listed section numbers (`docs/AI.md`); receipt backups hold numbers only. Analytics follow the fleet rule and stay off until owner IDs are set (`docs/CONTRACTS.md`).
+- **Update flow:** layer 1 is the signed Tauri updater (start + every 6 h, quiet-moment relaunch); layer 2 is the `app_releases` record (Admin › Releases; platforms desktop, web, docs). Prove changes on the `test` channel (`VITE_RELEASE_CHANNEL=test`), never with a production row.
+- **Money:** NO REFUNDS is stated only in the website's Terms and Privacy; every pay surface carries exactly "By continuing, you agree to our Terms of Service and Privacy Policy." Previews are never limited; only real runs claim the allowance.
+- **Secrets:** server secrets live in Supabase function secrets and `~/.secrets/macleanup/` (indexed, backed up to the FilesHub vault project `macleanup`). `.env` holds only client-safe values and is committed (private repo).
+- **Updater signing key (never lose it):** `~/.secrets/macleanup/tauri-updater.key` (+ `.password`, `.pub`). Backed up in the FilesHub vault, project `macleanup`, as `general_files.bk_macleanup_tauri_updater_key`, `general_files.bk_macleanup_tauri_updater_key_password` and `general_files.bk_macleanup_tauri_updater_key_pub`. Restore proven 2026-10-30: the downloaded key signed a file and the signature verified against the `pubkey` in `src-tauri/tauri.conf.json` (a tampered file failed). Restore on a new Mac with the Management API `GET /projects/macleanup/vault-files/<key>`. Never generate a new keypair: every shipped install trusts this one.
+- **Releases:** built and published by hand from a Mac (`docs/release/LOCAL-RELEASE.md`); no GitHub Actions workflow, ever (house rule 2026-10-31).
+- **Owner-only steps:** `docs/MANUAL-TASKS.md`.

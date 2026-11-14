@@ -1,0 +1,79 @@
+# Supabase CLI configuration for the HOSTED linux-cleanup project (hosted-only: there is no
+# local stack, and `supabase start` / `db reset` are banned). The project ref is passed
+# explicitly on every command (`--project-ref <ref>`); nothing here names it.
+# Auth settings below reach the hosted project only through `supabase config push`,
+# which the main session runs after the owner creates the project.
+
+project_id = "linux-cleanup"
+
+[api]
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 50
+
+[auth]
+site_url = "https://linux-cleanup.aoneahsan.com"
+# The desktop app receives the PKCE code on a loopback port chosen at run time (oauth_listen).
+additional_redirect_urls = ["http://127.0.0.1/**"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+# Every device signs in anonymously on first launch; Google links onto that user.
+enable_anonymous_sign_ins = true
+enable_manual_linking = true
+enable_signup = true
+
+[auth.rate_limit]
+anonymous_users = 30
+
+[auth.email]
+enable_signup = false
+
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+skip_nonce_check = false
+
+# Google-only sign-up (fleet rule 2026-10-29): anonymous devices and Google identities pass;
+# email/password is refused except the automation test identity. Function: migration
+# 20261030072417_auth_signup_hook.sql. Email/password signup is also off above.
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_before_user_created"
+
+[functions.allowance]
+verify_jwt = true
+
+[functions.claim-run]
+verify_jwt = true
+
+[functions.run-summary]
+verify_jwt = true
+
+[functions.polar-checkout]
+verify_jwt = true
+
+# Polar calls this without a Supabase JWT; the Standard Webhooks signature is the auth.
+[functions.polar-webhook]
+verify_jwt = false
+
+[functions.team]
+verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.admin]
+verify_jwt = true
+
+[functions.account-welcome]
+verify_jwt = true
+
+
+
+[functions.news]
+verify_jwt = true
+
+# Vector buckets stay off: nothing here stores vectors (the CLI default turned them on in one push, 2026-11-14).
+[storage.vector]
+enabled = false
