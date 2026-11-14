@@ -272,7 +272,8 @@ make_debug_bundle() {
   latest_report="$(ls -t "$REPORTS_DIR"/report-*.json 2>/dev/null | head -1 || true)"
 
   local tmpdir; tmpdir="$(mktemp -d)"
-  trap "rm -rf '$tmpdir'" RETURN
+  # Removed when this function returns; the trap clears itself so later returns do not re-run it.
+  trap 'rm -rf -- "$tmpdir"; trap - RETURN' RETURN
 
   # Manifest with non-sensitive system info only
   {

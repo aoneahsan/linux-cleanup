@@ -28,6 +28,16 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 - `--yes` now auto-accepts the shared confirmation prompt only in
   `--all-safe`. Other modes keep their interactive decisions.
 - Partial downloads are confirmed one file at a time instead of as one batch.
+- Index selections such as `1,3,5-7` are split without shell globbing, so a
+  stray `*` can no longer expand to file names in the current directory.
+- Global-package lookup builds its candidate path from the function's own
+  arguments instead of values left in the calling scope.
+- The debug-bundle temporary folder is removed once, when its function returns.
+
+### Maintenance
+
+- `yarn lint:bash` now runs ShellCheck at warning level on every script.
+- Removed unused variables, including a contact phone number that nothing printed.
 
 ---
 

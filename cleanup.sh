@@ -211,7 +211,7 @@ while [[ $# -gt 0 ]]; do
     --speed)          MODE=speed ;;
     --editor-ext)     MODE=editorext ;;
     --reports)        MODE=reports ;;
-    --export)         MODE=export; EXPORT_FMT="${2:-both}"; EXPORT_ID="${3:-latest}"; shift 2 || true ;;
+    --export)         MODE="export"; EXPORT_FMT="${2:-both}"; EXPORT_ID="${3:-latest}"; shift 2 || true ;;
     --feedback)       MODE=feedback ;;
     --debug-bundle)   MODE=debug_bundle ;;
     --list-targets)   MODE=list_targets ;;
