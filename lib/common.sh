@@ -7,16 +7,15 @@ LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
 LINUX_CLEANUP_LINKEDIN="https://linkedin.com/in/aoneahsan"
-LINUX_CLEANUP_PHONE="+92 304 6619706"
 LINUX_CLEANUP_LICENSE="MIT License"
 
 # Colors only when stdout is a TTY AND NO_COLOR is not set (de-facto standard).
 # Disable explicitly with --no-color flag (handled in cleanup.sh).
 if [[ -t 1 && -z "${NO_COLOR:-}" && "${CLEANUP_NO_COLOR:-0}" != 1 ]]; then
   C_RED=$'\e[31m'; C_GRN=$'\e[32m'; C_YLW=$'\e[33m'; C_BLU=$'\e[34m'
-  C_MAG=$'\e[35m'; C_CYN=$'\e[36m'; C_DIM=$'\e[2m'; C_BLD=$'\e[1m'; C_RST=$'\e[0m'
+  C_CYN=$'\e[36m'; C_DIM=$'\e[2m'; C_BLD=$'\e[1m'; C_RST=$'\e[0m'
 else
-  C_RED=''; C_GRN=''; C_YLW=''; C_BLU=''; C_MAG=''; C_CYN=''; C_DIM=''; C_BLD=''; C_RST=''
+  C_RED=''; C_GRN=''; C_YLW=''; C_BLU=''; C_CYN=''; C_DIM=''; C_BLD=''; C_RST=''
 fi
 
 ui_term_w() { tput cols 2>/dev/null || echo 78; }
@@ -283,7 +282,7 @@ lclean_event() {
 lclean_event_plan() {
   local dry=false stamp=routine
   (( DRY_RUN )) && dry=true
-  [[ "$MODE" == scan ]] && stamp=read
+  [[ "$MODE" == scan ]] && stamp="read"
   lclean_event plan ",\"version\":$(lclean_json_string "$LINUX_CLEANUP_VERSION"),\"dry_run\":$dry,\"profile\":null,\"sections\":[{\"id\":$(lclean_json_string "$MODE"),\"title\":$(lclean_json_string "$MODE"),\"stamp\":$(lclean_json_string "$stamp"),\"sudo\":false,\"deep\":false}]"
 }
 

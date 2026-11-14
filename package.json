@@ -8,7 +8,7 @@
     "test": "bash cleanup.sh --self-test",
     "scan": "bash cleanup.sh --scan",
     "dry-run": "bash cleanup.sh --all-safe --yes --dry-run",
-    "lint:bash": "bash -c 'for f in cleanup.sh lib/*.sh modules/*.sh; do bash -n \"$f\" || exit 1; done' && node -c bin/linux-cleanup.js",
+    "lint:bash": "bash -c 'for f in cleanup.sh lib/*.sh modules/*.sh; do bash -n \"$f\" || exit 1; done' && shellcheck -S warning cleanup.sh lib/*.sh modules/*.sh && node -c bin/linux-cleanup.js",
     "version:check": "node -e \"const fs=require('fs');const v=require('./package.json').version;const ok=fs.readFileSync('VERSION','utf8').trim()===v&&fs.readFileSync('lib/common.sh','utf8').includes('LINUX_CLEANUP_VERSION=\\\"'+v+'\\\"')&&fs.readFileSync('release/stable.env','utf8').includes('version='+v);if(!ok){console.error('version mismatch: package.json '+v+' must equal VERSION, lib/common.sh and release/stable.env');process.exit(1)}console.log('version parity OK: '+v)\"",
     "prepublishOnly": "npm run --silent lint:bash && test -x cleanup.sh && test -x bin/linux-cleanup.js && npm run --silent version:check"
   },

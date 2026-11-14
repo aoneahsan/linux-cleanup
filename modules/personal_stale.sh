@@ -81,7 +81,8 @@ run_stale_personal() {
     c)
       local idxs picks=()
       read -rp "Indexes (e.g. 1,3,5-7): " idxs
-      local IFS=','; local parts=($idxs); unset IFS
+      local parts=()
+      IFS=',' read -r -a parts <<< "$idxs"
       local p k
       for p in "${parts[@]}"; do
         p="${p// /}"

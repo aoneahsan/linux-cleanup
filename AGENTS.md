@@ -42,7 +42,7 @@ non-reversibility plainly. Keep package and docs histories independent.
 ## Local verification and release
 
 Use Yarn for local work. `yarn test` runs the built-in self-test;
-`bash -n cleanup.sh lib/*.sh modules/*.sh` checks shell syntax;
+`yarn lint:bash` checks shell syntax and runs ShellCheck at warning level (`.shellcheckrc` explains its one disable);
 `yarn run version:check` proves package.json, VERSION, lib/common.sh and release/stable.env agree. Inspect changes
 against the safety guards before any npm or GitHub release. The package
 has no app browser surface; the separate docs site has a build and
@@ -60,7 +60,7 @@ Any new command that deletes or changes something must go through
 settings-only mode starts with `dry_run_refuse`. Self-test check 8 proves
 the dry run on a probe file. On every publish, update `release/stable.env`
 (version, `urgency=normal|urgent`, one-sentence reason) in the same commit;
-an urgent record stops every older copy at start. Test the flow with
+an urgent record stops every older copy at start. Installed copies read the record from GitHub `main`, so a commit that changes it must not reach `main` before `npm publish` of that version succeeds: hold it on a `wip/` branch until then. Test the flow with
 `LINUX_CLEANUP_RELEASE_URL=file://…` and `LINUX_CLEANUP_CHANNEL=test`.
 
 ## ORCID / BibTeX record

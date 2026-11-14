@@ -221,7 +221,9 @@ clean_target_units() {
     clean_target "$label" "$root" "$desc"
     return
   fi
-  local prompt="Remove $label entries unused ≥${DAYS}d ($(dir_size "$root") in total; whole entries only)?"
+  local total prompt
+  total="$(dir_size "$root")"
+  prompt="Remove $label entries unused ≥${DAYS}d (${total} in total; whole entries only)?"
   [[ -n "$desc" ]] && prompt+=" — $desc"
   if ui_confirm "$prompt" n; then
     UNITS_FREED=0

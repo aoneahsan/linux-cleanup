@@ -91,7 +91,8 @@ PY
 # Resolve "<name>" to its on-disk directory under a given node_modules root.
 # Handles @scope/name. Returns empty if not present.
 _resolve_in_root() {
-  local root="$1" name="$2" candidate="$root/$name"
+  local root="$1" name="$2"
+  local candidate="$root/$name"
   [[ -d "$candidate" ]] && { printf '%s' "$candidate"; return; }
 }
 
@@ -114,7 +115,7 @@ _list_global_packages() {
         [[ -d "$entry" ]] || continue
         name="${entry##*/}"
         case "$name" in
-          .*|.bin|.cache|.modules.yaml|.pnpm) continue ;;
+          .*) continue ;;
           @*)
             for sub in "$entry"/*; do
               [[ -d "$sub" ]] || continue
@@ -222,10 +223,6 @@ run_global_packages_audit() {
     any=1
     printf '\n%b── %s globals (%s) ──%b\n' "${C_BLD}" "$pm" "${root:-<manifest-based>}" "${C_RST}"
 
-    # Build set of all directly-installed global package names (for dependent check).
-    local installed_names
-    installed_names="$(_list_global_packages "$pm" | awk -F'\t' '{print $1}' | sort -u)"
-
     # Build reverse-dep map: which other globals declare each package as a dep.
     declare -A reverse_deps=()
     local line name dir
@@ -240,7 +237,7 @@ run_global_packages_audit() {
 
     # Now classify each installed global.
     printf '  %-40s %8s  %s\n' "PACKAGE" "AGE(d)" "STATUS"
-    local stale_count=0 safe_count=0
+    local stale_count=0
     while IFS=$'\t' read -r name dir; do
       [[ -n "$dir" ]] || continue
       local age status="active"
