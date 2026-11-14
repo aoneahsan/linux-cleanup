@@ -1,4 +1,4 @@
-/** Shell overlay state: the ⌘K palette and the page tour. */
+/** Shell overlay state: the Ctrl+K palette and the page tour. */
 import { create } from 'zustand';
 
 interface OverlayState {

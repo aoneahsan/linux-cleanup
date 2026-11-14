@@ -4,7 +4,7 @@ import { useT, translate } from '@/i18n';
 import { refreshAllowance, replaceDeviceId } from '@/services/account';
 import { toast } from '@/lib/feedback';
 
-/** 403 device_owned: this Mac's id belongs to another account. One action: take a fresh id. */
+/** 403 device_owned: this computer's id belongs to another account. One action: take a fresh id. */
 export function DeviceOwned() {
   const t = useT();
   const [busy, setBusy] = useState(false);

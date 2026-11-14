@@ -13,7 +13,7 @@ import { create } from 'zustand';
 
 const VERIFY_API = 'https://fileshub.zaions.com/api/licensing/v1/licenses/verify';
 /** Our public page where anyone can check a licence key. */
-export const VERIFY_PAGE = 'https://macleanup.aoneahsan.com/verify-license';
+export const VERIFY_PAGE = 'https://linux-cleanup.aoneahsan.com/verify-license';
 const TIMEOUT_MS = 5000;
 /** Verdicts that mean the build is not covered by an active licence. */
 const INACTIVE = new Set(['revoked', 'not_found', 'invalid_format']);

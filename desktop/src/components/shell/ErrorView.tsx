@@ -3,7 +3,7 @@ import { Btn, RouterLink, StateCard } from '@/components/ui/primitives';
 import { useT } from '@/i18n';
 import { logger } from '@/lib/logger';
 
-/** Route error boundary: names the failure, says nothing on the Mac changed, offers a way out. */
+/** Route error boundary: names the failure, says nothing on the computer changed, offers a way out. */
 export function ErrorView({ error }: { error: unknown }) {
   const t = useT();
   const router = useRouter();

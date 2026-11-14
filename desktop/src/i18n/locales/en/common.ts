@@ -14,7 +14,7 @@ export default {
   external: '↗',
   sortBy: 'Sort by {{column}}',
   opensBrowser: ' (opens in your browser)',
-  kbdP: '⌘P',
+  kbdP: 'Ctrl+P',
   unitGiB: 'GiB',
   unitGB: 'GB',
   countOf: '{{n}} / {{max}}',

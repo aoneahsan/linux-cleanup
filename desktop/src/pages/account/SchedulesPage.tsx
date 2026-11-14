@@ -7,10 +7,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppLink, Btn, PageHead, Panel, StateCard } from '@/components/ui/primitives';
 import { NotInApp } from '@/components/states/NotInApp';
 import { useT, translate } from '@/i18n';
-import { DEEP_CONFIRM, SAFE_BATCH } from '@/data/sections';
 import { env } from '@/config/env';
 import { useSession } from '@/stores/session';
-import { usePlan } from '@/stores/plan';
 import { commands, isTauri, toAppError, type ScheduleSpec } from '@/lib/tauri';
 import { qk } from '@/services/queryClient';
 import { save } from '@/lib/storage';
@@ -28,22 +26,20 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
-/** A new schedule id (LaunchAgent label suffix). */
+/** A new schedule id (systemd unit name suffix). */
 function newScheduleId(): string {
   return `s${Date.now().toString(36)}`;
 }
 const hhmm = (h: number, m: number) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-/** Schedules (Pro): launch agents that preview or run the safe batch. Deep sections are never offered. */
+/** Schedules (Pro): systemd user timers that dry-run or run the all-safe cleanup. */
 export default function SchedulesPage() {
   const t = useT();
   const qc = useQueryClient();
   const plan = useSession((s) => s.plan);
-  const selection = usePlan((s) => s.selection);
   const entitled = !env.accountsConfigured || plan === 'pro' || plan === 'team';
   const list = useQuery({ queryKey: qk.schedules, queryFn: commands.scheduleList, enabled: isTauri() && entitled });
   const saved = loadSavedSchedules();
-  const previewSections = selection.filter((n) => !DEEP_CONFIRM.includes(n));
 
   const { control, handleSubmit, reset, setValue } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -70,7 +66,7 @@ export default function SchedulesPage() {
     const time = hhmm(s.hour, s.minute);
     const when = s.dayOfMonth ? t('schedules.everyMonth', { day: s.dayOfMonth, time })
       : s.weekday === null ? t('schedules.everyDay', { time }) : t('schedules.everyWeek', { day: t(`schedules.days.d${s.weekday}` as never), time });
-    const does = s.kind === 'cleanup' ? t('schedules.runSafe') : t('schedules.previewOf', { count: s.sections.length });
+    const does = s.kind === 'cleanup' ? t('schedules.runSafe') : t('schedules.previewSafe');
     return { when, does };
   };
 
@@ -137,16 +133,13 @@ export default function SchedulesPage() {
           className="stack-v"
           validationBehavior="aria"
           onSubmit={handleSubmit((v) => {
-            const sections = v.kind === 'cleanup' ? [...SAFE_BATCH] : previewSections;
-            if (!sections.length) { toast(translate('schedules.noSections')); return; }
             const spec: ScheduleSpec = {
               id: newScheduleId(), kind: v.kind, weekday: v.cadence === 'weekly' ? v.weekday : null,
-              dayOfMonth: v.cadence === 'monthly' ? v.dayOfMonth : null, hour: v.hour, minute: v.minute, sections,
+              dayOfMonth: v.cadence === 'monthly' ? v.dayOfMonth : null, hour: v.hour, minute: v.minute,
             };
             install.mutate({ spec, name: v.name }, {
               onSuccess: () => {
                 toast(translate('schedules.installed', { name: v.name }));
-                if (v.kind === 'preview' && previewSections.length < selection.length) toast(translate('schedules.deepDropped'));
                 reset();
               },
             });

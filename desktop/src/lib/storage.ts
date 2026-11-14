@@ -1,12 +1,12 @@
 /**
  * The app's single persistence layer. strata-storage is the only code that touches
- * web storage. `keyPrefix: false` keeps physical keys as `macleanup-app:<key>`,
+ * web storage. `keyPrefix: false` keeps physical keys as `linux-cleanup-app:<key>`,
  * because the pre-paint script in index.html reads the appearance keys directly.
  */
 import { defineStorage } from 'strata-storage';
 import { logger } from '@/lib/logger';
 
-export const STORAGE_NAMESPACE = 'macleanup-app';
+export const STORAGE_NAMESPACE = 'linux-cleanup-app';
 
 const storage = defineStorage({
   namespace: STORAGE_NAMESPACE,

@@ -7,7 +7,7 @@ import type { TKey } from '@/i18n';
 
 export const AXES = {
   theme: ['system', 'light', 'dark'],
-  palette: ['jade', 'cobalt', 'brass'],
+  palette: ['survey', 'coral', 'violet'],
   radius: ['none', 'small', 'medium', 'large'],
   density: ['compact', 'comfortable', 'spacious'],
   'type-scale': ['small', 'medium', 'large'],
@@ -21,7 +21,7 @@ export type Appearance = { [A in Axis]: AxisValue<A> };
 
 /** Defaults: the approved dummy's <html> attributes (sound starts off). */
 export const DEFAULTS: Appearance = {
-  theme: 'system', palette: 'jade', radius: 'medium', density: 'comfortable', 'type-scale': 'medium',
+  theme: 'system', palette: 'survey', radius: 'medium', density: 'comfortable', 'type-scale': 'medium',
   motion: 'system', sound: 'off',
 };
 
@@ -39,9 +39,9 @@ export const valueKey = (axis: Axis, value: string): TKey => `theme.axes.${LEGEN
 
 /** Surface / ink / accent triad each palette card previews (light values). */
 export const SWATCH: Record<AxisValue<'palette'>, [string, string, string]> = {
-  jade: ['oklch(0.974 0.010 104)', 'oklch(0.231 0.032 169)', 'oklch(0.425 0.102 169)'],
-  cobalt: ['oklch(0.972 0.008 260)', 'oklch(0.235 0.039 260)', 'oklch(0.431 0.157 260)'],
-  brass: ['oklch(0.974 0.018 80)', 'oklch(0.246 0.033 65)', 'oklch(0.428 0.120 70)'],
+  survey: ['oklch(0.968 0.010 95)', 'oklch(0.180 0.009 95)', 'oklch(0.800 0.150 95)'],
+  coral: ['oklch(0.976 0.010 25)', 'oklch(0.190 0.015 25)', 'oklch(0.720 0.160 25)'],
+  violet: ['oklch(0.971 0.012 305)', 'oklch(0.190 0.015 305)', 'oklch(0.780 0.100 305)'],
 };
 
 /** Physical storage key for one axis (read directly by the pre-paint script). */

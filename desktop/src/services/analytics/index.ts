@@ -91,7 +91,7 @@ export function track<E extends EventName>(name: E, props: EventProps<E> | Recor
   else if (env.amplitudeKey) ampQueue.push([name, p]);
 }
 
-/** Signed in: one opaque account id in all three. Signed out: cleared, so a shared Mac never merges two people. */
+/** Signed in: one opaque account id in all three. Signed out: cleared, so a shared computer never merges two people. */
 export function identify(userId: string | null): void {
   if (!started) return;
   if (userId) {

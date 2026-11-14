@@ -1,5 +1,5 @@
 import { useSearch } from '@tanstack/react-router';
-import { AppLink, Btn, PageHead, Plate, RouterLink, StateCard } from '@/components/ui/primitives';
+import { AppLink, Btn, PageHead, Plate, PreviewBtn, StateCard } from '@/components/ui/primitives';
 import { StaticBar } from '@/components/disk/DiskGauge';
 import { useT, translate } from '@/i18n';
 import { formatDateTime, formatGiB, formatKb, plate } from '@/i18n/format';
@@ -8,7 +8,7 @@ import { useCliInfo } from '@/hooks/useLocal';
 import { useReceipts, type ReceiptSection } from '@/stores/receipts';
 import { commands, toAppError } from '@/lib/tauri';
 import { toast } from '@/lib/feedback';
-import { BackupButton } from '@/components/receipt/BackupButton';
+import { startSafePreview } from '@/services/previewLauncher';
 
 const BADGE: Record<ReceiptSection['state'], string> = { completed: 'ok', skipped: 'warn', failed: 'bad', pending: '', running: '' };
 
@@ -33,7 +33,7 @@ export default function ReceiptPage() {
     return (
       <div className="workbench">
         <div className="span-12">
-          <StateCard icon="receipt" title={t('flow.receiptPage.none')} actions={<RouterLink to="/sections" className="btn btn-preview"><span className="tag">{t('common.dryRun')}</span>{t('flow.live.pick')}</RouterLink>}>
+          <StateCard icon="receipt" title={t('flow.receiptPage.none')} actions={<PreviewBtn tag={t('common.dryRun')} onPress={() => void startSafePreview()}>{t('flow.live.pick')}</PreviewBtn>}>
             {t('flow.receiptPage.noneBody')}
           </StateCard>
         </div>
@@ -56,7 +56,6 @@ export default function ReceiptPage() {
           <>
             <Btn icon="book" isDisabled={!r.reports[0]} onPress={() => void openLocal(r.reports[0])}>{t('flow.receiptPage.openReport')}</Btn>
             <Btn icon="terminal" isDisabled={!r.log} onPress={() => void openLocal(r.log)}>{t('flow.receiptPage.openLog')}</Btn>
-            <BackupButton receipt={r} />
             <AppLink to="/history" className="btn btn-quiet">{t('flow.receiptPage.all')}</AppLink>
           </>
         }
@@ -71,7 +70,7 @@ export default function ReceiptPage() {
           <hr className="perf" />
           {r.sections.map((s) => (
             <div className="slip-line" key={s.id}>
-              <span>{`${plate(s.id)} ${s.title || t(`sections.s${s.id}.title` as never)}`}</span>
+              <span>{`${plate(s.id)} ${t(`sections.s${s.id}.title` as never)}`}</span>
               <span>{t(`common.tiers.${TIER[s.id] ?? 'read'}`)}</span>
             </div>
           ))}
@@ -86,7 +85,6 @@ export default function ReceiptPage() {
             <span>{t('flow.receiptPage.freeSpace')}</span>
             <b>{r.dryRun ? t('receipt.nothingDeleted') : before !== null && after !== null ? t('receipt.freeChange', { before: formatGiB(before), after: formatGiB(after) }) : '—'}</b>
           </div>
-          {r.restored ? <p className="muted">{t('backups.receipt.restoredNote')}</p> : null}
           {r.interrupted ? <p className="muted">{r.cancelled ? t('receipt.cancelled') : t('receipt.interrupted')}</p> : null}
           {r.errors.slice(0, 3).map((e) => <p className="muted" key={e}>{e}</p>)}
         </article>
@@ -102,7 +100,7 @@ export default function ReceiptPage() {
           ) : null}
           <p className="lede">
             {r.dryRun ? t('flow.receiptPage.baPreview') : after !== null && before !== null && after > before ? t('flow.receiptPage.baGain', { size: formatKb(after - before) }) : null}{' '}
-            {r.snapshotNote && r.snapshots ? t('flow.receiptPage.baSnap', { count: r.snapshots }) : null}
+            {null}
           </p>
         </div>
         <div className="panel">
@@ -112,7 +110,7 @@ export default function ReceiptPage() {
             <tbody>
               {r.sections.map((s) => (
                 <tr key={s.id}>
-                  <td><Plate id={s.id} tier={TIER[s.id] ?? 'read'} /> {s.title || t(`sections.s${s.id}.title` as never)}</td>
+                  <td><Plate id={s.id} tier={TIER[s.id] ?? 'read'} /> {t(`sections.s${s.id}.title` as never)}</td>
                   <td><span className={`badge ${BADGE[s.state]}`}>{t(`flow.live.states.${s.state}`)}</span></td>
                   <td>{s.reason ?? (r.dryRun ? (s.plannedKb ? t('flow.receiptPage.noteFound', { size: formatKb(s.plannedKb) }) : t('flow.receiptPage.noteDone')) : s.freedKb ? t('flow.receiptPage.noteFreed', { size: formatKb(s.freedKb) }) : t('flow.receiptPage.noteDone'))}</td>
                 </tr>

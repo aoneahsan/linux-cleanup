@@ -1,5 +1,5 @@
 /**
- * The app's one icon sprite, drawn for macleanup (24px grid, 1.6 stroke) and ported
+ * The app's one icon sprite, drawn for linux-cleanup (24px grid, 1.6 stroke) and ported
  * verbatim from the approved click dummy. Mounted once; icons reference it by id.
  */
 

@@ -1,6 +1,7 @@
+import { startSafePreview } from '@/services/previewLauncher';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { AppLink, Btn, PageHead, Plate, RouterLink, StateCard, goTo } from '@/components/ui/primitives';
+import { AppLink, Btn, PageHead, Plate, PreviewBtn, StateCard, goTo } from '@/components/ui/primitives';
 import { useT, translate } from '@/i18n';
 import { formatGiB, formatShortDateTime } from '@/i18n/format';
 import { tierFor } from '@/data/sections';
@@ -50,7 +51,7 @@ export default function RunPage() {
             title={t('flow.live.none')}
             actions={
               <>
-                <RouterLink to="/sections" className="btn btn-preview"><span className="tag">{t('common.dryRun')}</span>{t('flow.live.pick')}</RouterLink>
+                <PreviewBtn tag={t('common.dryRun')} onPress={() => void startSafePreview()}>{t('flow.live.pick')}</PreviewBtn>
                 <AppLink to="/history" className="btn btn-quiet">{t('flow.live.past')}</AppLink>
               </>
             }
@@ -73,7 +74,7 @@ export default function RunPage() {
         dateline={active
           ? t('flow.live.dateline', { name: request.name, when: startedAt ? formatShortDateTime(startedAt) : '' })
           : t('flow.live.datelineDone', { name: request.name })}
-        title={t('flow.live.title')}
+        title={active ? t('flow.live.title') : t('flow.live.titleDone')}
         lede={t('flow.live.lede')}
         actions={active ? (
           <Btn variant="stop" icon="stop" kbd={cancelKeys} isDisabled={cancelAsked} onPress={() => { setCancelAsked(true); void cancel(); }}>
@@ -95,7 +96,7 @@ export default function RunPage() {
           {sections.map((s) => (
             <div className="lamp-row" key={s.id} data-state={s.state === 'completed' ? 'done' : s.state === 'failed' ? 'cancelled' : s.state}>
               <Plate id={s.id} tier={tierFor(s.id, s.stamp)} />
-              <span>{s.title || t(`sections.s${s.id}.title` as never)}{s.reason ? <span className="sub">{s.reason}</span> : null}</span>
+              <span>{t(`sections.s${s.id}.title` as never)}{s.reason ? <span className="sub">{s.reason}</span> : null}</span>
               <span className="state">{t(`flow.live.states.${s.state}`)}</span>
             </div>
           ))}

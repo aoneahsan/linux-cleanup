@@ -6,7 +6,7 @@ import { useLicence, verifyPageUrl } from '@/services/licensing/licenceCheck';
 
 /**
  * The inactive-licence view of a white-label build, drawn as the release gate's slip.
- * It covers the window and deletes nothing; receipts and settings stay on the Mac.
+ * It covers the window and deletes nothing; receipts and settings stay on the computer.
  * Mounted by the shell only when a white-label key is built in.
  */
 export function WhiteLabelGuard() {

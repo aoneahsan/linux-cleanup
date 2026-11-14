@@ -1,5 +1,6 @@
+import { startSafePreview } from '@/services/previewLauncher';
 import { useQueryClient } from '@tanstack/react-query';
-import { AppLink, Btn, ExternalLink, PageHead, PreviewBtn, StateCard, goTo } from '@/components/ui/primitives';
+import { AppLink, Btn, ExternalLink, PageHead, PreviewBtn, StateCard } from '@/components/ui/primitives';
 import { useNavigate } from '@tanstack/react-router';
 import { useT, translate } from '@/i18n';
 import { plate } from '@/i18n/format';
@@ -45,7 +46,7 @@ export default function ErrorsPage() {
       </section>
       <section className="span-6" aria-label={t('states.offline.title')}>
         <StateCard tone="offline" icon="wifioff" title={t('states.offline.title')} actions={
-          <PreviewBtn tag={t('common.dryRun')} onPress={() => goTo(navigate, '/sections')}>{t('states.offline.keepWorking')}</PreviewBtn>
+          <PreviewBtn tag={t('common.dryRun')} onPress={() => void startSafePreview()}>{t('states.offline.keepWorking')}</PreviewBtn>
         }>
           {t('states.offline.body')}
         </StateCard>
@@ -65,7 +66,7 @@ export default function ErrorsPage() {
         <StateCard tone="error" icon="alert" title={t('states.runFailed.title')} actions={
           <>
             {failed ? <Btn onPress={() => void navigate({ to: '/receipt', search: { id: failed.id2 } })}>{t('states.runFailed.receipt')}</Btn> : null}
-            <ExternalLink href="https://github.com/aoneahsan/macleanup/issues/new" className="btn btn-quiet">{t('states.runFailed.report')}</ExternalLink>
+            <ExternalLink href="https://github.com/aoneahsan/linux-cleanup/issues/new" className="btn btn-quiet">{t('states.runFailed.report')}</ExternalLink>
           </>
         }>
           {failed ? t('help.errors.lastFailed', { id: plate(failed.id), reason: failed.reason ?? '' }) : t('help.errors.noneFailed')}

@@ -71,7 +71,7 @@ export function PreviewSheet() {
                 <li key={s.id}>
                   <Plate id={s.id} tier={tierFor(s.id, s.stamp)} />
                   <span>
-                    {s.title || t(`sections.s${s.id}.title` as never)}
+                    {t(`sections.s${s.id}.title` as never)}
                     <span className="sub">{s.reason ?? (s.itemCount ? t(`sections.s${s.id}.what` as never) : t('run.sheet.noFindings'))}</span>
                   </span>
                   <b>{s.plannedKb ? formatKb(s.plannedKb) : '—'}</b>

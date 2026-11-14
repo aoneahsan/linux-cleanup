@@ -1,17 +1,17 @@
 /**
  * The source list: every destination, its group, icon and tail. The router and
- * the ⌘K palette both read this table, so a screen is added in one place.
+ * the Ctrl+K palette both read this table, so a screen is added in one place.
  */
 import type { IconName } from '@/components/ui/Icon';
 import type { TKey } from '@/i18n';
 
-export type NavGroup = 'workbench' | 'review' | 'account' | 'admin' | 'help';
+export type NavGroup = 'workbench' | 'account' | 'admin' | 'help';
 export type NavTail = { kind: 'count'; value: string } | { kind: 'pro' } | { kind: 'team' };
 
 /** Every screen path the app plans; a path without a registered route is hidden at runtime. */
 export type AppPath =
-  | '/' | '/sections' | '/profiles' | '/preview' | '/confirm' | '/run' | '/receipt' | '/history'
-  | '/apps' | '/services' | '/orphans' | '/snapshots' | '/assistant' | '/schedules' | '/account' | '/plans' | '/team' | '/settings' | '/backups'
+  | '/' | '/preview' | '/confirm' | '/run' | '/receipt' | '/history'
+  | '/schedules' | '/account' | '/plans' | '/team' | '/settings'
   | '/admin' | '/admin/users' | '/admin/plans' | '/admin/grants' | '/admin/config' | '/admin/audit' | '/admin/releases'
   | '/walkthrough' | '/onboarding' | '/updates' | '/errors';
 
@@ -25,17 +25,8 @@ export interface NavItem {
 export const NAV: readonly { group: NavGroup; items: readonly NavItem[] }[] = [
   { group: 'workbench', items: [
     { to: '/', label: 'shell.rail.overview', icon: 'gauge' },
-    { to: '/sections', label: 'shell.rail.sections', icon: 'plates', tail: { kind: 'count', value: '28' } },
-    { to: '/profiles', label: 'shell.rail.profiles', icon: 'stack', tail: { kind: 'count', value: '5' } },
     { to: '/preview', label: 'shell.rail.preview', icon: 'ledger' },
     { to: '/history', label: 'shell.rail.history', icon: 'receipt' },
-  ] },
-  { group: 'review', items: [
-    { to: '/apps', label: 'shell.rail.apps', icon: 'app' },
-    { to: '/services', label: 'shell.rail.services', icon: 'launch' },
-    { to: '/orphans', label: 'shell.rail.orphans', icon: 'orphan' },
-    { to: '/snapshots', label: 'shell.rail.snapshots', icon: 'snap' },
-    { to: '/assistant', label: 'shell.rail.assistant', icon: 'spark' },
   ] },
   { group: 'account', items: [
     { to: '/schedules', label: 'shell.rail.schedules', icon: 'calendar', tail: { kind: 'pro' } },
@@ -69,9 +60,7 @@ const FLOW: readonly NavItem[] = [
 ];
 
 /** Screens reached from a link, not the source list (titled under their group). */
-const LINKED: readonly { group: NavGroup; item: NavItem }[] = [
-  { group: 'account', item: { to: '/backups', label: 'shell.rail.backups', icon: 'cloudup' } },
-];
+const LINKED: readonly { group: NavGroup; item: NavItem }[] = [];
 
 /** Find the nav entry (and its group) for a pathname. */
 export function navFor(pathname: string): { group: NavGroup; item: NavItem } | null {

@@ -1,14 +1,14 @@
 /**
  * Typed wrapper for every Tauri command and event in docs/CONTRACTS.md §2.
- * Outside the macleanup app (a plain browser) every command rejects with
+ * Outside the linux-cleanup app (a plain browser) every command rejects with
  * `{ kind: 'not_in_app' }` and every listener is a no-op, so screens can show the
- * named "Run inside the macleanup app" state instead of fake data.
+ * named "Open this in the linux-cleanup app" state instead of fake data.
  */
 import { invoke, isTauri as coreIsTauri } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
 export type AppErrorKind =
-  | 'cli_missing' | 'cli_failed' | 'permission_denied' | 'not_found' | 'invalid_input' | 'io' | 'cancelled'
+  | 'cli_missing' | 'cli_failed' | 'permission_denied' | 'not_found' | 'invalid_input' | 'io'
   | 'not_in_app' | 'unknown';
 
 /** The serialised Rust `AppError`, plus the two kinds the UI adds. */
@@ -19,37 +19,13 @@ export interface AppError {
 
 export interface CliInfo { version: string; path: string; ok: boolean }
 export interface SystemInfo { os_version: string; arch: string; ram_bytes: number; device_id: string }
-export interface HealthInfo {
-  full_disk_access: boolean | null;
-  battery: { present: boolean; condition: string | null; cycle_count: number | null; charge_percent: number | null };
-  smart_status: string | null;
-}
-export interface BackupStatus { configured: boolean; destinations: number; last_backup_ms: number | null; local_snapshots: number }
 export interface ScheduleRunFile { file: string; scheduleId: string; startedMs: number; sizeBytes: number }
 export interface DiskStatus { total_kb: number; free_kb: number; purgeable_kb: number | null; snapshots: number }
-/** Settings passed to the CLI as flags (CONTRACTS §2). Absent keys keep the CLI defaults and ~/.macleanuprc. */
-export interface RunOptions {
-  idleDays?: number;
-  cacheAgeDays?: number;
-  unusedAppDays?: number;
-  staleBuildDays?: number;
-  largeFileDays?: number;
-  largeFileSizeGb?: number;
-  scanRoots?: string[];
-  excludePaths?: string[];
-  noSudo?: boolean;
-}
-
+/** One desktop run: the CLI's only two `--json-events` invocations (src-tauri/src/run_args.rs). */
 export interface RunCliArgs {
-  sections: number[];
+  mode: 'allsafe' | 'scan';
+  /** True for a dry run of the all-safe cleanup: it proposes paths and removes nothing. */
   dryRun: boolean;
-  deepOk: boolean;
-  profile: string | null;
-  /** Unique paths the user chose to keep (left in place). */
-  keepPaths?: string[];
-  /** Unique paths to archive to ~/.macleanup/archives/ before removal. */
-  archivePaths?: string[];
-  options?: RunOptions;
 }
 export interface LocalHistoryEntry { file: string; kind: 'report' | 'log'; modified_ms: number; size_bytes: number }
 export interface ScheduleSpec {
@@ -61,13 +37,11 @@ export interface ScheduleSpec {
   dayOfMonth: number | null;
   hour: number;
   minute: number;
-  sections: number[];
 }
 
 export interface CliEventPayload { runId: string; line: unknown }
 export interface CliStderrPayload { runId: string; text: string }
 export interface CliExitPayload { runId: string; code: number | null; cancelled: boolean }
-export interface AskpassRequestPayload { requestId: string; prompt: string }
 export interface OauthCallbackPayload { url: string }
 export type MenuId = 'preferences' | 'check-updates' | 'new-preview' | 'history' | 'help' | 'about';
 export interface MenuPayload { id: MenuId }
@@ -76,7 +50,6 @@ interface EventMap {
   'cli-event': CliEventPayload;
   'cli-stderr': CliStderrPayload;
   'cli-exit': CliExitPayload;
-  'askpass-request': AskpassRequestPayload;
   'oauth-callback': OauthCallbackPayload;
   menu: MenuPayload;
 }
@@ -91,7 +64,7 @@ export function isTauri(): boolean {
 }
 
 const KNOWN: readonly AppErrorKind[] = [
-  'cli_missing', 'cli_failed', 'permission_denied', 'not_found', 'invalid_input', 'io', 'cancelled', 'not_in_app',
+  'cli_missing', 'cli_failed', 'permission_denied', 'not_found', 'invalid_input', 'io', 'not_in_app',
 ];
 
 /** Normalise anything a command can throw into an AppError. */
@@ -123,10 +96,8 @@ export const commands = {
   cliInfo: () => call<CliInfo>('cli_info'),
   systemInfo: () => call<SystemInfo>('system_info'),
   diskStatus: () => call<DiskStatus>('disk_status'),
-  healthInfo: () => call<HealthInfo>('health_info'),
   runCli: (args: RunCliArgs) => call<string>('run_cli', { ...args }),
   cancelRun: (runId: string) => call<void>('cancel_run', { runId }),
-  askpassReply: (requestId: string, password: string | null) => call<void>('askpass_reply', { requestId, password }),
   listLocalHistory: (limit: number) => call<LocalHistoryEntry[]>('list_local_history', { limit }),
   openPath: (path: string) => call<void>('open_path', { path }),
   revealPath: (path: string) => call<void>('reveal_path', { path }),
@@ -135,7 +106,6 @@ export const commands = {
   scheduleList: () => call<ScheduleSpec[]>('schedule_list'),
   scheduleInstall: (spec: ScheduleSpec) => call<void>('schedule_install', { ...spec }),
   scheduleRemove: (id: string) => call<void>('schedule_remove', { id }),
-  backupStatus: () => call<BackupStatus>('backup_status'),
   exportJson: (filename: string, content: string) => call<{ path: string }>('export_json', { filename, content }),
   setTrayMode: (enabled: boolean) => call<void>('set_tray_mode', { enabled }),
   listScheduleRuns: () => call<ScheduleRunFile[]>('list_schedule_runs'),

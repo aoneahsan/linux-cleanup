@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { ExternalLink, PageHead, PreviewBtn, goTo } from '@/components/ui/primitives';
+import { ExternalLink, PageHead, PreviewBtn } from '@/components/ui/primitives';
 import { useT } from '@/i18n';
 import { env } from '@/config/env';
 import { startSafePreview } from '@/services/previewLauncher';
@@ -50,7 +50,7 @@ export default function WalkthroughPage() {
   return (
     <div className="workbench">
       <PageHead id="h-walk" dateline={t('walkthrough.dateline')} title={t('walkthrough.title')} lede={t('walkthrough.lede')}
-        actions={<PreviewBtn tag={t('common.dryRun')} onPress={() => goTo(navigate, '/sections')}>{t('walkthrough.try')}</PreviewBtn>} />
+        actions={<PreviewBtn tag={t('common.dryRun')} onPress={() => void startSafePreview()}>{t('walkthrough.try')}</PreviewBtn>} />
       <div className="span-12">
         {STEPS.map((n) => {
           const h = t(`walkthrough.s${n}.h` as never);

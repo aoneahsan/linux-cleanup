@@ -1,5 +1,5 @@
 /**
- * The macleanup component vocabulary from the approved dummy: buttons (dashed =
+ * The linux-cleanup component vocabulary from the approved dummy: buttons (dashed =
  * preview, solid = changes files), section plates, recovery stamps, tag chips,
  * panels and state cards. Every interactive part is a React Aria primitive.
  */

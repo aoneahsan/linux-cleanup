@@ -1,33 +1,21 @@
-import { Radio, RadioGroup } from 'react-aria-components';
-import { AppLink, PreviewBtn, PageHead, Panel, Plate, RouterLink, Stamp, TagChip } from '@/components/ui/primitives';
-import { Icon } from '@/components/ui/Icon';
+import { AppLink, PreviewBtn, PageHead, Panel, TagChip } from '@/components/ui/primitives';
 import { DiskGauge } from '@/components/disk/DiskGauge';
 import { ReceiptSlip } from '@/components/receipt/ReceiptSlip';
 import { NotInApp } from '@/components/states/NotInApp';
 import { useT } from '@/i18n';
 import { formatDate, formatGiB } from '@/i18n/format';
-import { PROFILES, SAFE_BATCH, TIER, type ProfileId, type Tier } from '@/data/sections';
+import { ALL_SAFE } from '@/data/sections';
 import { useDisk, useSystemInfo } from '@/hooks/useLocal';
 import { useReceipts } from '@/stores/receipts';
-import { usePlan } from '@/stores/plan';
 import { useSettings } from '@/stores/settings';
-import { startPreview, startSafePreview } from '@/services/previewLauncher';
+import { startSafePreview } from '@/services/previewLauncher';
 import { isTauri } from '@/lib/tauri';
-import { ReviewPanels } from '@/pages/overview/ReviewPanels';
-import { HelpPanels } from '@/pages/overview/HelpPanels';
 
-/** A plate row for a list of section ids. */
-export function Plates({ ids }: { ids: readonly number[] }) {
-  return (
-    <span className="plate-row">
-      {ids.map((n) => (
-        <Plate key={n} id={n} tier={TIER[n] ?? 'read'} />
-      ))}
-    </span>
-  );
-}
-
-const tiersOf = (ids: readonly number[]): Tier[] => [...new Set(ids.map((n) => TIER[n] ?? 'read'))];
+/**
+ * Folders the CLI refuses to remove, from its own guard (`lib/common.sh` PROTECTED_PATHS).
+ * Shown as facts; the guard, not this list, does the protecting.
+ */
+const PROTECTED = ['~/Documents', '~/Pictures', '~/Music', '~/Videos', '~/Desktop', '~/.ssh', '~/.gnupg', '~/.config'] as const;
 
 function DiskPanel() {
   const t = useT();
@@ -50,17 +38,9 @@ function DiskPanel() {
               {formatGiB(disk.data.free_kb)}
               <small>{t('overview.disk.freeNow')}</small>
             </span>
-            {disk.data.snapshots > 0 ? <TagChip tone="note">{t('overview.disk.snapChip', { count: disk.data.snapshots })}</TagChip> : null}
           </div>
           <DiskGauge disk={disk.data} />
-          {disk.data.snapshots > 0 ? (
-            <div className="gauge-note">
-              <Icon name="alert" />
-              <p>
-                <b>{t('overview.disk.noteTitle')}</b> {t('overview.disk.noteBody')}
-              </p>
-            </div>
-          ) : null}
+          <p className="help lede mt-3">{t('overview.disk.home')}</p>
         </>
       ) : (
         <p className="gauge-detail">{t('states.loading')}</p>
@@ -69,9 +49,9 @@ function DiskPanel() {
   );
 }
 
-function OrderPanel() {
+function AllSafePanel() {
   const t = useT();
-  const last = useReceipts((s) => s.receipts.find((r) => r.dryRun && r.name === t('sections.safeBatch')));
+  const finding = useReceipts((s) => s.findings[ALL_SAFE] ?? null);
   return (
     <section className="panel inset span-4" aria-labelledby="h-order" data-tour={t('overview.order.tour')}>
       <div className="order">
@@ -81,14 +61,8 @@ function OrderPanel() {
           <span className="rule" />
         </div>
         <h3>{t('overview.order.heading')}</h3>
-        <div className="meta">
-          {tiersOf(SAFE_BATCH).map((tier) => (
-            <Stamp key={tier} tier={tier} />
-          ))}
-        </div>
-        <Plates ids={SAFE_BATCH} />
         <p className="lede">
-          {t('overview.order.lede')} {last ? t('overview.order.lastPreviewed', { date: formatDate(last.at) }) : null}
+          {t('overview.order.lede')} {finding ? t('overview.order.lastPreviewed', { date: formatDate(finding.at) }) : null}
         </p>
         <div className="stack">
           <PreviewBtn tag={t('common.dryRun')} onPress={() => void startSafePreview()}>
@@ -104,38 +78,17 @@ function OrderPanel() {
   );
 }
 
-function ProfilesPanel() {
+function StaysPanel() {
   const t = useT();
-  const id = usePlan((s) => s.overviewProfile) as ProfileId;
-  const setId = usePlan((s) => s.setOverviewProfile);
-  const p = PROFILES.find((x) => x.id === id) ?? PROFILES[0];
-  if (!p) return null;
-  const tiers = tiersOf(p.sections);
   return (
-    <Panel idx={t('overview.profiles.idx')} title={t('overview.profiles.title')} titleId="h-profiles" className="span-12" aside={t('overview.profiles.aside')} tour={t('overview.profiles.tour')}>
-      <RadioGroup aria-labelledby="h-profiles" value={id} onChange={(v) => setId(v as ProfileId)} orientation="horizontal">
-        <div className="profiles">
-          {PROFILES.map((x) => (
-            <Radio key={x.id} value={x.id} className="profile">
-              <span className="pname">{t('overview.profiles.flag', { id: x.id })}</span>
-              <span className="pdesc">{t(`sections.profiles.${x.id}`)}</span>
-              <Plates ids={x.sections} />
-            </Radio>
-          ))}
-        </div>
-      </RadioGroup>
-      <div className="profile-detail">
-        <p className="lede">
-          <b>{t('overview.profiles.count', { count: p.sections.length })}</b>{' '}
-          {tiers.map((tier) => (
-            <Stamp key={tier} tier={tier} />
-          ))}{' '}
-          {tiers.includes('permanent') ? t('overview.profiles.permanentNote') : null}
-        </p>
-        <PreviewBtn tag={t('common.dryRun')} onPress={() => void startPreview(p.sections, t('overview.profiles.runName', { id: p.id }), p.id)}>
-          {t('overview.profiles.preview', { id: p.id })}
-        </PreviewBtn>
-      </div>
+    <Panel idx={t('overview.stays.idx')} title={t('overview.stays.title')} titleId="h-stays" className="span-7" tour={t('overview.stays.tour')}>
+      <p className="lede">{t('overview.stays.lede')}</p>
+      <ul className="path-list mt-3">
+        {PROTECTED.map((p) => (
+          <li key={p}><span className="path">{p}</span></li>
+        ))}
+      </ul>
+      <p className="help lede mt-3">{t('overview.stays.note')}</p>
     </Panel>
   );
 }
@@ -158,7 +111,7 @@ function ReceiptsPanel() {
   );
 }
 
-/** Overview: the disk gauge, the next preview, profiles, receipts and the review panels. */
+/** Overview: free space, the all-safe dry run, what always stays, and the latest receipts. */
 export default function OverviewPage() {
   const t = useT();
   const sys = useSystemInfo();
@@ -167,27 +120,19 @@ export default function OverviewPage() {
     <div className="workbench">
       <PageHead
         id="h-overview"
-        dateline={sys.data ? t('overview.dateline', { version: sys.data.os_version }) : t('overview.datelineNoMac')}
+        dateline={sys.data ? t('overview.dateline', { version: sys.data.os_version }) : t('overview.datelineNoMachine')}
         title={t('overview.title')}
         lede={t('overview.lede')}
         actions={
-          <>
-            <PreviewBtn tag={t('common.dryRun')} kbd={previewKeys} onPress={() => void startSafePreview()}>
-              {t('overview.previewSafe')}
-            </PreviewBtn>
-            <RouterLink to="/sections" className="btn btn-quiet">
-              <Icon name="plates" />
-              {t('overview.choose')}
-            </RouterLink>
-          </>
+          <PreviewBtn tag={t('common.dryRun')} kbd={previewKeys} onPress={() => void startSafePreview()}>
+            {t('overview.previewSafe')}
+          </PreviewBtn>
         }
       />
       <DiskPanel />
-      <OrderPanel />
-      <ProfilesPanel />
+      <AllSafePanel />
+      <StaysPanel />
       <ReceiptsPanel />
-      <ReviewPanels />
-      <HelpPanels />
     </div>
   );
 }

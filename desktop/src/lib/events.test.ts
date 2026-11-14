@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { finishStream, foldLines, initialRunState, INTERRUPTED_REASON, tally } from '@/lib/events';
+import { finishStream, foldLines, initialRunState, INTERRUPTED_REASON, sectionId, tally } from '@/lib/events';
 
 const line = (o: object) => JSON.stringify({ v: 1, ts: 1, ...o });
 
@@ -100,5 +100,40 @@ describe('events parser', () => {
     expect(s.phase).toBe('refused');
     expect(s.refusedVersion).toBe(2);
     expect(finishStream(s).phase).toBe('refused');
+  });
+});
+
+describe('linux-cleanup stream (CLI 2.1.0, --all-safe --yes --dry-run --json-events)', () => {
+  const lines = [
+    '{"v":1,"type":"plan","ts":1,"version":"2.1.0","dry_run":true,"profile":null,"sections":[{"id":"allsafe","title":"allsafe","stamp":"routine","sudo":false,"deep":false}]}',
+    '{"v":1,"type":"disk","ts":2,"phase":"before","total_kb":982860220,"free_kb":314453464,"purgeable_kb":null,"snapshots":null,"snapshot_note":false}',
+    '{"v":1,"type":"section_start","ts":3,"id":"allsafe","title":"allsafe","stamp":"routine"}',
+    '{"v":1,"type":"item","ts":4,"id":"allsafe","path":"/home/u/.cache/thumbnails","kb":2048,"action":"delete","unique":false,"age_days":null,"reason":"Thumbnail cache"}',
+    '{"v":1,"type":"item","ts":5,"id":"allsafe","path":"/home/u/Documents","kb":0,"action":"skip","unique":false,"age_days":null,"reason":"protected path"}',
+    '{"v":1,"type":"progress","ts":6,"id":"allsafe","done":1,"total":1}',
+    '{"v":1,"type":"section_result","ts":7,"id":"allsafe","status":"completed","freed_kb":null,"items":null,"reason":null}',
+    '{"v":1,"type":"disk","ts":8,"phase":"after","total_kb":982860220,"free_kb":314453464,"purgeable_kb":null,"snapshots":null,"snapshot_note":false}',
+    '{"v":1,"type":"summary","ts":9,"attempted":["allsafe"],"completed":["allsafe"],"skipped":[],"failed":[],"freed_kb":null,"disk_free_before_kb":314453464,"disk_free_after_kb":314453464,"elapsed_s":1,"reports":[],"log":null,"dry_run":true}',
+  ].join('\n');
+
+  it('maps the mode name to section 0 and folds the whole stream', () => {
+    const s = foldLines(initialRunState(), lines);
+    expect(s.phase).toBe('finished');
+    expect(s.order).toEqual([0]);
+    const sec = s.sections[0];
+    expect(sec?.state).toBe('completed');
+    expect(sec?.itemCount).toBe(2);
+    // Only the proposed delete counts; the protected-path refusal frees nothing.
+    expect(sec?.plannedKb).toBe(2048);
+    expect(s.summary?.completed).toEqual([0]);
+    expect(s.summary?.freedKb).toBe(0);
+  });
+
+  it('ignores an id that is neither a known mode nor a number', () => {
+    expect(sectionId('allsafe')).toBe(0);
+    expect(sectionId('scan')).toBe(1);
+    expect(sectionId('nuke')).toBe(-1);
+    expect(sectionId(3)).toBe(3);
+    expect(sectionId(-2)).toBe(-1);
   });
 });

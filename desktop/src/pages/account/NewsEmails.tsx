@@ -11,7 +11,7 @@ type NewsStatus = 'none' | 'active' | 'pending_confirmation' | 'unsubscribed' | 
 
 /**
  * Optional release emails for the signed-in account's Google address (the `news` function, FilesHub
- * "macleanup news" list). Account emails and important product updates never depend on this switch.
+ * "linux-cleanup releases" list). Account emails and important product updates never depend on this switch.
  */
 export function NewsEmails() {
   const t = useT();

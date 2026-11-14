@@ -9,7 +9,6 @@ import { Toasts } from '@/components/shell/Toasts';
 import { LegalBar } from '@/components/shell/LegalBar';
 import { TourBinder } from '@/components/shell/TourBinder';
 import { PreviewSheet } from '@/components/run/PreviewSheet';
-import { SudoSheet } from '@/components/run/SudoSheet';
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts';
 import { bindRunEvents } from '@/stores/run';
 import { initAppearance } from '@/theme/apply';
@@ -20,7 +19,6 @@ import { startAnalytics } from '@/services/analytics';
 import { commands } from '@/lib/tauri';
 import { bindAutoUpdate } from '@/services/autoUpdate';
 import { bindReleaseGate } from '@/services/releaseCheck';
-import { bindAutoBackup } from '@/services/autoBackup';
 import { bindLicenceCheck, licenceCheckEnabled } from '@/services/licensing/licenceCheck';
 import { useReleaseGate } from '@/stores/releaseGate';
 import { useSettings } from '@/stores/settings';
@@ -44,10 +42,10 @@ export function AppShell() {
   useEffect(() => bindSettingsSync(), []);
   useEffect(() => bindScheduleIngest(), []);
   useEffect(() => startAnalytics(), []);
-  // Update flow: layer 1 checks at start and every 6 h; layer 2 reads the release record.
+  // Update flow: layer 1 (signed updater) and layer 2 (release record) check at start, on return
+  // and the moment a release is published (services/releaseBroadcast).
   useEffect(() => bindAutoUpdate(), []);
   useEffect(() => bindReleaseGate(), []);
-  useEffect(() => bindAutoBackup(), []);
   useEffect(() => bindLicenceCheck(), []);
   useEffect(() => {
     void bootAccount();
@@ -69,7 +67,7 @@ export function AppShell() {
       </div>
       <CommandPalette />
       <PreviewSheet />
-      <SudoSheet />
+      
       <TourBinder pathname={pathname} />
       <LegalBar taskPage={TASK.has(pathname)} />
       {gate ? <Suspense fallback={null}><ReleaseGate /></Suspense> : null}

@@ -29,20 +29,6 @@ const overview = createRoute({
   component: lazyRouteComponent(() => import('@/pages/overview/OverviewPage')),
 });
 
-const sectionsSearch = z.object({
-  s: z.coerce.number().int().min(0).max(27).optional().catch(undefined),
-  shelf: z.enum(['all', 'dev', 'caches', 'storage', 'system', 'reports']).optional().catch(undefined),
-  off: z.string().regex(/^[a-z,]*$/).optional().catch(undefined),
-  q: z.string().max(60).optional().catch(undefined),
-});
-const sections = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/sections',
-  validateSearch: sectionsSearch,
-  component: lazyRouteComponent(() => import('@/pages/sections/SectionsPage')),
-});
-
-const profiles = page('/profiles', () => import('@/pages/sections/ProfilesPage'));
 const preview = page('/preview', () => import('@/pages/flow/PreviewPage'));
 const confirm = page('/confirm', () => import('@/pages/flow/ConfirmPage'));
 const run = page('/run', () => import('@/pages/flow/RunPage'));
@@ -59,28 +45,17 @@ const history = createRoute({
   component: lazyRouteComponent(() => import('@/pages/flow/HistoryPage')),
 });
 
-const apps = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/apps',
-  validateSearch: z.object({ tab: z.enum(['all', 'removed', 'unused', 'tool']).optional().catch(undefined) }),
-  component: lazyRouteComponent(() => import('@/pages/review/AppsPage')),
-});
-const services = page('/services', () => import('@/pages/review/ServicesPage'));
-const orphans = page('/orphans', () => import('@/pages/review/OrphansPage'));
-const snapshots = page('/snapshots', () => import('@/pages/review/SnapshotsPage'));
-const assistant = page('/assistant', () => import('@/pages/review/AssistantPage'));
-
 const settings = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings',
-  validateSearch: z.object({ tab: z.enum(['clean', 'folders', 'notify', 'privacy', 'keys']).optional().catch(undefined) }),
+  validateSearch: z.object({ tab: z.enum(['general', 'notify', 'privacy', 'keys']).optional().catch(undefined) }),
   component: lazyRouteComponent(() => import('@/pages/settings/SettingsPage')),
 });
 
 const onboarding = createRoute({
   getParentRoute: () => rootRoute,
   path: '/onboarding',
-  validateSearch: z.object({ step: z.coerce.number().int().min(1).max(5).optional().catch(undefined) }),
+  validateSearch: z.object({ step: z.coerce.number().int().min(1).max(3).optional().catch(undefined) }),
   component: lazyRouteComponent(() => import('@/pages/help/OnboardingPage')),
 });
 const updates = page('/updates', () => import('@/pages/help/UpdatesPage'));
@@ -96,7 +71,6 @@ const plans = createRoute({
   component: lazyRouteComponent(() => import('@/pages/account/PlansPage')),
 });
 const team = page('/team', () => import('@/pages/account/TeamPage'));
-const backups = page('/backups', () => import('@/pages/account/BackupsPage'));
 
 const adminOverview = page('/admin', () => import('@/pages/admin/AdminOverviewPage'));
 const adminUsers = createRoute({
@@ -124,9 +98,9 @@ const walkthrough = createRoute({
   component: lazyRouteComponent(() => import('@/pages/help/WalkthroughPage')),
 });
 
-const routeTree = rootRoute.addChildren([walkthrough, adminOverview, adminUsers, adminPlans, adminGrants, adminConfig, adminAudit, adminReleases, account, plans, team, backups, schedules, settings, onboarding, updates, errors, overview, sections, profiles, preview, confirm, run, receipt, history, apps, services, orphans, snapshots, assistant]);
+const routeTree = rootRoute.addChildren([walkthrough, adminOverview, adminUsers, adminPlans, adminGrants, adminConfig, adminAudit, adminReleases, account, plans, team, schedules, settings, onboarding, updates, errors, overview, preview, confirm, run, receipt, history]);
 
-registerPaths(['/walkthrough', '/', '/sections', '/profiles', '/preview', '/confirm', '/run', '/receipt', '/history', '/apps', '/services', '/orphans', '/snapshots', '/assistant', '/settings', '/schedules', '/account', '/plans', '/team', '/backups', '/admin', '/admin/users', '/admin/plans', '/admin/grants', '/admin/config', '/admin/audit', '/admin/releases', '/onboarding', '/updates', '/errors']);
+registerPaths(['/walkthrough', '/', '/preview', '/confirm', '/run', '/receipt', '/history', '/settings', '/schedules', '/account', '/plans', '/team', '/admin', '/admin/users', '/admin/plans', '/admin/grants', '/admin/config', '/admin/audit', '/admin/releases', '/onboarding', '/updates', '/errors']);
 
 export const router = createRouter({
   routeTree,

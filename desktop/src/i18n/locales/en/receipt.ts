@@ -10,6 +10,6 @@ export default {
   freeChange: '{{before}} → {{after}}',
   nothingDeleted: 'Nothing deleted',
   sectionsLine: 'Sections {{ids}}',
-  interrupted: 'The run was interrupted; unfinished sections are counted as failed.',
-  cancelled: 'Cancelled by you; unfinished sections are listed as failed: interrupted.',
+  interrupted: 'The run was interrupted; the unfinished step is counted as failed.',
+  cancelled: 'Cancelled by you; the unfinished step is listed as failed: interrupted.',
 } as const;

@@ -1,7 +1,10 @@
 /**
- * The one parser for the macleanup `--json-events` NDJSON stream (schema v1,
- * `macleanup/docs/json-events.md`). Pure: it folds parsed event objects into a
+ * The one parser for the linux-cleanup `--json-events` NDJSON stream (schema v1,
+ * `linux-cleanup/docs/reference/json-events.md`). Pure: it folds parsed event objects into a
  * run state. No I/O, no clocks, no React — so the pre-approved test can pin it.
+ *
+ * The CLI names its one section by mode (`"allsafe"`, `"scan"`); the app and the server key
+ * sections by number, so `sectionId` maps the mode names once, here, at the boundary.
  */
 
 export const SCHEMA_VERSION = 1;
@@ -37,7 +40,9 @@ export interface RunItem {
   unique: boolean;
   /** 5.2.0+: days since last opened or changed; null when unknown or not sent. */
   ageDays: number | null;
-  /** 5.2.0+: section 0's toolchain inventory names the tool and its version. */
+  /** Why the CLI chose this path or refused it, e.g. "protected path" (linux-cleanup 2.1.0). */
+  reason?: string;
+  /** Optional tool name and version some streams attach to an inventory row. */
   tool?: string;
   version?: string;
 }
@@ -114,7 +119,17 @@ const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !
 const num = (v: unknown, fallback = 0): number => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
 const numOrNull = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
 const str = (v: unknown): string | null => (typeof v === 'string' ? v : null);
-const ids = (v: unknown): number[] => (Array.isArray(v) ? v.filter((x): x is number => typeof x === 'number') : []);
+/** Section numbers for the CLI's mode names. 0 is the all-safe cleanup (also the server's id). */
+export const MODE_SECTION: Readonly<Record<string, number>> = { allsafe: 0, scan: 1 };
+
+/** A section id from the stream: a mode name or a number; -1 when it is neither. */
+export function sectionId(v: unknown): number {
+  if (typeof v === 'number' && Number.isInteger(v) && v >= 0) return v;
+  if (typeof v === 'string' && v in MODE_SECTION) return MODE_SECTION[v] ?? -1;
+  return -1;
+}
+
+const ids = (v: unknown): number[] => (Array.isArray(v) ? v.map(sectionId).filter((x) => x >= 0) : []);
 const strs = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
 
 const STAMPS: readonly Stamp[] = ['routine', 'trash', 'permanent', 'read'];
@@ -159,7 +174,7 @@ export function foldEvent(state: RunState, event: unknown): RunState {
   const v = num(event.v, SCHEMA_VERSION);
   if (v > SCHEMA_VERSION) return { ...state, phase: 'refused', refusedVersion: v };
   const s: RunState = { ...state, lastTs: numOrNull(event.ts) ?? state.lastTs };
-  const id = num(event.id, -1);
+  const id = sectionId(event.id);
 
   switch (event.type) {
     case 'plan': {
@@ -167,7 +182,7 @@ export function foldEvent(state: RunState, event: unknown): RunState {
       const sections: Record<number, SectionRun> = {};
       const order: number[] = [];
       for (const p of planned) {
-        const pid = num(p.id, -1);
+        const pid = sectionId(p.id);
         if (pid < 0) continue;
         order.push(pid);
         sections[pid] = {
@@ -196,6 +211,8 @@ export function foldEvent(state: RunState, event: unknown): RunState {
       if (id < 0) return s;
       const action = ACTIONS.includes(event.action as ItemAction) ? (event.action as ItemAction) : 'report';
       const item: RunItem = { path: str(event.path) ?? '', kb: num(event.kb), action, unique: event.unique === true, ageDays: numOrNull(event.age_days) };
+      const reason = str(event.reason);
+      if (reason) item.reason = reason;
       const tool = str(event.tool);
       const version = str(event.version);
       if (tool) item.tool = tool;

@@ -1,14 +1,15 @@
 /**
- * Update flow layer 2 (CONTRACTS "Releases (2026-10-30)"): read the newest
- * `desktop` release record for this build's channel after the first paint, every
- * 15 minutes, and when the window comes back (at most once a minute); decide with
+ * Update flow layer 2 (CONTRACTS "Releases"): read the newest `desktop` release record
+ * for this build's channel after the first paint, the moment a release is published
+ * (Realtime broadcast), and when the window comes back (at most once a minute); decide with
  * the pure `decide()`. A failed read fails open, except that a normal release
  * stored by an earlier start still blocks. The stored notice lives in
  * strata-storage with this start's number, so "from the next start" works.
  */
 import { env } from '@/config/env';
 import { decide } from '@/lib/releaseGate';
-import { GATE_CHECK_EVERY_MS, mayRecheck, nextStartCount, readStoredNotice } from '@/lib/updatePolicy';
+import { mayRecheck, nextStartCount, readStoredNotice } from '@/lib/updatePolicy';
+import { onReleasePublished } from '@/services/releaseBroadcast';
 import { load, remove, save } from '@/lib/storage';
 import { openExternal } from '@/lib/open';
 import { logger } from '@/lib/logger';
@@ -93,12 +94,14 @@ export async function runUpdate(): Promise<void> {
   }
 }
 
-/** Bind the schedule once (AppShell): after first paint, every 15 min, on return. Returns the cleanup. */
+/** Bind once (AppShell): after first paint, on every published release, on return. Returns the cleanup. */
 export function bindReleaseGate(): () => void {
   const check = () => void checkRelease().catch((error: unknown) => logger.warn('release check failed', error instanceof Error ? error.message : String(error)));
   let first = 0;
   const frame = window.requestAnimationFrame(() => { first = window.setTimeout(check, 0); });
-  const every = window.setInterval(check, GATE_CHECK_EVERY_MS);
+  const offRelease = onReleasePublished((release) => {
+    if (!release || (release.platform === 'desktop' && release.channel === env.releaseChannel)) check();
+  });
   const onReturn = () => {
     if (document.hidden) return;
     if (mayRecheck(useReleaseGate.getState().lastChecked, Date.now())) check();
@@ -108,7 +111,7 @@ export function bindReleaseGate(): () => void {
   return () => {
     window.cancelAnimationFrame(frame);
     window.clearTimeout(first);
-    window.clearInterval(every);
+    offRelease();
     document.removeEventListener('visibilitychange', onReturn);
     window.removeEventListener('focus', onReturn);
   };

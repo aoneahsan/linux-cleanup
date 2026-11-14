@@ -22,7 +22,7 @@ export function useGlobalShortcuts(): void {
       if (hit === 'search') useOverlays.getState().setPaletteOpen(!useOverlays.getState().paletteOpen);
       else if (hit === 'preview') void startSafePreview();
       else if (hit === 'appearance') useOverlays.getState().setThemeOpen(true);
-      else if (hit === 'sections') goTo(navigate, '/sections');
+      else if (hit === 'ledger') goTo(navigate, '/preview');
       else if (hit === 'history') goTo(navigate, '/history');
       else if (hit === 'cancel' && isActive(useRun.getState())) void useRun.getState().cancel();
     };

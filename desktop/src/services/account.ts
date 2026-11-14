@@ -64,7 +64,7 @@ export async function callFunction<T>(name: string, init: { method?: 'GET' | 'PO
 let deviceId: string | null = null;
 const OVERRIDE_KEY = 'device-id-override';
 
-/** This Mac's device id: a replacement stored after a failed hand-over, else system_info's. */
+/** This computer's device id: a replacement stored after a failed hand-over, else system_info's. */
 export async function getDeviceId(): Promise<string> {
   if (deviceId) return deviceId;
   const override = load<string | null>(OVERRIDE_KEY, null);
@@ -139,7 +139,7 @@ export async function handoffBegin(): Promise<string | null> {
   return (data as { code?: string } | null)?.code ?? null;
 }
 
-/** Finish the hand-over in the new session; without a valid code the Mac gets a new device id. */
+/** Finish the hand-over in the new session; without a valid code the computer gets a new device id. */
 export async function handoffComplete(code: string | null): Promise<void> {
   const sb = supabase();
   if (!sb) return;

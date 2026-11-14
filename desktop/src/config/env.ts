@@ -18,8 +18,8 @@ export const env = {
   supabaseUrl,
   supabaseKey,
   accountsConfigured: missingSupabaseVars.length === 0,
-  websiteUrl: read(import.meta.env.VITE_APP_WEBSITE_URL) || 'https://macleanup.aoneahsan.com',
-  docsUrl: read(import.meta.env.VITE_DOCS_URL) || 'https://macleanup-docs.aoneahsan.com',
+  websiteUrl: read(import.meta.env.VITE_APP_WEBSITE_URL) || 'https://linux-cleanup.aoneahsan.com',
+  docsUrl: read(import.meta.env.VITE_DOCS_URL) || 'https://linux-cleanup-docs.aoneahsan.com',
   appVersion: __APP_VERSION__,
   /** The release-record channel this build reads (update flow layer 2). Test builds set `test`. */
   releaseChannel: (read(import.meta.env.VITE_RELEASE_CHANNEL) === 'test' ? 'test' : 'production') as 'production' | 'test',

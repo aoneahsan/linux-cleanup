@@ -9,7 +9,7 @@ import { useSession } from '@/stores/session';
 import { useOverlays } from '@/stores/overlays';
 import { useSettings } from '@/stores/settings';
 
-/** Overlay title bar: 78 px inset for the traffic lights, drag region, crumb, ⌘K, tour, theme, account. */
+/** The app bar under the native window frame: mark, crumb, search (Ctrl+K), tour, theme, account. */
 export function Titlebar() {
   const t = useT();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -23,18 +23,13 @@ export function Titlebar() {
   const initials = displayName ? displayName.split(/\s+/).map((w) => w[0] ?? '').join('').slice(0, 2).toUpperCase() : '—';
 
   return (
-    <header className="titlebar" data-tauri-drag-region>
-      <div className="traffic" aria-hidden="true" data-tauri-drag-region>
-        <span />
-        <span />
-        <span />
-      </div>
+    <header className="titlebar">
       <RouterLink to="/" className="mark">
         <img src="/logo.svg" alt="" />
         {t('shell.brand')}
       </RouterLink>
       {nav ? (
-        <span className="crumb" data-tauri-drag-region>
+        <span className="crumb">
           {t('shell.crumbSeparator', { group: t(`shell.rail.groups.${nav.group}`) })}
           <b>{t(nav.item.label)}</b>
         </span>

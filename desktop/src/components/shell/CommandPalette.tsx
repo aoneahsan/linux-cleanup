@@ -3,8 +3,7 @@ import { Autocomplete, Dialog, Input, Menu, MenuItem, Modal, ModalOverlay, TextF
 import { useNavigate } from '@tanstack/react-router';
 import { Plate, Stamp, TagChip, goTo } from '@/components/ui/primitives';
 import { useT } from '@/i18n';
-import { plate } from '@/i18n/format';
-import { SECTION_IDS, TIER } from '@/data/sections';
+import { TIER } from '@/data/sections';
 import { NAV } from '@/router/nav';
 import { isRegistered } from '@/router/registry';
 import { useOverlays } from '@/stores/overlays';
@@ -24,7 +23,7 @@ interface Entry {
   section?: number;
 }
 
-/** ⌘K command palette: sections, screens and actions by number, name or tier. */
+/** Ctrl+K command palette: sections, screens and actions by number, name or tier. */
 export function CommandPalette() {
   const t = useT();
   const open = useOverlays((s) => s.paletteOpen);
@@ -48,12 +47,7 @@ export function CommandPalette() {
         run: () => goTo(navigate, i.to),
       })),
     );
-    const sections: Entry[] = SECTION_IDS.map((n) => ({
-      id: `p-${n}`, kind: 'section' as const, section: n,
-      text: `${plate(n)} ${t(`sections.s${n}.title` as never)} ${t(`common.tiers.${TIER[n] ?? 'read'}`)}`,
-      run: () => void navigate({ to: '/sections', search: { s: n } as never }),
-    }));
-    return [...actions, ...screens, ...sections];
+    return [...actions, ...screens];
   }, [t, role, navigate, startTour, bindings]);
 
   return (

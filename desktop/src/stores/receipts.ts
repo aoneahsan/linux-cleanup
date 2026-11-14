@@ -1,5 +1,5 @@
 /**
- * Local receipts and the latest findings per section. Both live only on this Mac
+ * Local receipts and the latest findings per section. Both live only on this computer
  * (strata-storage); a synced run summary never carries a path (CONTRACTS §3).
  */
 import { create } from 'zustand';
@@ -38,10 +38,6 @@ export interface Receipt {
   errors: string[];
   claimId: string | null;
   schedule?: { id: string; name: string; ranAt: number; nextAt: number | null };
-  /** Restored to this Mac from a Pro receipt backup (the summary only: no reports, log or paths). */
-  restored?: true;
-  /** A receipt backup holds this receipt. */
-  backedUp?: true;
 }
 
 /** The latest preview findings for one section, kept for the review screens. */
@@ -57,10 +53,6 @@ interface ReceiptsState {
   receipts: Receipt[];
   findings: Record<number, Finding>;
   record: (args: { state: RunState; dryRun: boolean; name: string; profile: string | null; cancelled: boolean; claimId: string | null; at: number; schedule?: Receipt['schedule'] }) => Receipt;
-  /** Merge a restored receipt into this Mac's history (newest first). False when it is already here. */
-  addRestored: (receipt: Receipt) => boolean;
-  /** Mark receipts a backup now holds. */
-  markBackedUp: (ids: readonly string[]) => void;
 }
 
 export const useReceipts = create<ReceiptsState>((set, get) => ({
@@ -105,20 +97,5 @@ export const useReceipts = create<ReceiptsState>((set, get) => ({
     }
     set({ receipts, findings });
     return receipt;
-  },
-  addRestored: (receipt) => {
-    if (get().receipts.some((r) => r.id === receipt.id)) return false;
-    const receipts = [...get().receipts, { ...receipt, restored: true as const, backedUp: true as const }].sort((a, b) => b.at - a.at).slice(0, RECEIPTS_CAP);
-    save('receipts', receipts);
-    set({ receipts });
-    return receipts.some((r) => r.id === receipt.id);
-  },
-  markBackedUp: (ids) => {
-    if (!ids.length) return;
-    const want = new Set(ids);
-    if (!get().receipts.some((r) => want.has(r.id) && !r.backedUp)) return;
-    const receipts = get().receipts.map((r) => (want.has(r.id) && !r.backedUp ? { ...r, backedUp: true as const } : r));
-    save('receipts', receipts);
-    set({ receipts });
   },
 }));

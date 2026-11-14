@@ -1,12 +1,15 @@
 /**
- * Update flow layer 1 schedule: check for a signed update at start and every
- * 6 hours. With automatic updates on, download and install it at once, then
+ * Update flow layer 1: check for a signed update at start, the moment a desktop release is
+ * published (Realtime broadcast, services/releaseBroadcast) and when the window comes back
+ * (at most once a minute). With automatic updates on, download and install it at once, then
  * relaunch at a quiet moment only — no run live, and the window hidden or
  * unfocused for 2 minutes or idle for 10. With them off, the Updates screen keeps
  * its "ready, relaunch" card and nothing happens by itself.
  */
 import { checkForUpdate, installUpdate, relaunch } from '@/services/updater';
-import { isQuietMoment, UPDATE_CHECK_EVERY_MS } from '@/lib/updatePolicy';
+import { env } from '@/config/env';
+import { isQuietMoment, mayRecheck } from '@/lib/updatePolicy';
+import { onReleasePublished } from '@/services/releaseBroadcast';
 import { useSettings } from '@/stores/settings';
 import { useUpdateState } from '@/stores/update';
 import { isActive, useRun } from '@/stores/run';
@@ -31,9 +34,10 @@ export function bindAutoUpdate(): () => void {
 
   const away = () => { hiddenSince ??= Date.now(); };
   const back = () => { if (!document.hidden) hiddenSince = null; lastActivity = Date.now(); };
-  const onVisibility = () => (document.hidden ? away() : back());
+  const onVisibility = () => { if (document.hidden) away(); else { back(); onReturn(); } };
   const onActivity = () => { lastActivity = Date.now(); };
 
+  // A local idle watch (no network): it only decides when an already-downloaded update relaunches.
   const quiet = window.setInterval(() => {
     if (relaunching || useUpdateState.getState().status !== 'ready' || !useSettings.getState().settings.updatesAuto) return;
     if (!isQuietMoment({ runLive: isActive(useRun.getState()), hiddenSince, lastActivity, now: Date.now() })) return;
@@ -44,9 +48,18 @@ export function bindAutoUpdate(): () => void {
     });
   }, QUIET_POLL_MS);
 
-  const run = () => void tick().catch((error: unknown) => logger.warn('scheduled update failed', error instanceof Error ? error.message : String(error)));
+  let lastCheck: number | null = null;
+  const run = () => {
+    lastCheck = Date.now();
+    void tick().catch((error: unknown) => logger.warn('update check failed', error instanceof Error ? error.message : String(error)));
+  };
   run();
-  const every = window.setInterval(run, UPDATE_CHECK_EVERY_MS);
+  const offRelease = onReleasePublished((release) => {
+    if (!release || (release.platform === 'desktop' && release.channel === env.releaseChannel)) run();
+  });
+  const onReturn = () => {
+    if (!document.hidden && mayRecheck(lastCheck, Date.now())) run();
+  };
 
   document.addEventListener('visibilitychange', onVisibility);
   window.addEventListener('blur', away);
@@ -54,7 +67,7 @@ export function bindAutoUpdate(): () => void {
   for (const ev of ACTIVITY) window.addEventListener(ev, onActivity, { passive: true });
   return () => {
     window.clearInterval(quiet);
-    window.clearInterval(every);
+    offRelease();
     document.removeEventListener('visibilitychange', onVisibility);
     window.removeEventListener('blur', away);
     window.removeEventListener('focus', back);

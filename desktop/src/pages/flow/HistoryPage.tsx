@@ -18,7 +18,7 @@ import { getDeviceId } from '@/services/account';
 type Kind = 'all' | 'real' | 'preview' | 'synced';
 const PAGE = 20;
 
-/** Numbers-only CSV of receipts: no path ever leaves the Mac. */
+/** Numbers-only CSV of receipts: no path ever leaves the computer. */
 function toCsv(rows: Receipt[]): string {
   const head = 'when,name,kind,sections,attempted,completed,skipped,failed,freed_kb,free_before_kb,free_after_kb';
   const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
@@ -40,7 +40,7 @@ function Rows({ rows }: { rows: Receipt[] }) {
       <>
         <span className={`badge${c.row.original.dryRun ? '' : ' accent'}`}>{c.row.original.dryRun ? t('flow.history.kindPreview') : t('flow.history.kindReal')}</span>
         {c.row.original.schedule ? <> <span className="tagchip pro">{t('schedules.scheduledTag')}</span></> : null}
-        {c.row.original.restored ? <> <span className="tagchip note">{t('flow.history.restoredTag')}</span></> : null}
+        
       </>
     ) }),
     col.accessor((r) => r.sections.length, { id: 'sections', header: t('flow.history.colSections'), meta: { num: true } }),
@@ -73,7 +73,7 @@ function AppLinkReceipt({ id }: { id: string }) {
   return <Button className="link-arrow" onPress={() => void navigate({ to: '/receipt', search: { id } })}>{t('flow.history.open')}</Button>;
 }
 
-/** History: every local receipt, filterable by kind; synced receipts from other Macs when signed in. */
+/** History: every local receipt, filterable by kind; synced receipts from other computers when signed in. */
 export default function HistoryPage() {
   const t = useT();
   const search = useSearch({ from: '/history' });
@@ -131,9 +131,9 @@ export default function HistoryPage() {
       <Panel idx="§ 02" title={t('flow.history.filesTitle')} titleId="h-files" className="span-6" inset>
         <dl className="kv">
           <dt>{t('flow.history.logs')}</dt>
-          <dd>{t('flow.history.filesLine', { dir: '~/.macleanup/logs', count: logs.count, size: formatKb(logs.size / 1024) })}</dd>
+          <dd>{t('flow.history.filesLine', { dir: '~/.linux-cleanup/logs', count: logs.count, size: formatKb(logs.size / 1024) })}</dd>
           <dt>{t('flow.history.reports')}</dt>
-          <dd>{t('flow.history.filesLine', { dir: '~/.macleanup/reports', count: reports.count, size: formatKb(reports.size / 1024) })}</dd>
+          <dd>{t('flow.history.filesLine', { dir: '~/.linux-cleanup/reports', count: reports.count, size: formatKb(reports.size / 1024) })}</dd>
           <dt>{t('flow.history.keptFor')}</dt>
           <dd>{t('flow.history.keptForValue')}</dd>
         </dl>
@@ -165,7 +165,7 @@ interface SyncedSummary {
 
 type RawSummary = Omit<SyncedSummary, 'sections'> & { run_summary_sections: SyncedSummary['sections'] | null };
 
-/** Receipts synced from the account's other Macs (numbers only), read under RLS, newest 20. */
+/** Receipts synced from the account's other computers (numbers only), read under RLS, newest 20. */
 function SyncedRows() {
   const t = useT();
   const q = useQuery({

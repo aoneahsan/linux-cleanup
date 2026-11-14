@@ -1,6 +1,6 @@
 /**
  * After a run ends: sync its numbers (never a path) for signed-in Google accounts,
- * and post the opt-in macOS notification with the receipt's totals.
+ * and post the opt-in desktop notification with the receipt's totals.
  */
 import { translate } from '@/i18n';
 import { formatDateTime } from '@/i18n/format';

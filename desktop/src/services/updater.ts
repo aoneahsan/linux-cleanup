@@ -63,7 +63,7 @@ export async function installUpdate(): Promise<void> {
 }
 
 /** The public download page: the fallback when the in-app update cannot run. */
-export const RELEASES_URL = 'https://github.com/aoneahsan/macleanup/releases/latest';
+export const RELEASES_URL = 'https://github.com/aoneahsan/linux-cleanup/releases/latest';
 
 /**
  * The release gate's Update: check → download and install → (caller relaunches).

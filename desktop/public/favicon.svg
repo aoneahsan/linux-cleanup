@@ -1,4 +1,9 @@
-<svg width="64" height="64" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="macleanup">
-  <title>macleanup</title>
-  <rect width="1024" height="1024" rx="240" fill="#005F45"/><path fill="#FFFFFF" transform="translate(-42.67 -42.67) scale(1.0833)" d="M221.87 426.67L307.2 426.67A42.67 42.67 0 0 1 349.87 469.33L349.87 810.67A42.67 42.67 0 0 1 307.2 853.33L221.87 853.33A42.67 42.67 0 0 1 179.2 810.67L179.2 469.33A42.67 42.67 0 0 1 221.87 426.67ZM716.8 426.67L802.13 426.67A42.67 42.67 0 0 1 844.8 469.33L844.8 810.67A42.67 42.67 0 0 1 802.13 853.33L716.8 853.33A42.67 42.67 0 0 1 674.13 810.67L674.13 469.33A42.67 42.67 0 0 1 716.8 426.67ZM548.27 179.01L623.91 192.35A42.67 42.67 0 0 1 658.52 241.78L599.24 577.93A42.67 42.67 0 0 1 549.82 612.53L474.18 599.2A42.67 42.67 0 0 1 439.57 549.77L498.85 213.62A42.67 42.67 0 0 1 548.27 179.01Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="linux-cleanup">
+  <!-- The brand mark from the approved dummy: three receding bars on the Survey Chartreuse tile, turned -8°. -->
+  <g transform="rotate(-8 32 32)">
+    <rect x="8" y="8" width="48" height="48" fill="#e2c632"/>
+    <rect x="15" y="21" width="34" height="4" rx="2" fill="#2b2a24"/>
+    <rect x="15" y="30" width="25.5" height="4" rx="2" fill="#2b2a24"/>
+    <rect x="15" y="39" width="17" height="4" rx="2" fill="#2b2a24"/>
+  </g>
 </svg>

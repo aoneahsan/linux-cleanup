@@ -1,36 +1,31 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Button } from 'react-aria-components';
-import { Btn, Stamp, goTo } from '@/components/ui/primitives';
+import { Btn, goTo } from '@/components/ui/primitives';
 import { Icon } from '@/components/ui/Icon';
 import { PunchCard } from '@/components/allowance/PunchCard';
 import { useT, translate } from '@/i18n';
-import { SECTION_IDS, TIER, type Tier } from '@/data/sections';
-import { Plates } from '@/pages/overview/OverviewPage';
-import { useHealth } from '@/hooks/useLocal';
 import { usePublicConfig } from '@/hooks/usePublicConfig';
 import { usePrefs } from '@/stores/prefs';
 import { useSession } from '@/stores/session';
-import { openPrivacySettings } from '@/lib/open';
 import { signInWithGoogle } from '@/services/auth';
 import { env } from '@/config/env';
 import { toast } from '@/lib/feedback';
 
-const STEPS = [1, 2, 3, 4, 5] as const;
-const TIERS: Tier[] = ['routine', 'trash', 'permanent', 'read'];
+const STEPS = [1, 2, 3] as const;
+/** The guard's protected folders (lib/common.sh PROTECTED_PATHS), shown as facts. */
+const KEPT = ['~/Documents', '~/Pictures', '~/Music', '~/Videos', '~/Desktop', '~/.ssh', '~/.gnupg', '~/.config'] as const;
 const pad = (n: number) => `0${n}`;
 
-/** First launch: five steps (welcome, safety, Full Disk Access, Open Anyway, optional sign-in). Step lives in the URL. */
+/** First launch: three steps (welcome, what stays, optional sign-in). The step lives in the URL. */
 export default function OnboardingPage() {
   const t = useT();
   const navigate = useNavigate({ from: '/onboarding' });
   const { step = 1 } = useSearch({ from: '/onboarding' });
   const markOnboarded = usePrefs((s) => s.markOnboarded);
   const signedIn = useSession((s) => s.signedIn);
-  const health = useHealth();
   const cfg = usePublicConfig();
   const go = (n: number) => void navigate({ search: { step: n === 1 ? undefined : n } });
   const finish = () => { markOnboarded(); goTo(navigate, '/'); };
-  const fda = health.data?.full_disk_access;
   const device = cfg.data?.deviceRuns;
   const extra = cfg.data?.accountExtraRuns;
   const nums = typeof device === 'number' && typeof extra === 'number';
@@ -66,7 +61,6 @@ export default function OnboardingPage() {
           <div className="panel">
             <div className="gauge-bar" aria-hidden="true">
               <span className="seg" data-k="used" style={{ flex: 3 }} />
-              <span className="seg" data-k="purge" style={{ flex: 0.3 }} />
               <span className="seg" data-k="free" style={{ flex: 5 }} />
             </div>
             <p className="lede mt-3">{t('help.onboarding.gaugeNote')}</p>
@@ -82,14 +76,10 @@ export default function OnboardingPage() {
             {nav}
           </div>
           <div className="panel">
-            <div className="tiers">
-              {TIERS.map((tier) => (
-                <div className="tier" key={tier}>
-                  <Stamp tier={tier} />
-                  <div>{t(`overview.tiers.${tier}`)}<Plates ids={SECTION_IDS.filter((n) => TIER[n] === tier)} /></div>
-                </div>
-              ))}
-            </div>
+            <ul className="path-list">
+              {KEPT.map((p) => <li key={p}><Icon name="lock" /><span className="path">{p}</span></li>)}
+            </ul>
+            <p className="help lede mt-3">{t('help.onboarding.keptNote')}</p>
           </div>
         </section>
       ) : null}
@@ -97,50 +87,8 @@ export default function OnboardingPage() {
         <section className="step-pane welcome" aria-labelledby="h-ob3">
           <div className="stack-v">
             <span className="dateline">{t('help.onboarding.d3')}</span>
-            <h1 id="h-ob3">{t('help.onboarding.h3')}</h1>
-            <p className="lede">{t('help.onboarding.p3')}</p>
-            <div className="row-actions">
-              <Btn onPress={() => void openPrivacySettings('fda').then((ok) => ok && toast(translate('help.onboarding.opened')))}>{t('help.onboarding.openPrivacy')}</Btn>
-              <Btn icon="refresh" onPress={() => void health.refetch()}>{t('help.onboarding.recheck')}</Btn>
-              <Btn variant="run" tag={t('common.next')} onPress={() => go(4)}>{t('help.onboarding.continue')}</Btn>
-              <Btn onPress={() => go(2)}>{t('common.back')}</Btn>
-            </div>
-            <p className="lede" aria-live="polite">
-              {fda === true ? t('help.onboarding.fdaGranted') : fda === false ? t('help.onboarding.fdaMissing') : t('help.onboarding.fdaUnknown')}
-            </p>
-          </div>
-          <div className="perm-card">
-            <Icon name="lock" />
-            <div>
-              <b>{t('help.onboarding.fdaTitle')}</b>
-              <ol><li>{t('help.onboarding.fda1')}</li><li>{t('help.onboarding.fda2')}</li><li>{t('help.onboarding.fda3')}</li></ol>
-            </div>
-          </div>
-        </section>
-      ) : null}
-      {step === 4 ? (
-        <section className="step-pane welcome" aria-labelledby="h-ob4">
-          <div className="stack-v">
-            <span className="dateline">{t('help.onboarding.d4')}</span>
-            <h1 id="h-ob4">{t('help.onboarding.h4')}</h1>
-            <p className="lede">{t('help.onboarding.p4')}</p>
-            {nav}
-          </div>
-          <div className="perm-card">
-            <Icon name="shield" />
-            <div>
-              <b>{t('help.onboarding.anywayTitle')}</b>
-              <ol><li>{t('help.onboarding.any1')}</li><li>{t('help.onboarding.any2')}</li><li>{t('help.onboarding.any3')}</li></ol>
-            </div>
-          </div>
-        </section>
-      ) : null}
-      {step === 5 ? (
-        <section className="step-pane welcome" aria-labelledby="h-ob5">
-          <div className="stack-v">
-            <span className="dateline">{t('help.onboarding.d5')}</span>
-            <h1 id="h-ob5">{nums ? t('help.onboarding.h5', { device, account: extra }) : t('help.onboarding.h5plain')}</h1>
-            <p className="lede">{nums ? t('help.onboarding.p5', { device, account: extra }) : t('help.onboarding.p5plain')}</p>
+            <h1 id="h-ob3">{nums ? t('help.onboarding.h3', { device, account: extra }) : t('help.onboarding.h3plain')}</h1>
+            <p className="lede">{nums ? t('help.onboarding.p3', { device, account: extra }) : t('help.onboarding.p3plain')}</p>
             <div className="row-actions">
               {env.accountsConfigured && !signedIn ? (
                 <Btn variant="run" icon="person" onPress={() => void signInWithGoogle().then(() => { toast(translate('help.onboarding.signedIn')); finish(); }).catch((e: unknown) => toast(translate('states.genericError', { message: e instanceof Error ? e.message : String(e) })))}>

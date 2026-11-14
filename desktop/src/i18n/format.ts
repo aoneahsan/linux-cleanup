@@ -3,7 +3,7 @@ import { FORMAT_LOCALE } from '@/i18n';
 
 const KIB = 1024;
 
-/** Kilobytes (1024-based, as macOS `df -k` reports) → "153.5 GiB". */
+/** Kilobytes (1024-based, as `df -k` reports) → "153.5 GiB". */
 export function formatKb(kb: number): string {
   const units = ['KB', 'MB', 'GB', 'TB'];
   let value = kb;

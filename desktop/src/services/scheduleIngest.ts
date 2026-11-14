@@ -1,7 +1,8 @@
 /**
- * Scheduled runs report back (CONTRACTS §2): at launch and every 15 minutes, read
- * each unread stream the LaunchAgent wrote, fold it with the one event parser into
- * a "scheduled" receipt, sync its numbers when signed in, then ack the file.
+ * Scheduled runs report back (CONTRACTS §2): at launch and whenever the window comes back,
+ * read each unread stream the systemd timer wrote, fold it with the one event parser into
+ * a "scheduled" receipt, sync its numbers when signed in, then ack the file. No timer: a
+ * scheduled run is seen the next time the person looks at the app.
  */
 import { finishStream, foldLines, initialRunState } from '@/lib/events';
 import { commands, isTauri } from '@/lib/tauri';
@@ -12,7 +13,6 @@ import { useReceipts } from '@/stores/receipts';
 import { loadSavedSchedules } from '@/services/schedulesLocal';
 import { afterRun } from '@/services/afterRun';
 
-const EVERY_MS = 15 * 60_000;
 let busy = false;
 
 /** Ingest every unread scheduled run once; returns how many were recorded. */
@@ -52,9 +52,14 @@ export async function ingestScheduleRuns(): Promise<number> {
   return n;
 }
 
-/** Ingest now and every 15 minutes while the app is open. Returns the cleanup. */
+/** Ingest now and each time the window comes back into view or focus. Returns the cleanup. */
 export function bindScheduleIngest(): () => void {
   void ingestScheduleRuns();
-  const timer = window.setInterval(() => void ingestScheduleRuns(), EVERY_MS);
-  return () => window.clearInterval(timer);
+  const onReturn = () => { if (!document.hidden) void ingestScheduleRuns(); };
+  document.addEventListener('visibilitychange', onReturn);
+  window.addEventListener('focus', onReturn);
+  return () => {
+    document.removeEventListener('visibilitychange', onReturn);
+    window.removeEventListener('focus', onReturn);
+  };
 }

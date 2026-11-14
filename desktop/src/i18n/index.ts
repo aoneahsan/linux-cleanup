@@ -26,7 +26,7 @@ const catalogues: Record<string, Catalogue> = Object.fromEntries(
 );
 
 /** Locale used for dates and numbers (the project's decided English locale). */
-export const FORMAT_LOCALE = 'en-US';
+export const FORMAT_LOCALE = 'en-GB';
 
 interface LocaleState {
   locale: string;

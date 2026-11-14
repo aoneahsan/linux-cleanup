@@ -95,7 +95,7 @@ function DeleteAccount({ signedIn, busy, onDelete }: { signedIn: boolean; busy: 
 
 interface DeviceRow { id: string; name: string | null; os_version: string | null; last_seen_at: string | null }
 
-/** The signed-in account's own Macs (RLS: select own), newest first, at most 20. */
+/** The signed-in account's own computers (RLS: select own), newest first, at most 20. */
 function Devices({ thisId }: { thisId: string | null }) {
   const t = useT();
   const userId = useSession((s) => s.userId);
@@ -167,10 +167,10 @@ export default function AccountPage() {
     const sb = supabase();
     if (!sb || !signedIn) { toast(translate('account.signInFirst')); return; }
     try {
-      // One server call returns every table the account owns (export_my_data); the file stays on this Mac.
+      // One server call returns every table the account owns (export_my_data); the file stays on this computer.
       const { data, error } = await sb.rpc('export_my_data');
       if (error) throw new Error(error.message);
-      const { path } = await commands.exportJson('macleanup-account.json', JSON.stringify(data, null, 2));
+      const { path } = await commands.exportJson('linux-cleanup-account.json', JSON.stringify(data, null, 2));
       toast(translate('account.downloaded', { path }));
     } catch (e) {
       toast(translate('states.genericError', { message: isAppError(e) ? e.message || e.kind : e instanceof Error ? e.message : String(e) }));

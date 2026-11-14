@@ -8,61 +8,50 @@ import { load, save } from '@/lib/storage';
 import { track } from '@/services/analytics';
 
 export interface Settings {
-  /** null = the CLI's own default (and ~/.macleanuprc) applies. */
-  ageDays: number | null;
-  largeFileGb: number | null;
   units: 'GiB' | 'GB';
-  scanRoots: string[];
-  excludes: string[];
   notify: boolean;
   updatesAuto: boolean;
   syncHistory: boolean;
   closeToMenuBar: boolean;
   /** Email me when a scheduled run finishes (off by default). */
   emailOnSchedule: boolean;
-  /** Pro: back up each real run's receipt summary when the run finishes (off by default). */
-  autoBackup: boolean;
   inviteCode: string | null;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  ageDays: null, largeFileGb: null, units: 'GiB', scanRoots: [], excludes: [],
-  notify: true, updatesAuto: true, syncHistory: true, closeToMenuBar: false, emailOnSchedule: false, autoBackup: false, inviteCode: null,
+  units: 'GiB',
+  notify: true, updatesAuto: true, syncHistory: true, closeToMenuBar: false, emailOnSchedule: false, inviteCode: null,
 };
 
-/** What the rulers show while the CLI default applies. */
-export const CLI_DEFAULTS = { ageDays: 100, largeFileGb: 1 } as const;
-
-export type ShortcutId = 'search' | 'preview' | 'appearance' | 'sections' | 'history' | 'cancel';
+export type ShortcutId = 'search' | 'preview' | 'appearance' | 'ledger' | 'history' | 'cancel';
 export type ShortcutGroup = 'everywhere' | 'navigation' | 'run';
 
 /** Defaults ship clash-free. */
 export const SHORTCUTS: readonly { id: ShortcutId; group: ShortcutGroup; keys: string }[] = [
-  { id: 'search', group: 'everywhere', keys: '⌘K' },
-  { id: 'preview', group: 'everywhere', keys: '⌘P' },
-  { id: 'appearance', group: 'everywhere', keys: '⌥⌘A' },
-  { id: 'sections', group: 'navigation', keys: '⌘2' },
-  { id: 'history', group: 'navigation', keys: '⌘3' },
-  { id: 'cancel', group: 'run', keys: '⌘.' },
+  { id: 'search', group: 'everywhere', keys: 'Ctrl+K' },
+  { id: 'preview', group: 'everywhere', keys: 'Ctrl+P' },
+  { id: 'appearance', group: 'everywhere', keys: 'Ctrl+Alt+A' },
+  { id: 'ledger', group: 'navigation', keys: 'Ctrl+2' },
+  { id: 'history', group: 'navigation', keys: 'Ctrl+3' },
+  { id: 'cancel', group: 'run', keys: 'Ctrl+.' },
 ];
 
 /**
- * Accelerators owned by the native macOS menu (menu.rs) and the system. They are
- * part of the same namespace, so a binding can never take one of them.
+ * Accelerators something else in the app already owns. The Linux build has no native menu
+ * (the tray carries Open, New preview and Quit), so nothing is reserved today; the map stays
+ * so a future menu accelerator joins the same clash check.
  */
-export const RESERVED: Readonly<Record<string, 'settings' | 'newPreview' | 'history' | 'quit' | 'close' | 'hide' | 'minimize'>> = {
-  '⌘,': 'settings', '⌘N': 'newPreview', '⌘Y': 'history', '⌘Q': 'quit', '⌘W': 'close', '⌘H': 'hide', '⌘M': 'minimize',
-};
+export const RESERVED: Readonly<Record<string, 'settings' | 'newPreview' | 'history' | 'quit' | 'close' | 'hide' | 'minimize'>> = {};
 export type BindResult = null | { kind: 'shortcut'; owner: ShortcutId } | { kind: 'menu'; item: (typeof RESERVED)[string] };
 
 const DEFAULT_BINDINGS = Object.fromEntries(SHORTCUTS.map((s) => [s.id, s.keys])) as Record<ShortcutId, string>;
 
-/** "⌃⌥⇧⌘K" from a key event, or null when no modifier other than Shift is held. */
+/** "Ctrl+Alt+Shift+Super+K" from a key event, or null when no modifier other than Shift is held. */
 export function comboFrom(e: Pick<KeyboardEvent, 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'key' | 'code'>): string | null {
   if (!e.metaKey && !e.ctrlKey && !e.altKey) return null;
   if (['Meta', 'Control', 'Alt', 'Shift'].includes(e.key)) return null;
   const key = /^Key[A-Z]$/.test(e.code) ? e.code.slice(3) : /^Digit\d$/.test(e.code) ? e.code.slice(5) : e.key.length === 1 ? e.key.toUpperCase() : e.key;
-  return `${e.ctrlKey ? '⌃' : ''}${e.altKey ? '⌥' : ''}${e.shiftKey ? '⇧' : ''}${e.metaKey ? '⌘' : ''}${key}`;
+  return `${e.ctrlKey ? 'Ctrl+' : ''}${e.altKey ? 'Alt+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.metaKey ? 'Super+' : ''}${key}`;
 }
 
 interface SettingsState {

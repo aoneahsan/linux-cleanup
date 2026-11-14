@@ -3,8 +3,8 @@ export default {
   inactive: {
     head: 'LICENCE CHECK',
     title: 'This licence is not active',
-    reason: 'The licence key in this build is revoked or unknown, so the app has stopped here. Nothing on this Mac was changed or deleted.',
+    reason: 'The licence key in this build is revoked or unknown, so the app has stopped here. Nothing on this computer was changed or deleted.',
     verify: 'Check the licence key ↗',
-    fine: 'Receipts, reports and settings stay on this Mac. The licence holder can renew or correct the key.',
+    fine: 'Receipts, reports and settings stay on this computer. The licence holder can renew or correct the key.',
   },
 } as const;

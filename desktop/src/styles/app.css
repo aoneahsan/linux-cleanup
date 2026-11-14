@@ -83,7 +83,7 @@
 .trio [data-selected][data-v="archive"] { background: var(--panel-2); color: var(--st-trash); box-shadow: inset 0 -2px 0 var(--st-trash); }
 .trio [data-selected][data-v="delete"] { background: var(--panel-2); color: var(--st-permanent); box-shadow: inset 0 -2px 0 var(--st-permanent); }
 .trio [data-focus-visible] { outline: 2px solid var(--focus); outline-offset: -2px; }
-.ledger td.sub { color: var(--muted); font-size: .72rem; }
+.ledger td.sub { display: table-cell; color: var(--muted); font-size: .72rem; }
 .link-plain { border: 0; background: none; padding: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; }
 .link-plain[data-hovered] .path { text-decoration: underline; }
 .capture[data-selected] { border-color: var(--accent); color: var(--accent); }

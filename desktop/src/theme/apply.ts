@@ -1,7 +1,7 @@
 /**
  * The single write path for every appearance axis. The pre-paint script stamps the
  * stored values on <html> before first paint; this keeps them, the store and
- * storage in step, and resolves `system` with a live macOS listener.
+ * storage in step, and resolves `system` with a live system listener.
  */
 import { create } from 'zustand';
 import { load, save } from '@/lib/storage';
@@ -53,7 +53,7 @@ export const useAppearance = create<AppearanceState>((setState, get) => ({
   },
 }));
 
-/** Apply every axis once at boot (repairs anything the pre-paint script skipped) and follow macOS. */
+/** Apply every axis once at boot (repairs anything the pre-paint script skipped) and follow the system setting. */
 export function initAppearance(): () => void {
   const { values, set } = useAppearance.getState();
   for (const axis of AXIS_ORDER) set(axis, values[axis], false);

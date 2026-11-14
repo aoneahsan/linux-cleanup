@@ -315,3 +315,9 @@ textarea.note-field::placeholder { color: var(--muted); }
   .ask-summary li { grid-template-columns: auto minmax(0, 1fr) auto; }
   .ask-summary li .stamp { grid-column: 2 / -1; justify-self: start; }
 }
+
+/* Protected folders on the Overview and in onboarding: a two-column list of named paths. */
+.path-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.path-list li { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-xs); background: var(--panel-2); }
+.path-list .path { font-family: var(--font-code); font-size: .8rem; overflow-wrap: anywhere; }
+.path-list svg { width: .9rem; height: .9rem; color: var(--muted); flex: none; }

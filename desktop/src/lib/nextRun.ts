@@ -1,6 +1,6 @@
 /**
- * When a schedule fires next, in the Mac's local time (LaunchAgent
- * StartCalendarInterval semantics: monthly day, else weekday, else daily).
+ * When a schedule fires next, in this computer's local time (the systemd OnCalendar the
+ * desktop writes: monthly day, else weekday, else daily; src-tauri/src/schedule.rs).
  */
 export interface Cadence {
   weekday: number | null;
