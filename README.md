@@ -15,6 +15,15 @@
 
 </div>
 
+<a id="available-on"></a>
+## 📦 Available on&nbsp;[#](#available-on)
+
+| Where | Link |
+|---|---|
+| npm | [`linux-cleanup`](https://www.npmjs.com/package/linux-cleanup) |
+| Website | [linux-cleanup.aoneahsan.com](https://linux-cleanup.aoneahsan.com) |
+| Everything | [All places](https://linux-cleanup.aoneahsan.com/apps) |
+
 > [!IMPORTANT]
 > **This tool deletes files, and deletion is permanent — there is no undo and nothing is archived first.**
 > It removes caches and build artefacts that regenerate on next use, never your documents. Start with
@@ -47,6 +56,7 @@ repository's README, `--help` and changelog describe the current behaviour.
 <a id="table-of-contents"></a>
 ## 🧭 Table of Contents&nbsp;[#](#table-of-contents)
 
+- [📦 Available on](#available-on)
 - [💡 Why linux-cleanup](#why-linux-cleanup)
 - [✨ Features](#features)
 - [📱 Platform Support](#platform-support)
