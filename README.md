@@ -21,6 +21,8 @@
 | Where | Link |
 |---|---|
 | npm | [`linux-cleanup`](https://www.npmjs.com/package/linux-cleanup) |
+| Desktop app for Linux (AppImage, .deb) | [Download](https://linux-cleanup.aoneahsan.com/download) |
+| Documentation | [linux-cleanup-docs.aoneahsan.com](https://linux-cleanup-docs.aoneahsan.com/) |
 | Website | [linux-cleanup.aoneahsan.com](https://linux-cleanup.aoneahsan.com) |
 | Everything | [All places](https://linux-cleanup.aoneahsan.com/apps) |
 
