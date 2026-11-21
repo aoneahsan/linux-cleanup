@@ -1,11 +1,17 @@
 # linux-cleanup — project guide
 
-**Last Updated:** 2026-11-10
+**Last Updated:** 2026-11-21
 
 <!-- fleet:node-26-13-1 v1 --> Node 26.13.1 LTS (.nvmrc), packages latest — 2026-11-16
 
 **Status:** production (reopened by the owner 2026-11-10, rebuilt as 2.0.0). Category: desktop app + CLI —
 this repo is the CLI; the desktop app, website and docs follow. Plan and open work: `../PENDING-TASKS.md`.
+
+🔴 **Branch `wip/cli-2.1.0` is retired (2026-11-21) — never push it.** It carried the private desktop app's source,
+which now lives only in private `aoneahsan/linux-cleanup-desktop`. This repository is PUBLIC: never add a
+`desktop/` folder or merge a branch that has one. A clone that still has `wip/cli-2.1.0` deletes it
+(`git branch -D wip/cli-2.1.0`); its CLI changes are on `main` since 2.1.0.
+
 
 | Context | Value |
 |---|---|
