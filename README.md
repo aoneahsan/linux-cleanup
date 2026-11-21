@@ -39,7 +39,7 @@ anywhere.
 
 | | |
 |---|---|
-| **Version** | `2.0.0` |
+| **Version** | `2.0.1` |
 | **License** | MIT |
 | **Node** | `>=14` (launcher only) |
 | **Runtime** | `bash >= 4.0` + GNU coreutils |
@@ -49,7 +49,7 @@ anywhere.
 | **Status** | Stable · actively maintained |
 
 **Documentation status (2026-11-10):** The package source and npm release
-are at 2.0.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
+are at 2.0.1. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
 was last fact-checked against 1.4.0 and is being rewritten for 2.0. Until then, this
 repository's README, `--help` and changelog describe the current behaviour.
 
@@ -470,7 +470,7 @@ More: [FAQ](https://github.com/aoneahsan/linux-cleanup/blob/main/docs/faq.md).
 <a id="changelog"></a>
 ## 🔄 Changelog&nbsp;[#](#changelog)
 
-Latest release: **`2.0.0`** — the rebuild: a real `--dry-run` that changes nothing anywhere, update notices from a public release record (urgent releases stop older copies until updated), `--refresh-app` for the copy the alias and cron use, and a self-test check proving the dry run cannot delete.
+Latest release: **`2.0.1`** (README: every released place). 2.0.0 was the rebuild: a real `--dry-run` that changes nothing anywhere, update notices from a public release record (urgent releases stop older copies until updated), `--refresh-app` for the copy the alias and cron use, and a self-test check proving the dry run cannot delete.
 Full history: [CHANGELOG.md](https://github.com/aoneahsan/linux-cleanup/blob/main/CHANGELOG.md).
 
 <a id="contributing"></a>

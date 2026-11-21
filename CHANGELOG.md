@@ -7,6 +7,13 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [2.0.1] — 2026-11-21
+
+### Changed
+
+- README: an "Available on" table under the badges lists every place linux-cleanup is released, with a link to
+  the Get linux-cleanup page. No code changes.
+
 ## [2.0.0] — 2026-11-10
 
 The rebuild. linux-cleanup is a production project again, and 2.0.0 is its
