@@ -48,10 +48,9 @@ anywhere.
 | **Undo** | None — deletion is one-way |
 | **Status** | Stable · actively maintained |
 
-**Documentation status (2026-11-10):** The package source and npm release
-are at 2.1.0. The separate [documentation site](https://github.com/aoneahsan/linux-cleanup-docs)
-was last fact-checked against 1.4.0 and is being rewritten for the current CLI. Until then, this
-repository's README, `--help` and changelog describe the current behaviour.
+**Documentation:** the [documentation site](https://linux-cleanup-docs.aoneahsan.com/) describes 2.1.0,
+including the [JSON event stream](https://linux-cleanup-docs.aoneahsan.com/reference/json-events) and the
+desktop app. `--help` and the changelog in this repository describe the same behaviour.
 
 <a id="table-of-contents"></a>
 ## 🧭 Table of Contents&nbsp;[#](#table-of-contents)
