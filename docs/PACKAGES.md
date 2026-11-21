@@ -2,7 +2,7 @@
 
 The dependency and manifest record for this package. Keep it accurate on every add, removal, or upgrade.
 
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-11-16
 
 ---
 
@@ -12,6 +12,12 @@ One `package.json`, at the repository root. There is no monorepo, no workspace m
 emits a second manifest — verified with
 `find . -name package.json -not -path './node_modules/*' -not -path './.git/*'`, which returns exactly one
 path. Publishing can therefore only ever happen from the repository root.
+
+## Node toolchain (2026-11-16)
+
+Development runs on Node 26.13.1 LTS: `.nvmrc` at the repository root. The published package's `engines.node`
+stays `>=14` — it is the install promise to users, not the development pin, and raising it is a major version
+bump (see Manifest decisions).
 
 ## Dependencies
 

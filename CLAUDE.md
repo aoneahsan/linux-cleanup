@@ -2,6 +2,8 @@
 
 **Last Updated:** 2026-11-10
 
+<!-- fleet:node-26-13-1 v1 --> Node 26.13.1 LTS (.nvmrc), packages latest — 2026-11-16
+
 **Status:** production (reopened by the owner 2026-11-10, rebuilt as 2.0.0). Category: desktop app + CLI —
 this repo is the CLI; the desktop app, website and docs follow. Plan and open work: `../PENDING-TASKS.md`.
 
