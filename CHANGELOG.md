@@ -7,12 +7,48 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [2.1.0] — 2026-11-21
+
+### Added
+
+- **`--json-events`** streams versioned local NDJSON for non-interactive
+  `--scan` and `--all-safe --yes` runs. A dry run reports proposed paths without
+  deleting them. Human output remains on stderr; the stream gives a desktop
+  client plan, path, mode-progress, refusal, disk-sample and summary events.
+- [Event reference](docs/reference/json-events.md) defines the version 1
+  envelope, field meanings and incomplete-run handling.
+
+### Safety
+
+- JSON strings escape control characters in paths. Protected-path refusals
+  emit a skip item and an error event. File-level prune events are emitted
+  after a successful deletion; dry-run events describe candidates only.
+- Personal-file discovery now omits protected roots, including `~/Desktop`,
+  which the path guard always refused at deletion time.
+- `--yes` now auto-accepts the shared confirmation prompt only in
+  `--all-safe`. Other modes keep their interactive decisions.
+- Partial downloads are confirmed one file at a time instead of as one batch.
+- Index selections such as `1,3,5-7` are split without shell globbing, so a
+  stray `*` can no longer expand to file names in the current directory.
+- Global-package lookup builds its candidate path from the function's own
+  arguments instead of values left in the calling scope.
+- The debug-bundle temporary folder is removed once, when its function returns.
+
+### Maintenance
+
+- `yarn lint:bash` now runs ShellCheck at warning level on every script.
+- Removed unused variables, including a contact phone number that nothing printed.
+
+---
+
 ## [2.0.1] — 2026-11-21
 
 ### Changed
 
 - README: an "Available on" table under the badges lists every place linux-cleanup is released, with a link to
   the Get linux-cleanup page. No code changes.
+
+---
 
 ## [2.0.0] — 2026-11-10
 
@@ -25,8 +61,9 @@ way to hear about fixes.
 - **`-n` / `--dry-run`.** Add it to any cleanup mode. The run walks the same
   steps and asks the same questions; every delete, package-manager command,
   `sudo` step, Docker prune and speed fix prints `[dry-run] would …` instead of
-  running. Nothing on disk, in a service or in a setting changes, and no session
-  report is written. Settings-only modes (`--install-alias`, `--install-cron`,
+  running. Cleanup targets, services and settings are unchanged; a local log
+  and update-check state may still be written. No JSON session report is
+  written. Settings-only modes (`--install-alias`, `--install-cron`,
   `--doctor`, the reports manager) say they do nothing under a dry run.
 - **`--self-test` check 8** puts a probe file through `safe_rm` and the dry-run
   wrapper with the dry run on, and fails if the file is gone.

@@ -1,0 +1,6 @@
+# lib/*.sh and modules/*.sh are sourced by cleanup.sh and share globals across files
+# (LINUX_CLEANUP_*, C_*, UNITS_FREED, ...). Per-file analysis cannot see the consumer,
+# so SC2034 (assigned but unused) is a false positive here. Truly dead variables are
+# removed by hand when found (2026-11-14 sweep: LINUX_CLEANUP_PHONE, C_MAG, installed_names,
+# safe_count, REPORT_FILE). Re-check trigger: if modules stop sharing globals, delete this.
+disable=SC2034

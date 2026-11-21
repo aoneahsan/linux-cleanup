@@ -2,7 +2,7 @@
 
 Fixed entries moved from `REPORTED-ISSUES.md`, original bodies intact, each with its resolution date and fixing version.
 
-**Last Updated:** 2026-09-18
+**Last Updated:** 2026-11-10
 
 ---
 
@@ -168,3 +168,14 @@ honours `LOG_DIR` (`~/.linux-cleanup/logs` under npx).
 **Symptom** — `newest_access_age_days` takes the freshest of `atime` and `mtime`. `noatime` is common SSD advice; with it the kernel never moves `atime`, so a distribution launched this morning reports the age of its download. At `-d 30` it is removed whole, and the whole-unit rule of 1.5.x makes that more thorough, not less. Nothing in the output hinted at it.
 
 **Why it was not caught earlier** — the author's machines mount `relatime`, where reads move `atime` at most once a day and the gate works.
+
+---
+
+### ISSUE-008 — `--yes` auto-accepts confirmations outside all-safe
+
+**Resolved:** 2026-11-10 · fixed in the 2.1.0 source candidate — `ui_confirm` auto-accepts only when the selected mode is `allsafe`. Partial downloads now ask once per file; protected personal roots are omitted before showing candidates.
+
+**Severity:** High (data safety) — `--partials --yes` could accept the single batch deletion prompt, and `--system --yes` could accept sudo cleanup prompts, contrary to the all-safe-only contract.
+**Affected:** at least 2.0.0 · **Found while working on:** the full project completion safety review, 2026-11-10.
+
+**Verification:** With `ASSUME_YES=1`, an isolated non-interactive helper check still required input for `partials` and `system`, while `allsafe` auto-confirmed. In a disposable home fixture, a partial file survived `--partials` with no confirmation and was removed only after an explicit `y`. A separate fixture showed protected `Desktop` and `Documents` roots omitted while `Downloads` remained. No real home or workspace cleanup was run.

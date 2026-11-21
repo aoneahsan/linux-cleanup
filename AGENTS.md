@@ -2,12 +2,14 @@
 
 **Last Updated:** 2026-11-10
 
+<!-- fleet:node-26-13-1 v1 --> Node 26.13.1 LTS (.nvmrc), packages latest — 2026-11-16
+
 **Status:** production (reopened by the owner 2026-11-10, rebuilt as 2.0.0). Category: desktop app + CLI —
 this repo is the CLI; the desktop app, website and docs follow. Plan and open work: `../PENDING-TASKS.md`.
 
 | Context | Value |
 |---|---|
-| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.0.0 |
+| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.1.0 |
 | Docs site | Public `../linux-cleanup-docs/` on its own `main` |
 | Container | Private `../` on `aoneahsan/linux-cleanup-website` `project-root` |
 | Fleet record | `../../../docs/tracking/fleet-maintenance-tracker.json` |
@@ -42,7 +44,7 @@ non-reversibility plainly. Keep package and docs histories independent.
 ## Local verification and release
 
 Use Yarn for local work. `yarn test` runs the built-in self-test;
-`bash -n cleanup.sh lib/*.sh modules/*.sh` checks shell syntax;
+`yarn lint:bash` checks shell syntax and runs ShellCheck at warning level (`.shellcheckrc` explains its one disable);
 `yarn run version:check` proves package.json, VERSION, lib/common.sh and release/stable.env agree. Inspect changes
 against the safety guards before any npm or GitHub release. The package
 has no app browser surface; the separate docs site has a build and
@@ -60,7 +62,7 @@ Any new command that deletes or changes something must go through
 settings-only mode starts with `dry_run_refuse`. Self-test check 8 proves
 the dry run on a probe file. On every publish, update `release/stable.env`
 (version, `urgency=normal|urgent`, one-sentence reason) in the same commit;
-an urgent record stops every older copy at start. Test the flow with
+an urgent record stops every older copy at start. Installed copies read the record from GitHub `main`, so a commit that changes it must not reach `main` before `npm publish` of that version succeeds: hold it on a `wip/` branch until then. Test the flow with
 `LINUX_CLEANUP_RELEASE_URL=file://…` and `LINUX_CLEANUP_CHANNEL=test`.
 
 ## ORCID / BibTeX record

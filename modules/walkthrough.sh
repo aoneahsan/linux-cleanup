@@ -84,7 +84,7 @@ session_report_finalize() {
   for s in "${REPORT_STEPS_JSON[@]}"; do
     case "$s" in
       *'"status":"ran"'*)            ((steps_run++)) ;;
-      *'"status":"skipped'*|*'"status":"skipped (quit)"'*) ((steps_skipped++)) ;;
+      *'"status":"skipped'*) ((steps_skipped++)) ;;
     esac
   done
 
@@ -135,7 +135,6 @@ session_report_finalize() {
 }
 JSON
   REPORT_FINALIZED=1
-  REPORT_FILE="$REPORT_JSON"  # back-compat name used elsewhere
 }
 
 # ── Quickstart welcome screen
