@@ -94,7 +94,7 @@ session_report_finalize() {
   "credits": {
     "tool": "linux-cleanup",
     "tool_version": $(json_str "$LINUX_CLEANUP_VERSION"),
-    "tool_homepage": $(json_str "$LINUX_CLEANUP_WEB"),
+    "tool_homepage": $(json_str "$LINUX_CLEANUP_HOME"),
     "tool_license": $(json_str "$LINUX_CLEANUP_LICENSE"),
     "author": {
       "name":     $(json_str "$LINUX_CLEANUP_AUTHOR"),

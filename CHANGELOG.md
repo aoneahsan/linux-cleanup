@@ -7,6 +7,23 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ---
 
+## [2.1.1] — 2026-11-22
+
+### Changed
+
+- `--help`, `--version`, the menu's About box and the feedback screen now list the
+  website, the manual and the desktop app's download page beside the author's
+  contact details.
+- The run report's `credits.tool_homepage` is the product website
+  (`https://linux-cleanup.aoneahsan.com`) instead of the author's site.
+- The npm page carries the README's desktop app and manual links.
+
+### Fixed
+
+- The About box said linux-cleanup makes no network calls. It reads the public
+  release record once at start; the box now says so, and it is tall enough for
+  every line.
+
 ## [2.1.0] — 2026-11-21
 
 ### Added

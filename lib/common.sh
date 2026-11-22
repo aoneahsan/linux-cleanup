@@ -2,12 +2,16 @@
 # common.sh — UI helpers, safety guards, sudo handling. Sourced, not executed.
 
 # Project metadata
-LINUX_CLEANUP_VERSION="2.1.0"
+LINUX_CLEANUP_VERSION="2.1.1"
 LINUX_CLEANUP_AUTHOR="Ahsan Mahmood"
 LINUX_CLEANUP_EMAIL="aoneahsan@gmail.com"
 LINUX_CLEANUP_WEB="https://aoneahsan.com"
 LINUX_CLEANUP_LINKEDIN="https://linkedin.com/in/aoneahsan"
 LINUX_CLEANUP_LICENSE="MIT License"
+# Where linux-cleanup lives: the website, the manual and the desktop app's download page.
+LINUX_CLEANUP_HOME="https://linux-cleanup.aoneahsan.com"
+LINUX_CLEANUP_DOCS="https://linux-cleanup-docs.aoneahsan.com"
+LINUX_CLEANUP_DESKTOP="https://linux-cleanup.aoneahsan.com/download"
 
 # Colors only when stdout is a TTY AND NO_COLOR is not set (de-facto standard).
 # Disable explicitly with --no-color flag (handled in cleanup.sh).

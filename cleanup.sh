@@ -186,7 +186,10 @@ ${C_BLD}OUTPUT${C_RST}  (where this tool writes)
   • Shell rc files: only via --install-alias or --doctor, and only after you confirm
 
 ${C_BLD}ABOUT${C_RST}
-  linux-cleanup v${LINUX_CLEANUP_VERSION}  ·  by ${LINUX_CLEANUP_AUTHOR} <${LINUX_CLEANUP_EMAIL}>
+  linux-cleanup v${LINUX_CLEANUP_VERSION}  ·  ${LINUX_CLEANUP_HOME}
+  Manual:      ${LINUX_CLEANUP_DOCS}
+  Desktop app: ${LINUX_CLEANUP_DESKTOP}  (AppImage and .deb)
+  By ${LINUX_CLEANUP_AUTHOR} <${LINUX_CLEANUP_EMAIL}>
   ${LINUX_CLEANUP_WEB}  ·  ${LINUX_CLEANUP_LINKEDIN}
   Licensed under: ${LINUX_CLEANUP_LICENSE}  (see LICENSE)
 EOF

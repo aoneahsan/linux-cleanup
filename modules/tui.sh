@@ -16,8 +16,8 @@ _lclean_tui_tool() {
 }
 
 _lclean_tui_msg() {
-  local tool="$1" title="$2" text="$3"
-  "$tool" --title "$title" --msgbox "$text" 16 78 3>&1 1>&2 2>&3 || true
+  local tool="$1" title="$2" text="$3" rows="${4:-16}"
+  "$tool" --title "$title" --msgbox "$text" "$rows" 78 3>&1 1>&2 2>&3 || true
 }
 
 _lclean_tui_yesno() {
@@ -86,6 +86,10 @@ run_tui() {
         _lclean_tui_msg "$tool" "About linux-cleanup" \
 "linux-cleanup v${LINUX_CLEANUP_VERSION}
 
+Website:  ${LINUX_CLEANUP_HOME}
+Manual:   ${LINUX_CLEANUP_DOCS}
+Desktop:  ${LINUX_CLEANUP_DESKTOP}
+
 Author:   ${LINUX_CLEANUP_AUTHOR}
 Email:    ${LINUX_CLEANUP_EMAIL}
 Web:      ${LINUX_CLEANUP_WEB}
@@ -93,9 +97,9 @@ LinkedIn: ${LINUX_CLEANUP_LINKEDIN}
 
 License:  ${LINUX_CLEANUP_LICENSE}
 
-linux-cleanup makes no network calls. No telemetry. No analytics.
-Logs and reports stay on your machine. Only what you explicitly
-email leaves this computer."
+linux-cleanup sends nothing about you: it only reads the public
+release record. No telemetry. No analytics. Logs and reports stay
+on your machine; only what you choose to email leaves it." 23
         continue
         ;;
       quit|"") break ;;

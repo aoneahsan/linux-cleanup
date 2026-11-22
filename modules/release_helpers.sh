@@ -7,6 +7,10 @@ show_version() {
   ${C_BLU}${C_BLD}linux-cleanup${C_RST} ${C_DIM}v${LINUX_CLEANUP_VERSION}${C_RST}
   Safe, modular disk + cache cleanup utility for Linux
 
+  ${C_DIM}Website:${C_RST}   $LINUX_CLEANUP_HOME
+  ${C_DIM}Manual:${C_RST}    $LINUX_CLEANUP_DOCS
+  ${C_DIM}Desktop:${C_RST}   $LINUX_CLEANUP_DESKTOP
+
   ${C_DIM}Author:${C_RST}    $LINUX_CLEANUP_AUTHOR
   ${C_DIM}Email:${C_RST}     $LINUX_CLEANUP_EMAIL
   ${C_DIM}Web:${C_RST}       $LINUX_CLEANUP_WEB
@@ -215,6 +219,7 @@ show_feedback() {
   printf '  Email:    %b%s%b\n'    "${C_BLD}" "$LINUX_CLEANUP_EMAIL"    "${C_RST}"
   printf '  Web:      %s\n'        "$LINUX_CLEANUP_WEB"
   printf '  LinkedIn: %s\n'        "$LINUX_CLEANUP_LINKEDIN"
+  printf '  Manual:   %s  (troubleshooting and the FAQ)\n' "$LINUX_CLEANUP_DOCS"
 
   printf '\n%bWhat to include in your report%b\n' "${C_BLD}" "${C_RST}"
   printf '  · Linux distribution + version\n'

@@ -15,7 +15,7 @@ which now lives only in private `aoneahsan/linux-cleanup-desktop`. This reposito
 
 | Context | Value |
 |---|---|
-| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.1.0 |
+| Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.1.1 |
 | Docs site | Public `../linux-cleanup-docs/` on its own `main` |
 | Container | Private `../` on `aoneahsan/linux-cleanup-website` `project-root` |
 | Fleet record | `../../../docs/tracking/fleet-maintenance-tracker.json` |
