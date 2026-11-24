@@ -27,3 +27,13 @@ npm-debug.log*
 
 # The desktop app is private (aoneahsan/linux-cleanup-desktop); never in this public repo
 /desktop/
+
+# Yarn 4 (Berry) — ignore cache/state, allow patches/plugins/releases/sdks/versions
+**/.yarn/install-state.gz
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
