@@ -85,3 +85,10 @@ type changes remain owner actions in the notebook manual-task record.
 <!-- RULE:stop-work-git-gate v2026-10-20 -->
 
 Before stopping, commit every legitimate change and work-progress checkpoint in this repository and each independent nested repository, fetch and merge the designated upstream, push the documented working branch, then verify an empty worktree and `0 0` ahead/behind. Never stash, discard, reset, rebase, or force-push. If synchronization is blocked, report the exact repository, branch, blocker, and next action instead of calling the work complete. The full workflow remains authoritative in `~/.claude/rules/git-workflow.md`.
+
+## Sub-agents — main context only (owner, 2026-11-07; reaffirmed 2026-11-26)
+
+Work in the main context window. Never start a custom `aoneahsan-ccca-*` sub-agent unless the owner approves it in
+this Claude Code or Codex session, in his own typed words; one approval covers that session only and a new session
+asks again. Never a default sub-agent, approved or not: default sub-agents cannot reach the custom skills.
+Law: `~/.claude/rules/subagent-orchestration.md`.
