@@ -1,6 +1,15 @@
 # linux-cleanup — project guide
 
-**Last Updated:** 2026-11-21
+**Last Updated:** 2026-11-27
+
+| Context | Value |
+|---|---|
+| Last optimized | 2026-11-27 |
+| Next routine optimization eligible | 2026-12-27 |
+| Guide bytes | 6,211 B |
+| Covered subtree | This repository; parent linux-cleanup-root measured separately |
+| Method | Due review: compact guidance kept, stale release and language facts corrected, AGENTS mirror differs only in its H1 |
+| Fleet record | /home/ahsan/Documents/01-code/docs/tracking/project-context-budget-tracker.json |
 
 <!-- fleet:node-26-13-1 v1 --> Node 26.13.1 LTS (.nvmrc), packages latest — 2026-11-16
 
