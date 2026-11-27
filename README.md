@@ -51,7 +51,7 @@ anywhere.
 | **Status** | Stable · actively maintained |
 
 **Documentation:** the [documentation site](https://linux-cleanup-docs.aoneahsan.com/) describes 2.1.0,
-including the [JSON event stream](https://linux-cleanup-docs.aoneahsan.com/reference/json-events) and the
+including the [JSON event stream](https://linux-cleanup-docs.aoneahsan.com/reference/json-events/) and the
 desktop app. `--help` and the changelog in this repository describe the same behaviour.
 
 <a id="table-of-contents"></a>
