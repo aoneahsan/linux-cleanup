@@ -21,7 +21,6 @@ which now lives only in private `aoneahsan/linux-cleanup-desktop`. This reposito
 `desktop/` folder or merge a branch that has one. A clone that still has `wip/cli-2.1.0` deletes it
 (`git branch -D wip/cli-2.1.0`); its CLI changes are on `main` since 2.1.0.
 
-
 | Context | Value |
 |---|---|
 | Package | Public `aoneahsan/linux-cleanup` on `main`; source version 2.1.1 |
@@ -37,6 +36,14 @@ version check and isolated package/build checks. Never test a real
 deletion against the workspace, home directory or system. The self-test
 checks protected paths without deleting them; redirect its logs/reports
 to a temporary directory.
+
+<!-- issue-queues:v1 -->
+## 🔴 Open issues — read first, every session
+
+This repository's open defects are in `docs/REPORTED-ISSUES.md`. Read it at the start of every session, before other
+work, and fix what your task allows. A fixed entry moves to `docs/RESOLVED-ISSUES.md` with its date and the fixing commit
+or version; nothing is deleted. The project root's `CLAUDE.md` lists the queues of the sibling repositories.
+<!-- /issue-queues:v1 -->
 
 ## Route by task
 
